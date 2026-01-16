@@ -1,4 +1,8 @@
 
+
+
+```Diseño e implementación de una plataforma web y móvil para el reporte, gestión y análisis de eventos adversos posteriores a la vacunación en el contexto del Instituto Finlay de Vacunas```
+
 # 📌 Contexto del sistema
 
 El sistema propone una **plataforma web y móvil** para el **reporte, gestión y análisis de eventos adversos posteriores a la vacunación**, orientada al Instituto Finlay de Vacunas. Permitirá a **ciudadanos y profesionales de la salud** registrar reportes, mientras que **autoridades sanitarias** podrán analizarlos para apoyar la **farmacovigilancia** y la toma de decisiones.
@@ -195,13 +199,3 @@ El sistema deberá validar datos para:
 
 ---
 
-## 🧠 (Plus para lucirte) Requerimientos de futuro
-
-### RNF-11
-
-El sistema deberá permitir la incorporación futura de:
-
-* Modelos de ML para detección temprana de señales adversas
-* Análisis predictivo de riesgos
-
----
