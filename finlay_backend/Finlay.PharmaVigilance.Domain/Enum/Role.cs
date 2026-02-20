@@ -7,7 +7,7 @@ public enum UserRole
     Supervisor
 }
 
-public static class UserroleHelper
+public static class UserRoleHelper
 {
     /// <summary>
     /// Validates whether the specified role belongs to any of the registered roles
