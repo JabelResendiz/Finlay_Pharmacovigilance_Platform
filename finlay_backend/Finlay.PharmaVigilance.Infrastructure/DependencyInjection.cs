@@ -5,16 +5,16 @@ using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Finlay.PharmaVigilance.Domain.Entities;
-//using Finlay.PharmaVigilance.Application.Common.Authentication;
-//using Finlay.PharmaVigilance.Infrastructure.Authentication;
-//using Microsoft.Extensions.Options;
-//using Finlay.PharmaVigilance.Application.Authentication;
-//using Finlay.PharmaVigilance.Infrastructure.Initializer;
+using Finlay.PharmaVigilance.Application.Common.Authentication;
+using Finlay.PharmaVigilance.Infrastructure.Authentication;
+using Microsoft.Extensions.Options;
+using Finlay.PharmaVigilance.Application.Authentication;
+using Finlay.PharmaVigilance.Infrastructure.Initializer;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Infrastructure.UnitOfWorkPattern;
-// using Microsoft.AspNetCore.Authentication.JwtBearer;
-// using Microsoft.IdentityModel.Tokens;
-// using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Builder;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -32,7 +32,7 @@ public static class DependencyInjection
 
         // Database Configuration
         var connectionString = configuration.GetConnectionString("AppDbConnectionString");
-        var db = services.AddDbContext<DbContext>(options => options.UseMySql(
+        var db = services.AddDbContext<FinlayDbContext>(options => options.UseMySql(
                                                         connectionString, ServerVersion.AutoDetect(connectionString)));
 
         // Add HttpContextAccessor for accessing the current HTTP context
@@ -40,17 +40,17 @@ public static class DependencyInjection
 
 
         // Authentication and Authorization
-        //services.AddAuth(configuration);
+        services.AddAuth(configuration);
 
-        // Identity configuration
-        // services.AddIdentity<User,Role>(options=>
-        //         {
-        //             options.User.RequireUniqueEmail = true;
+        //Identity configuration
+        services.AddIdentity<User,Role>(options=>
+                {
+                    options.User.RequireUniqueEmail = true;
 
-        //             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"; 
-        //         })
-        //        .AddEntityFrameworkStores<DbContext>() // Configures EF for Identity
-        //        .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"; 
+                })
+               .AddEntityFrameworkStores<FinlayDbContext>() // Configures EF for Identity
+               .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
 
 
         // Add custom repositories and services
@@ -71,10 +71,11 @@ public static class DependencyInjection
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IIdentityManager,IdentityManager>();
  
         //Register a service of type IHostedService in the dependency container
-        //services.AddHostedService<RoleInitializer>();
+        services.AddHostedService<RoleInitializer>();
 
 
 
@@ -89,37 +90,37 @@ public static class DependencyInjection
     /// <param name="services">The IServiceCollection to add services to.</param>
     /// <param name="configuration">The configuration object for accessing application settings.</param>
     /// <returns>The updated IServiceCollection.</returns>
-//     public static IServiceCollection AddAuth(this IServiceCollection services,
-//                                               ConfigurationManager configuration)
-//     {
-//         var jwtSettings = new JwtSettings();
-//         configuration.Bind(JwtSettings.SECTION_NAME, jwtSettings);
+    public static IServiceCollection AddAuth(this IServiceCollection services,
+                                              ConfigurationManager configuration)
+    {
+        var jwtSettings = new JwtSettings();
+        configuration.Bind(JwtSettings.SECTION_NAME, jwtSettings);
 
-//         services.AddSingleton(jwtSettings); // Registro directo para dependencias que lo necesiten como instancia
+        services.AddSingleton(jwtSettings); // Registro directo para dependencias que lo necesiten como instancia
 
-//         services.AddSingleton(Options.Create(jwtSettings));
+        services.AddSingleton(Options.Create(jwtSettings));
 
-//         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
-//         // Configuración de autenticación JWT
-//         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//                 .AddJwtBearer(options =>
-//                 {
-//                     options.TokenValidationParameters = new TokenValidationParameters
-//                     {
-//                         ValidateIssuer = true,
-//                         ValidateAudience = true,
-//                         ValidateLifetime = true,
-//                         ValidateIssuerSigningKey = true,
-//                         ValidIssuer = jwtSettings.Issuer,
-//                         ValidAudience = jwtSettings.Audience,
-//                         IssuerSigningKey = new SymmetricSecurityKey(
-//                             System.Text.Encoding.UTF8.GetBytes(jwtSettings.Secret))
-//                     };
-//                 });
+        // Configuración de autenticación JWT
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            System.Text.Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                    };
+                });
 
-//         return services;
-//     }
+        return services;
+    }
 
 }
 

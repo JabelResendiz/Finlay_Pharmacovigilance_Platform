@@ -1,9 +1,10 @@
 
 
+using Finlay.PharmaVigilance.Infrastructure.Initializer;
 using Finlay.PharmaVigilance.Api;
-//using Finlay.PharmaVigilance.Api.Middleware;
 using Finlay.PharmaVigilance.Application;
 using Finlay.PharmaVigilance.Infrastructure;
+using Finlay.PharmaVigilance.Api.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +29,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //await DatabaseInitializer.InitializeAsync(app.Services);
+    await DatabaseInitializer.InitializeAsync(app.Services);
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -36,7 +37,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 //app.UseCors("LocalhostPolicy");
         
-//app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

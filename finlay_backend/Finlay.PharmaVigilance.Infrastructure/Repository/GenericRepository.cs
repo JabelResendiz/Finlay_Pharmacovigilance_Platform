@@ -10,9 +10,9 @@ namespace Finlay.PharmaVigilance.Infrastructure.Repository;
 public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntity
 {
     protected readonly DbSet<T> _entity; // Represents the database set for the entity type T.
-    private DbContext _context; // Holds the database context for interacting with the database.
+    private FinlayDbContext _context; // Holds the database context for interacting with the database.
 
-    public GenericRepository(DbContext context)
+    public GenericRepository(FinlayDbContext context)
     {
         if (context == null)
             throw new ArgumentException(nameof(context));

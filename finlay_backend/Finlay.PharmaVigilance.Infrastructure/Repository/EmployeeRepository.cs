@@ -7,5 +7,5 @@ namespace Finlay.PharmaVigilance.Infrastructure.Repository;
 
 public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
 {
-    public EmployeeRepository(DbContext context) : base(context) { }
+    public EmployeeRepository(FinlayDbContext context) : base(context) { }
 }

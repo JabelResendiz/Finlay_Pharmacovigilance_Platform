@@ -1,5 +1,7 @@
 using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
+using Finlay.PharmaVigilance.Application.Services.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +23,7 @@ public static class DependencyInjection
 
         // Registers services related to Entities
 
-        //services.AddScoped<IIdentityService,IdentityService>();
+        services.AddScoped<IIdentityService,IdentityService>();
 
         services.AddScoped<IEmployeeQueryServices,EmployeeQueryServices>();
         services.AddScoped<IEmployeeCommandServices,EmployeeCommandServices>();

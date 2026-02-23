@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Finlay.PharmaVigilance.Infrastructure;
 
 
-public class DbContext : IdentityDbContext<User,Role,int>
+public class FinlayDbContext : IdentityDbContext<User,Role,int>
 {
-    public DbContext(DbContextOptions options) : base(options) {
+    public FinlayDbContext(DbContextOptions options) : base(options) {
 
     }
 

@@ -13,7 +13,7 @@ public interface IUnitOfWork : IDisposable
     /// <summary>
     /// Gets the repository for user-related operations.
     /// </summary>
-    //IUserRepository UserRepository { get; }
+    IUserRepository UserRepository { get; }
     
     //IDepartmentRepository DepartmentRepository {get;}
     /// <summary>

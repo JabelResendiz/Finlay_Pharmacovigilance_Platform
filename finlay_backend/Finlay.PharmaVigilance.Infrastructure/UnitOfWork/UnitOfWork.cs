@@ -10,19 +10,19 @@ namespace Finlay.PharmaVigilance.Infrastructure.UnitOfWorkPattern;
 // Pattern Unit of Work
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly DbContext _context;
+    private readonly FinlayDbContext _context;
     private Dictionary<Type, object> _repositories;
-    //public IUserRepository UserRepository { get; }
+    public IUserRepository UserRepository { get; }
     //public IDepartmentRepository DepartmentRepository { get; }
 
-    public UnitOfWork(DbContext context)
+    public UnitOfWork(FinlayDbContext context,IUserRepository userRepository)
 
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
 
         _repositories = new Dictionary<Type, object>();
 
-        // UserRepository = userRepository;
+        UserRepository = userRepository;
 
         // DepartmentRepository = departmentRepository;
 
