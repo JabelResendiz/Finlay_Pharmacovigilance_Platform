@@ -1,5 +1,5 @@
 namespace Finlay.PharmaVigilance.Domain.Entities;
 public class GenericEntity
 {
-    public int Id {get;set;}
+    public int id {get;set;}
 }
