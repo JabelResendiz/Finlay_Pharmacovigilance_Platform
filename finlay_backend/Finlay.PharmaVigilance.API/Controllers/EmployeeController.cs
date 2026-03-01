@@ -58,41 +58,6 @@ public class EmployeeController : ControllerBase
         return Ok(result);
     }   
 
-    // [HttpGet]
-    // [Route("GetPaged")]
-
-    // public async Task<IActionResult> GetPagedEmployee ([FromQuery]PagedRequestDto paged)
-    // {
-    //     paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
-
-    //     var result = await _employeeQueryService.GetAllPagedResultAsync(paged);
-        
-    //     return Ok (result);
-        
-    // }
-
-    // [HttpGet]
-    // [Route("GetAllSectionManager")]
-
-    // public async Task<ActionResult<IEnumerable<GetEmployeeDto>>> GetAllSectionManager ()
-    // {
-    //     var sectionManager = await _employeeQueryService.ListAllByRole(UserRole.SectionManager);
-
-    //     return Ok(sectionManager);
-    // }
-
-    // [HttpGet]
-    // [Route("GetAllShippingSupervisor")]
-
-    // public async Task<ActionResult<IEnumerable<GetEmployeeDto>>> GetAllShippingSupervisor()
-    // {
-    //     var supervisor = await _employeeQueryService.ListAllByRole(UserRole.ShippingSupervisor);
-
-    //     return Ok(supervisor);
-    // }
-
-    
-
     #endregion
 
     #region Command

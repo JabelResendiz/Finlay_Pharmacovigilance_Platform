@@ -24,37 +24,8 @@ public static class DependencyInjection
         // Registers services related to Entities
 
         services.AddScoped<IIdentityService,IdentityService>();
-
         services.AddScoped<IEmployeeQueryServices,EmployeeQueryServices>();
         services.AddScoped<IEmployeeCommandServices,EmployeeCommandServices>();
-        // services.AddScoped<ISectionQueryServices,SectionQueryServices>();
-        // services.AddScoped<ISectionCommandServices,SectionCommandServices>();
-        // services.AddScoped<IDepartmentQueryServices, DepartmentQueryServices>();
-        // services.AddScoped<IDepartmentCommandServices, DepartmentCommandServices>();
-        // services.AddScoped<ITechnicianQueryServices, TechnicianQueryServices>();
-        // services.AddScoped<ITechnicianCommandServices, TechnicianCommandServices>();
-        // services.AddScoped<IEquipmentReceptorQueryServices, EquipmentReceptorQueryServices>();
-        // services.AddScoped<IEquipmentReceptorCommandServices, EquipmentReceptorCommandServices>();
-        // services.AddScoped<IEvaluationQueryServices, EvaluationQueryServices>();
-        // services.AddScoped<IEvaluationCommandServices, EvaluationCommandServices>();
-        // services.AddScoped<IDoneMaintenanceCommandServices, DoneMaintenanceCommandServices>();
-        // services.AddScoped<IDoneMaintenanceQueryServices, DoneMaintenanceQueryServices>();
-        // services.AddScoped<IEquipmentCommandServices, EquipmentCommandServices>();
-        // services.AddScoped<IEquipmentQueryServices, EquipmentQueryServices>();
-        // services.AddScoped<IEquipmentDecommissioningCommandServices, EquipmentDecommissioningCommandServices>();
-        // services.AddScoped<IEquipmentDecommissioningQueryServices, EquipmentDecommissioningQueryServices>();
-        // services.AddScoped<ITransferRequestCommandServices, TransferRequestCommandServices>();
-        // services.AddScoped<ITransferRequestQueryServices, TransferRequestQueryServices>();
-        // services.AddScoped<ITransferCommandServices, TransferCommandServices>();
-        // services.AddScoped<ITransferQueryServices, TransferQueryServices>();
-        
-        // services.AddScoped<IAdminStatisticsService, AdminStatisticsService>();
-        // services.AddScoped<ITechnicianStatisticsService, TechnicianStatisticsService>();
-        // services.AddScoped<IReceptorStatisticsService, ReceptorStatisticsService>();
-        // services.AddScoped<IDirectorStatisticsService, DirectorStatisticsService>();
-        // services.AddScoped<ISectionManagerStatisticsService, SectionManagerStatisticsService>();
-
-        // services.AddScoped<StatisticsServicesContainer>();
         
         return services;
 

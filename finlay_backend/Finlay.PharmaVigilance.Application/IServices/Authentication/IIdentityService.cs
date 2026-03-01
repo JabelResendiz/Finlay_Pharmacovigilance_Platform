@@ -20,12 +20,16 @@ public interface IIdentityService
     /// </summary>
     /// <param name="userDto">The DTO containing the user's login details.</param>
     /// <returns>A Task representing the asynchronous operation, returning the generated token as a string if login is successful, otherwise null.</returns>
-    Task<string> LoginUserAsync(LoginUserDto userDto);
-
+    
+    
+    //Task<string> LoginUserAsync(LoginUserDto userDto);
+    Task<UserResponseDTO> LoginUserAsync(LoginUserDto loginDto);
+    
+    
     /// <summary>
     /// Update a user with the provided update credentials
     /// </summary>
     /// <param name="updateDto"></param>
     /// <returns></returns>
-    Task UpdateUserAsync (UpdateUserDto updateDto);
+    //Task UpdateUserAsync (UpdateUserDto updateDto);
 }

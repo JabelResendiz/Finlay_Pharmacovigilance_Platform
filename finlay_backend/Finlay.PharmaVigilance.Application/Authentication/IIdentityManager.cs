@@ -16,14 +16,14 @@ public interface IIdentityManager
 
 
     /// <summary>
-    /// Verifies if the provided username and password are valid.
+    /// Verifies if the provided email and password are valid.
     /// </summary>
-    /// <param name="username">The username to check.</param>
+    /// <param name="email">The email to check.</param>
     /// <param name="password">The password to verify.</param>
     /// <returns>
     /// The user object if the credentials are valid; otherwise, null.
     /// </returns>
-    Task<User?> CheckCredentialsAsync(string username, string password);
+    Task<User?> CheckCredentialsAsync(string email, string password);
 
 
     /// <summary>

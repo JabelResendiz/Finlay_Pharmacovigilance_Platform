@@ -14,7 +14,6 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Infrastructure.UnitOfWorkPattern;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Builder;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -53,24 +52,9 @@ public static class DependencyInjection
                .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
 
 
-        // Add custom repositories and services
-        // services.AddScoped<IUnitOfWork, UnitOfWork>();
-        // services.AddScoped<ITechnicianRepository, TechnicianRepository>();
-        // services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        // services.AddScoped<IEquipmentReceptorRepository, EquipmentReceptorRepository>();
-        // services.AddScoped<IUserRepository, UserRepository>();
-        // services.AddScoped<IEquipmentRepository, EquipmentRepository>();
-        // services.AddScoped<ISectionRepository, SectionRepository>();
-        // services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-        // services.AddScoped<IIdentityManager, IdentityManager>();
-        // services.AddScoped<IDoneMaintenanceRepository, DoneMaintenanceRepository>();
-        // services.AddScoped<IEvaluationRepository, EvaluationRepository>();
-        // services.AddScoped<IEquipmentDecommissioningRepository, EquipmentDecommissioningRepository>();
-        // services.AddScoped<ITransferRequestRepository, TransferRequestRepository>();
-        // services.AddScoped<ITransferRepository, TransferRepository>();
-        
+        // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IIdentityManager,IdentityManager>();
  

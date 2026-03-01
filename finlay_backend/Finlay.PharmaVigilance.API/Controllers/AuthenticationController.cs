@@ -22,8 +22,10 @@ public class AuthenticationController : ControllerBase
     {
         var result = await _identityService.RegisterUserAsync(registerDto);
         
-        return Ok(result);
-
+        return Ok( new
+        {
+            message = result
+        });
     }
 
     [HttpPost]
@@ -37,17 +39,4 @@ public class AuthenticationController : ControllerBase
 
     }
 
-    [HttpPut]
-    [Route("PUT")]
-    public async Task<IActionResult> UpdateUser(UpdateUserDto updateDto )
-    {
-        // System.Console.WriteLine("Aaaa==we=fger=gekrfogjdfioghuidsofhgushfjsdbhjfbsdjhkfbiuwehfuiweshbfjkbwsdhjfkbsdiufbsidhbfhsaAAAAAAA=============");
-        // System.Console.WriteLine($"{updateDto.Id.ToString()},{updateDto.Name},{updateDto.Email},{updateDto.DepartmentId},{updateDto.ExpYears},{updateDto.Salary},{updateDto.Specialty},{updateDto.UserName},{updateDto.UserRole}");
-        
-        
-        await _identityService.UpdateUserAsync(updateDto);
-        
-
-        return Ok();
-    }
 }

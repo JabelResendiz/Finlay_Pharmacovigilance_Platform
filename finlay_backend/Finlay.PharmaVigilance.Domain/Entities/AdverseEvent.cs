@@ -4,13 +4,13 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class AdverseEvent : GenericEntity
 {
-    public DateTime startDate {get;set;}
-    public string description {get;set;} = null!;
-    public SeverityLevel severity {get;set;}
-    public bool requiredHospitalization {get;set;}
-    public string treatment {get;set;} = null!;
-    public string notes {get;set;} = null!;
-    public string currentStatus {get;set;} = null!;
-    public DateTime createdAt {get;set;}
+    public DateTime StartDate {get;set;}
+    public string Description {get;set;} = null!;
+    public SeverityLevel Severity {get;set;}
+    public bool RequiredHospitalization {get;set;}
+    public string Treatment {get;set;} = null!;
+    public string Notes {get;set;} = null!;
+    public string CurrentStatus {get;set;} = null!;
+    public DateTime CreatedAt {get;set;}
 
 }

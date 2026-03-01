@@ -6,10 +6,10 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class Physician : GenericEntity{
    
-   public string fullName {get;set;} = null!;
-   public DateTime dateOfBirth {get;set;}
-   public Gender gender {get;set;}
-   public string medicalHistory {get;set;} = null!;
-   public DateTime createdAt {get;set;}
+   public string FullName {get;set;} = null!;
+   public DateTime DateOfBirth {get;set;}
+   public Gender Gender {get;set;}
+   public string MedicalHistory {get;set;} = null!;
+   public DateTime CreatedAt {get;set;}
    
 }

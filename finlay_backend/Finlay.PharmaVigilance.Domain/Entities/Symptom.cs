@@ -4,8 +4,8 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class Symptom : GenericEntity
 {
-    public string name {get;set;} = null!;
-    public string description {get;set;} = null!;
-    public string standardCode {get;set;} = null!;
-    public DateTime createdAt {get;set;}
+    public string Name {get;set;} = null!;
+    public string Description {get;set;} = null!;
+    public string StandardCode {get;set;} = null!;
+    public DateTime CreatedAt {get;set;}
 }

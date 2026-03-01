@@ -3,8 +3,8 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class AefiReport : GenericEntity
 {
-    public DateTime reportDate {get;set;}
-    public string generalNotes {get;set;} = null!;
-    public DateTime createdAt {get;set;}
+    public DateTime ReportDate {get;set;}
+    public string GeneralNotes {get;set;} = null!;
+    public DateTime CreatedAt {get;set;}
     
 }

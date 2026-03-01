@@ -3,9 +3,9 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class Vaccination : GenericEntity
 {
-    public string batchNumber {get;set;} = null!;
-    public string administrationSite {get;set;} = null!;
-    public int doseNumber {get;set;}
-    public DateTime createdAt {get;set;}
-    public DateTime administrationDate {get;set;}
+    public string BatchNumber {get;set;} = null!;
+    public string AdministrationSite {get;set;} = null!;
+    public int DoseNumber {get;set;}
+    public DateTime CreatedAt {get;set;}
+    public DateTime AdministrationDate {get;set;}
 }

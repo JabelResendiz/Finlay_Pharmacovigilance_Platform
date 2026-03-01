@@ -13,19 +13,14 @@ public class UnitOfWork : IUnitOfWork
     private readonly FinlayDbContext _context;
     private Dictionary<Type, object> _repositories;
     public IUserRepository UserRepository { get; }
-    //public IDepartmentRepository DepartmentRepository { get; }
 
-    public UnitOfWork(FinlayDbContext context,IUserRepository userRepository)
-
+    public UnitOfWork(FinlayDbContext context, IUserRepository userRepository)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
 
         _repositories = new Dictionary<Type, object>();
 
         UserRepository = userRepository;
-
-        // DepartmentRepository = departmentRepository;
-
 
     }
 

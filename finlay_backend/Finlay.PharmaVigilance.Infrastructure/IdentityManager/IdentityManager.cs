@@ -10,9 +10,9 @@ public class IdentityManager : IIdentityManager
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
 
-    public IdentityManager(UserManager<User> userManage, RoleManager<Role> roleManager)
+    public IdentityManager(UserManager<User> userManager, RoleManager<Role> roleManager)
     {
-        _userManager = userManage;
+        _userManager = userManager;
         _roleManager = roleManager;
     }
 
@@ -35,18 +35,6 @@ public class IdentityManager : IIdentityManager
     {
         
         var existingRole = await _roleManager.FindByNameAsync(role);
-        // if (existingRole == null)
-        // {
-        //     var newRole = new IdentityRole<int>(role);
-
-        //     var roleResult = await _roleManager.CreateAsync(newRole);
-            
-        //     if (!roleResult.Succeeded)
-        //     {
-        //         throw new Exception($"Error creating role  {role}: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
-        //     }
-        // }
-
         
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
@@ -62,10 +50,10 @@ public class IdentityManager : IIdentityManager
         }
     }
 
-    public async Task<User?> CheckCredentialsAsync(string username, string password)
+    public async Task<User?> CheckCredentialsAsync(string email, string password)
     {
         var user = await _userManager.Users
-                       .FirstOrDefaultAsync(u => u.UserName!.Equals(username));
+                       .FirstOrDefaultAsync(u => u.Email!.Equals(email));
 
         if (user is null)
             return null;

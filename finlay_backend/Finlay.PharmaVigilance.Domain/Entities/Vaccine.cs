@@ -3,10 +3,10 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class Vaccine : GenericEntity
 {
-    public string name {get;set;} = null!;
-    public string manufacturer {get;set;} = null!;
-    public string vaccineType {get;set;} = null!;
-    public string description {get;set;} = null!;
-    public DateTime createdAt {get;set;}
+    public string Name {get;set;} = null!;
+    public string Manufacturer {get;set;} = null!;
+    public string VaccineType {get;set;} = null!;
+    public string Description {get;set;} = null!;
+    public DateTime CreatedAt {get;set;}
 
 }

@@ -44,120 +44,117 @@ public class IdentityService : IIdentityService
     /// </summary>
     /// <param name="userDto">The login DTO containing username and password.</param>
     /// <returns>A JWT token if authentication is successful, otherwise null.</returns>
-    public async Task<string> LoginUserAsync(LoginUserDto userDto)
+    // public async Task<string> LoginUserAsync(LoginUserDto userDto)
+    // {
+    //     // Map the login DTO to the User model.
+    //     var user = _mapper.Map<User>(userDto);
+
+
+    //     // Check if the mapping or the user object is null.
+    //     if (user == null)
+    //         throw new Exception();
+
+    //     //Console.WriteLine("User mapped successfully: " + user.Email + " " + userDto.Password);
+    //     // Validate the user's credentials.
+    //     var savedUser = await _identityManager.CheckCredentialsAsync(user.Email!, userDto.Password);
+
+    //     //Console.WriteLine("candela");
+
+    //     // If the credentials are invalid, return null.
+    //     if (savedUser is null)
+    //         throw new Exception();
+
+    //     // If the credentials are valid, generate a token for the authenticated user.
+    //     return await _jwtTokenGenerator.GenerateToken(savedUser);
+
+    // }
+    public async Task<UserResponseDTO> LoginUserAsync(LoginUserDto loginDto)
     {
-        // Map the login DTO to the User model.
-        var user = _mapper.Map<User>(userDto);
-
-
-        // Check if the mapping or the user object is null.
-        if (user == null)
-            throw new Exception();
-
+        
         // Validate the user's credentials.
-        var savedUser = await _identityManager.CheckCredentialsAsync(user.UserName!, userDto.Password);
+        var savedUser = await _identityManager.CheckCredentialsAsync(
+            loginDto.Email, 
+            loginDto.Password
+        );
 
         // If the credentials are invalid, return null.
-        if (savedUser is null)
-            throw new Exception();
+        if (savedUser == null)
+            throw new Exception("invalid credentials");
+
+        // generate token for the authenticate user
+        var token = await _jwtTokenGenerator.GenerateToken(savedUser);
 
         // If the credentials are valid, generate a token for the authenticated user.
-        return await _jwtTokenGenerator.GenerateToken(savedUser);
+        return new UserResponseDTO
+        {
+            Id = savedUser.Id,
+            UserName = savedUser.UserName!,
+            Email = savedUser.Email!,
+            UserRole = savedUser.UserRole!,
+            Token = token
+        } ;
 
     }
+
+
+
     /// <summary>
     /// Registers a new user in the system.
     /// </summary>
     /// <param name="userDto">The register DTO containing user details.</param>
     /// <returns>A JWT token upon successful registration.</returns>
-
+    
     public async Task<string> RegisterUserAsync(RegisterUserDto userDto)
     {
-        //Console.WriteLine(userDto.DepartmentId);// Debug logging
-        try
-        {
-            // Check if the user role is valid
-            if (!UserRoleHelper.IsValidRole(userDto.UserRole))
+        //validate that the provided role is allowed
+        if (!UserRoleHelper.IsValidRole(userDto.UserRole))
+            throw new Exception("Invalid Role");
 
-                throw new Exception("Invalid Role");// Throw exception if role is invalid
+        // Map the DTO to the User entity
+        var user = _mapper.Map<User>(userDto);
 
-            // Map the user DTO to the User model
-            var user = _mapper.Map<User>(userDto);
+        // Create the user in ASP.NET Identity with the provided password
+        var savedUser = await _identityManager.CreateUserAsync(user, userDto.Password);
+    
+        if (savedUser == null)
+            throw new Exception("User creation failed");
 
-            // Handle different user roles
-            // if (userDto.UserRole == UserRole.ShippingSupervisor.ToString())
-            // {
-            //     // Create Shipping Supervisor entity
-            //     var supervisor = _mapper.Map<Employee>(userDto);
+        // Assign the specified role to the newly created user
+        await _identityManager.AddRoles(savedUser.Id.ToString(), userDto.UserRole);
 
-            //     await _unitOfWork.GetRepository<Employee>().CreateAsync(supervisor);
+        // Commit all changes to the database
+        await _unitOfWork.CompleteAsync();
 
-            //     await _unitOfWork.CompleteAsync(); // Save changes to database
-
-            //     return "Not token for this user"; // Return placeholder response
-
-
-            // }
-
-          
-                
-            // Create Employee entity
-            var employee = _mapper.Map<Employee>(userDto);
-  
-            employee.User = user;
-            //Console.WriteLine(employee.User);
-            await _unitOfWork.GetRepository<Employee>().CreateAsync(employee);
-
-
-            // Create user in database
-            var savedUser = await _identityManager.CreateUserAsync(user, userDto.Password);
-
-            // Add user roles to database
-            await _identityManager.AddRoles(savedUser.Id.ToString(), userDto.UserRole);
-
-            // Save changes to database
-            await _unitOfWork.CompleteAsync();
-            // Generate JWT token for the new user
-            var token = await _jwtTokenGenerator.GenerateToken(savedUser);
-
-            return token;
-        }
-        catch (Exception ex)
-        {
-            // Log any errors
-            Console.WriteLine($"Error: {ex.Message}");
-            throw; // Re-throw the exception
-        }
+        return "User created successfully";
     }
-
 
     /// <summary>
     /// Updates an existing user's details.
     /// </summary>
     /// <param name="updateDto">The update DTO containing user details.</param>
 
-    public async Task UpdateUserAsync(UpdateUserDto updateDto)
-    {
-        try
-        {
+    // public async Task UpdateUserAsync(UpdateUserDto updateDto)
+    // {
+    //     try
+    //     {
 
-            var employee = _mapper.Map<Employee>(updateDto);
+    //         var employee = _mapper.Map<Employee>(updateDto);
 
-            _unitOfWork.GetRepository<Employee>().Update(employee);
+    //         _unitOfWork.GetRepository<Employee>().Update(employee);
             
-            // Update user email if not ShippingSupervisor
+    //         // Update user email if not ShippingSupervisor
             
-            await _unitOfWork.UserRepository.UpdateByIdAsync(updateDto.Id, updateDto.Email);
-            // Save changes to database
-            await _unitOfWork.CompleteAsync();
+    //         await _unitOfWork.UserRepository.UpdateByIdAsync(updateDto.Id, updateDto.Email);
+    //         // Save changes to database
+    //         await _unitOfWork.CompleteAsync();
 
-        }
-        catch (Exception ex)
-        {
-            // Log any errors
-            throw new Exception(ex.Message);
-        }
-    }
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         // Log any errors
+    //         throw new Exception(ex.Message);
+    //     }
+    // }
 
 
 }
