@@ -22,10 +22,11 @@ public static class DependencyInjection
 
 
         // Registers services related to Entities
-
-        services.AddScoped<IIdentityService,IdentityService>();
-        services.AddScoped<IEmployeeQueryServices,EmployeeQueryServices>();
-        services.AddScoped<IEmployeeCommandServices,EmployeeCommandServices>();
+        services.AddScoped<IIdentityService, IdentityService>();
+        
+        // User Services
+        services.AddScoped<IUserQueryServices, UserQueryService>();
+        services.AddScoped<IUserCommandServices, UserCommandService>();
         
         return services;
 
