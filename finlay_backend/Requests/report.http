@@ -1,0 +1,46 @@
+@host = http://localhost:5137
+POST {{host}}/api/Report/POST
+Content-Type:  application/json
+
+{
+  "reportDate": "2026-03-07T17:24:24.248Z",
+  "generalNotes": "EL primer reporte",
+  "pacient": {
+    "fullName": "Jabel Resendiz Aguirre",
+    "address": "Charles Street",
+    "age": 22,
+    "dateOfBirth": "2018-04-18T17:24:24.248Z",
+    "gender": 0,
+    "province": 3
+  },
+  "vaccination": {
+    "vaccine": {
+      "name": "Abdala",
+      "vaccineType": "COVID-19",
+      "description": "Vacuna cubana",
+      "manufacturer": "Instituo Finlay Vacunas"
+    },
+    "batchNumber": "190-89-89-89",
+    "administrationSite": "Policlinico del Vedado",
+    "doseNumber": 2,
+    "administrationDate": "2026-03-07T17:24:24.248Z"
+  },
+  "adverseEvents": [
+    {
+      "startDate": "2026-03-07T17:24:24.248Z",
+      "description": "Primer evento adverso",
+      "severity": 2,
+      "requiredHospitalization": true,
+      "treatment": "sin tratamiento",
+      "notes": "asdad",
+      "currentStatus": "fuera de peligro",
+      "symptoms": [
+        {
+          "name": "cefalea",
+          "description": "asdfafd",
+          "standardCode": "190"
+        }
+      ]
+    }
+  ]
+}

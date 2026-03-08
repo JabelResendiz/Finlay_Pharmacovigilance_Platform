@@ -42,11 +42,11 @@ public static class DependencyInjection
         services.AddAuth(configuration);
 
         //Identity configuration
-        services.AddIdentity<User,Role>(options=>
+        services.AddIdentity<User, Role>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
 
-                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+"; 
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 })
                .AddEntityFrameworkStores<FinlayDbContext>() // Configures EF for Identity
                .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
@@ -56,8 +56,16 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IIdentityManager,IdentityManager>();
- 
+        services.AddScoped<IIdentityManager, IdentityManager>();
+        services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();
+        services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();
+        services.AddScoped<IPatientRepository, PatientRepository>();
+        services.AddScoped<IPhysicianRepository, PhysicianRepository>();
+        services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<ISymptomRepository, SymptomRepository>();
+        services.AddScoped<IVaccinationRepository, VaccinationRepository>();
+        services.AddScoped<IVaccineRepository, VaccineRepository>();
+
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();
 

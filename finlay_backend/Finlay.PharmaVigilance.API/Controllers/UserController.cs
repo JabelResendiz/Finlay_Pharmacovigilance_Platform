@@ -11,7 +11,7 @@ namespace Finlay.PharmaVigilance.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Requires authentication for all endpoints
+//[Authorize] // Requires authentication for all endpoints
 public class UserController : ControllerBase
 {
     private readonly IUserQueryServices _userQueryService;
@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     /// <response code="401">Unauthorized - authentication required.</response>
     /// <response code="403">Forbidden - requires administrator role.</response>
     [HttpGet]
-    // [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Supervisor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -80,7 +80,7 @@ public class UserController : ControllerBase
     /// <response code="403">Forbidden - requires administrator role.</response>
     /// <response code="404">User not found.</response>
     [HttpGet("search/{userName}")]
-    // [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Supervisor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -110,7 +110,7 @@ public class UserController : ControllerBase
     /// <response code="403">Forbidden - requires administrator role.</response>
     /// <response code="404">User not found.</response>
     [HttpDelete("{userId:int}")]
-    // [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Supervisor")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

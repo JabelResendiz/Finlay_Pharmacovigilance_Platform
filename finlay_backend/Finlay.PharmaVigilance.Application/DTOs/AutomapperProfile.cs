@@ -18,11 +18,22 @@ public class AutomapperProfile : Profile
             .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole));
 
 
-        CreateMap<User,GetUserDto>()
+        CreateMap<User, GetUserDto>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole));
 
+        CreateMap<SymptomDto, Symptom>();
+
+        CreateMap<PatientDto, Patient>();
+
+        CreateMap<VaccineDto, Vaccine>();
+
+        CreateMap<AdverseEventDto, AdverseEvent>();
+
+        CreateMap<VaccinationDto, Vaccination>();
+
+        CreateMap<ReportDto, AefiReport>();
     }
 }
 

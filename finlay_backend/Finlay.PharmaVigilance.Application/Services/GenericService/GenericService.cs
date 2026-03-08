@@ -8,25 +8,25 @@ using Microsoft.EntityFrameworkCore;
 namespace Finlay.PharmaVigilance.Application.Services;
 
 
-public class GenericQueryServices<TEntity,TDto> : IGenericQueryService<TEntity,TDto>  where TEntity:  GenericEntity
+public class GenericQueryService<TEntity, TDto> : IGenericQueryService<TEntity, TDto> where TEntity : GenericEntity
 {
     protected readonly IMapper _mapper;
     protected readonly IUnitOfWork _unitOfWork;
-    public GenericQueryServices(IUnitOfWork unitOfWork, IMapper mapper)
+    public GenericQueryService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
     }
 
-    public virtual Expression<Func<TEntity,object>> [] GetIncludes()
+    public virtual Expression<Func<TEntity, object>>[] GetIncludes()
     {
         return Array.Empty<Expression<Func<TEntity, object>>>();
     }
-    
+
     public async Task<IEnumerable<TDto>> ListAsync()
     {
         var includes = GetIncludes();
-        var dtoQuery =  _unitOfWork.GetRepository<TEntity>().GetAll();
+        var dtoQuery = _unitOfWork.GetRepository<TEntity>().GetAll();
 
         if (includes != null)
         {
@@ -37,7 +37,7 @@ public class GenericQueryServices<TEntity,TDto> : IGenericQueryService<TEntity,T
         }
 
         var dtoList = await dtoQuery.ToListAsync();
-        
+
         return dtoList.Select(_mapper.Map<TDto>);
     }
 
@@ -47,13 +47,13 @@ public class GenericQueryServices<TEntity,TDto> : IGenericQueryService<TEntity,T
         var includes = GetIncludes();
 
         var result = await _unitOfWork.GetRepository<TEntity>()
-                                      .GetByIdAsync(dto,default,includes);
+                                      .GetByIdAsync(dto, default, includes);
 
         return _mapper.Map<TDto>(result);
 
     }
 
-  
+
     // public async Task<PagedResultDto<TDto>> GetPagedResultByQueryAsync(PagedRequestDto paged, IQueryable<TEntity> query)
     // {
     //     var includes = GetIncludes();
