@@ -29,7 +29,8 @@ public class AutomapperProfile : Profile
 
         CreateMap<VaccineDto, Vaccine>();
 
-        CreateMap<AdverseEventDto, AdverseEvent>();
+        CreateMap<AdverseEventDto, AdverseEvent>()
+            .ForMember(dest => dest.AdverseEventSymptoms, opt => opt.MapFrom(src => src.Symptoms.Select(s => new AdverseEventSymptom { Symptom = new Symptom { Name = s.Name, Description = s.Description, StandardCode = s.StandardCode } })));
 
         CreateMap<VaccinationDto, Vaccination>();
 

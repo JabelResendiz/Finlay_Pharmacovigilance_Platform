@@ -31,38 +31,11 @@ public class ReportCommandService : IReportCommandService
         vaccination.Vaccine = vaccine;
         report.Vaccination = vaccination;
         report.Patient = patient;
-        // report.Vaccination = vaccinations;
-        // report.Vaccination.Vaccine = vaccine;
-
-        Console.WriteLine(report.ReportDate + " " + report.GeneralNotes);
-        Console.WriteLine(report.Patient.FullName + " " + report.Patient.Address + " " + report.Patient.Age + " " + report.Patient.DateOfBirth + " " + report.Patient.Gender + " " + report.Patient.Province);
-        // Console.WriteLine(report.Vaccination.BatchNumber + " " + report.Vaccination.AdministrationSite + " " + report.Vaccination.AdministrationDate + " " + report.Vaccination.DoseNumber);
-        // Console.WriteLine(report.Vaccination.Vaccine.Name + " " + report.Vaccination.Vaccine.VaccineType + " " + report.Vaccination.Vaccine.Description + " " + report.Vaccination.Vaccine.Manufacturer);
-
-
-        foreach (var aeDto in dto.AdverseEvents)
-        {
-            var adverseEvent = _mapper.Map<AdverseEvent>(aeDto);
-
-            foreach (var symptomDto in aeDto.Symptoms)
-            {
-                var symptom = _mapper.Map<Symptom>(symptomDto);
-
-                var adverseEventSymptom = new AdverseEventSymptom
-                {
-                    Symptom = symptom
-                };
-
-                adverseEvent.AdverseEventSymptoms.Add(adverseEventSymptom);
-            }
-
-            report.AdverseEvents.Add(adverseEvent);
-        }
+        report.PhysicianId = dto.PhysicianId;
 
         await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
-
-
         await _unitOfWork.CompleteAsync();
+        
         return dto;
     }
 

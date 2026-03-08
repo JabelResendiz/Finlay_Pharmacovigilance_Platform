@@ -5,6 +5,7 @@ Content-Type:  application/json
 {
   "reportDate": "2026-03-07T17:24:24.248Z",
   "generalNotes": "EL primer reporte",
+  "physicianId": 1,
   "pacient": {
     "fullName": "Jabel Resendiz Aguirre",
     "address": "Charles Street",
