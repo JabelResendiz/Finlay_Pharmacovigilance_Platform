@@ -1,12 +1,5 @@
 @host = http://localhost:5137
-@token = 
-GET {{host}}/api/User
-Content-Type:  application/json
 
-{
-  "name": "Jabel",
-  "userName": "JabelRA",
-  "email": "jabel@example.com",
-  "password": "Password_123!",
-  "userRole": "Supervisor"
-}
+GET {{host}}/api/User
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZ2l2ZW5fbmFtZSI6ImphYmVsIiwianRpIjoiODY1OWU2NDUtYjJmNC00MDNiLThjZmMtMTQ1NjEzOGFiZDgzIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiU3VwZXJ2aXNvciIsImV4cCI6MTc3MzUyMzUwMCwiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.UwoeXa1rwz6OiyeKymXVKZpTCDV6SjrEK3EnElsWTnE

@@ -1,5 +1,6 @@
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.Api.Controllers;
@@ -17,12 +18,12 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    // [Authorize(Roles = "Administrator")]
+    //[Authorize(Roles = "Administrator")]
     public async Task<IActionResult> RegisterUser(RegisterUserDto registerDto)
     {
         var result = await _identityService.RegisterUserAsync(registerDto);
-        
-        return Ok( new
+
+        return Ok(new
         {
             message = result
         });
@@ -30,7 +31,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-
+    //[Authorize(Roles = "Supervisor")]
     public async Task<IActionResult> LoginUser(LoginUserDto loginDto)
     {
 

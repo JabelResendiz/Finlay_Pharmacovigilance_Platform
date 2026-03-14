@@ -1,8 +1,24 @@
 @host = http://localhost:5137
+
+# SUpervisor
 POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
 {
-  "email": "eduardo@example.com",
+  "email": "jabel@example.com",
   "password": "Password_123!"
 }
+
+
+####
+#Physician
+POST {{host}}/api/Authentication/login
+Content-Type:  application/json
+
+{
+  "email": "carlos@example.com",
+  "password": "Password_123!"
+}
+
+
+

@@ -10,3 +10,29 @@ Content-Type:  application/json
   "password": "Password_123!",
   "userRole": "Supervisor"
 }
+
+####
+POST {{host}}/api/Authentication/register
+Content-Type:  application/json
+
+{
+  "name": "Jabel",
+  "userName": "jabel",
+  "email": "jabel@example.com",
+  "password": "Password_123!",
+  "userRole": "Supervisor"
+}
+
+
+
+####
+POST {{host}}/api/Authentication/register
+Content-Type:  application/json
+
+{
+  "name": "Carlos",
+  "userName": "carlos",
+  "email": "carlos@example.com",
+  "password": "Password_123!",
+  "userRole": "Physician"
+}

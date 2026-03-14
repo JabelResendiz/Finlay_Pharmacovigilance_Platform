@@ -14,6 +14,8 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Infrastructure.UnitOfWorkPattern;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -37,10 +39,6 @@ public static class DependencyInjection
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
 
-
-        // Authentication and Authorization
-        services.AddAuth(configuration);
-
         //Identity configuration
         services.AddIdentity<User, Role>(options =>
                 {
@@ -50,6 +48,9 @@ public static class DependencyInjection
                 })
                .AddEntityFrameworkStores<FinlayDbContext>() // Configures EF for Identity
                .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
+
+        // Authentication and Authorization
+        services.AddAuth(configuration);
 
 
         // Add custom repositories and services       
@@ -95,7 +96,11 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         // Configuración de autenticación JWT
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -108,6 +113,36 @@ public static class DependencyInjection
                         ValidAudience = jwtSettings.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(
                             System.Text.Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = async context =>
+                        {
+                            context.HandleResponse(); // evita el comportamiento default (302 redirect)
+                            context.Response.StatusCode = 401;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                            {
+                                success = false,
+                                status = 401,
+                                message = "Unauthorized. A valid JWT token is required."
+                            }));
+                        },
+
+                        OnForbidden = async context =>
+                        {
+                            context.Response.StatusCode = 403;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                            {
+                                success = false,
+                                status = 403,
+                                message = "Forbidden. You do not have permission to access this resource."
+                            }));
+                        }
                     };
                 });
 

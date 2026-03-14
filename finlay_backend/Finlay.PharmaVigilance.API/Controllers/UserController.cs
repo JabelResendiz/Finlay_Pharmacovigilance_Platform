@@ -33,10 +33,7 @@ public class UserController : ControllerBase
     /// <response code="401">Unauthorized - authentication required.</response>
     /// <response code="403">Forbidden - requires administrator role.</response>
     [HttpGet]
-    //[Authorize(Roles = "Supervisor")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Supervisor")]
     public async Task<ActionResult<IEnumerable<GetUserDto>>> GetAllUsers()
     {
         var users = await _userQueryService.ListAsync();
