@@ -10,6 +10,5 @@ public class Vaccine : GenericEntity
     //public DateTime CreatedAt { get; set; }
 
 
-
     public ICollection<Vaccination> Vaccinations { get; set; } = new List<Vaccination>();
 }
