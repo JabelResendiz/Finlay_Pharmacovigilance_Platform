@@ -116,7 +116,8 @@ El proceso no quita que se active el proceso de alerta, porque incluso si el aut
 
 ---
 
-# Numero de Referencai y Seguimineto
+# Numero de Referencia y Seguimiento
+
 Para permitir que el sistema sea accesible sin necesidad de un registro previo obligatorio para todos los usuarios, se implementa un mecanismo de seguimiento basado en un identificador único.
 
 - **Acuse de Recibo:** Una vez enviado el reporte inicial, el sistema genera automáticamente un informe de acuse de recibo que se envía al notificador

@@ -3,21 +3,21 @@ namespace Finlay.PharmaVigilance.Domain.Enum;
 
 public enum Province
 {
-    PinardelRio,
+    PinarDelRio,
     Artemisa,
     Mayabeque,
-    IslaJuventud,
+    IslaDeLaJuventud,
     LaHabana,
     Matanzas,
     Cienfuegos,
     VillaClara,
     SanctiSpiritus,
-    CiegoAvila,
+    CiegoDeAvila,
     Camaguey,
     LasTunas,
     Granma,
     Holguin,
-    SantiagoCuba,
+    SantiagoDeCuba,
     Guantanamo
 }
 
