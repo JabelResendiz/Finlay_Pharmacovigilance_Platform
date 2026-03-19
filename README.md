@@ -251,3 +251,181 @@ Esto permite maximizar la cantidad de reportes recibidos mientras se mantiene co
 
 ---
 
+
+# Autenticación y gestión de usuarios (médicos y responsables)
+
+Un aspecto clave del sistema es definir **cómo se crean y acceden los usuarios internos**, específicamente:
+
+* médicos (validan y completan reportes)
+* responsables de sección (gestionan médicos por área)
+* administradores (gestionan el sistema)
+
+Dado que se trata de un **sistema institucional cerrado**, no se permite registro público.
+Los usuarios son creados por niveles superiores dentro de la organización.
+
+---
+
+## Modelos de creación y autenticación de usuarios
+
+### 1. Creación por responsable con contraseña temporal (modelo recomendado)
+
+En este modelo, un usuario superior crea las cuentas de los usuarios subordinados.
+
+#### Flujo
+
+1. El responsable crea un médico en el sistema:
+
+   * username (puede ser CI o generado)
+   * contraseña temporal (ej: `Medico#1234`)
+   * `MustChangePassword = true`
+
+2. El responsable comunica las credenciales:
+
+   * en persona
+   * por vía institucional interna
+
+3. El médico inicia sesión:
+
+   * introduce usuario + contraseña temporal
+
+4. El sistema detecta que debe cambiar la contraseña:
+
+   * redirige automáticamente a cambio de contraseña
+
+5. El médico define su contraseña definitiva
+
+---
+
+#### Ventajas
+
+* no depende de correo electrónico
+* funciona en entornos con baja conectividad
+* control total por parte de la institución
+* flujo utilizado en sistemas hospitalarios y gubernamentales
+
+---
+
+#### Desventajas
+
+* requiere comunicación manual de credenciales
+* depende del responsable para la creación inicial
+
+---
+
+### 2. Contraseña inicial basada en CI (modelo práctico)
+
+En este modelo se utiliza el CI como base de autenticación inicial.
+
+#### Flujo
+
+1. El responsable crea el usuario:
+
+   * username = CI
+   * contraseña inicial = CI o parte del CI
+   * `MustChangePassword = true`
+
+2. El médico inicia sesión con esos datos
+
+3. El sistema obliga a cambiar la contraseña
+
+---
+
+#### Ventajas
+
+* no requiere enviar credenciales
+* fácil de recordar para el usuario
+* muy práctico en entornos institucionales
+
+---
+
+#### Desventajas
+
+* menor seguridad inicial
+* requiere forzar cambio de contraseña obligatoriamente
+
+---
+
+### 3. Activación mediante enlace (modelo moderno)
+
+En este modelo el usuario define su contraseña mediante un enlace de activación.
+
+#### Flujo
+
+1. El responsable crea el usuario sin contraseña
+
+2. El sistema genera un token de activación:
+
+   ```go
+   /activate-account?token=xyz
+   ```
+
+3. El usuario recibe el enlace (correo u otro medio)
+
+4. El usuario accede al enlace y define su contraseña
+
+---
+
+#### Ventajas
+
+* mayor seguridad
+* el usuario crea su propia contraseña
+* evita compartir credenciales
+
+---
+
+#### Desventajas
+
+* depende de correo electrónico o mensajería
+* no siempre viable en entornos con baja conectividad (ej: Cuba)
+
+---
+
+## Gestión por niveles de usuarios
+
+### Administradores
+
+Los administradores son pocos usuarios (generalmente 2 o 3) y tienen control total del sistema.
+
+#### Flujo
+
+1. Las cuentas se crean manualmente:
+
+   * directamente en la base de datos o por script
+
+2. Se asigna una contraseña segura:
+
+   * generada manualmente
+
+3. Las credenciales se entregan por vía segura:
+
+   * en persona
+   * canal interno confiable
+
+4. Se recomienda cambio de contraseña en primer acceso
+
+---
+
+#### Ventajas
+
+* máximo control
+* alta seguridad
+* adecuado para pocos usuarios críticos
+
+---
+
+## Recomendación final del sistema
+
+Para un sistema institucional como este:
+
+✔ Administradores
+→ creación manual + credenciales seguras
+
+✔ Responsables
+→ contraseña temporal + cambio obligatorio
+
+✔ Médicos
+→ contraseña temporal o CI + cambio obligatorio
+
+❌ No usar autenticación sin contraseña
+
+---

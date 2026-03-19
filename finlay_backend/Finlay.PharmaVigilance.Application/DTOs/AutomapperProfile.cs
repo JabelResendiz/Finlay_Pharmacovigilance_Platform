@@ -25,16 +25,36 @@ public class AutomapperProfile : Profile
 
         CreateMap<SymptomDto, Symptom>();
 
-        CreateMap<PatientDto, Patient>();
-
         CreateMap<VaccineDto, Vaccine>();
 
         CreateMap<AdverseEventDto, AdverseEvent>()
-            .ForMember(dest => dest.AdverseEventSymptoms, opt => opt.MapFrom(src => src.Symptoms.Select(s => new AdverseEventSymptom { Symptom = new Symptom { Name = s.Name, Description = s.Description, StandardCode = s.StandardCode } })));
+            .ForMember(dest => dest.AdverseEventSymptoms,
+                opt => opt.MapFrom(
+                    src => src.Symptoms.Select(
+                        s => new AdverseEventSymptom
+                        {
+                            Symptom = new Symptom
+                            {
+                                Name = s.Name,
+                                Description = s.Description,
+                                StandardCode = s.StandardCode
+                            }
+                        }
+                        )
+                )
+            );
 
         CreateMap<VaccinationDto, Vaccination>();
 
         CreateMap<ReportDto, AefiReport>();
+
+
+        // MedicalReviewer
+
+        CreateMap<RegisterMedicalReviewerDto, MedicalReviewer>();
+
+        CreateMap<MedicalReviewer, LoginMedicalReviewerDto>();
+
     }
 }
 

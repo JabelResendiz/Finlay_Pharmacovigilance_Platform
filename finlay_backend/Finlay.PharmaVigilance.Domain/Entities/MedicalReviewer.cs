@@ -1,5 +1,4 @@
 
-using System.Dynamic;
 using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
@@ -7,7 +6,7 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class MedicalReviewer : GenericEntity
 {
-   //public string FullName { get; set; } = null!;
+   public string FullName { get; set; } = null!;
    public DateTime DateOfBirth { get; set; }
    public Gender Gender { get; set; }
    public int ProvinceId { get; set; }
