@@ -1,9 +1,9 @@
 
 
-namespace Finlay.PharmaVigilance.Application.DTO;
+// namespace Finlay.PharmaVigilance.Application.DTO;
 
 
-public class ReportResponseDto
-{
+// public class ReportResponseDto
+// {
 
-}
+// }

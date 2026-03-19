@@ -42,32 +42,8 @@ public class IdentityService : IIdentityService
     /// <summary>
     /// Authenticates a user based on the provided credentials.
     /// </summary>
-    /// <param name="userDto">The login DTO containing username and password.</param>
+    /// <param name="loginDto">The login DTO containing username and password.</param>
     /// <returns>A JWT token if authentication is successful, otherwise null.</returns>
-    // public async Task<string> LoginUserAsync(LoginUserDto userDto)
-    // {
-    //     // Map the login DTO to the User model.
-    //     var user = _mapper.Map<User>(userDto);
-
-
-    //     // Check if the mapping or the user object is null.
-    //     if (user == null)
-    //         throw new Exception();
-
-    //     //Console.WriteLine("User mapped successfully: " + user.Email + " " + userDto.Password);
-    //     // Validate the user's credentials.
-    //     var savedUser = await _identityManager.CheckCredentialsAsync(user.Email!, userDto.Password);
-
-    //     //Console.WriteLine("candela");
-
-    //     // If the credentials are invalid, return null.
-    //     if (savedUser is null)
-    //         throw new Exception();
-
-    //     // If the credentials are valid, generate a token for the authenticated user.
-    //     return await _jwtTokenGenerator.GenerateToken(savedUser);
-
-    // }
     public async Task<UserResponseDTO> LoginUserAsync(LoginUserDto loginDto)
     {
         

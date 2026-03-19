@@ -14,8 +14,8 @@ public class MedicalReviewer : GenericEntity
    public int MunicipalityId { get; set; }
    public Municipality Municipality { get; set; } = null!;
    public string HealthArea { get; set; } = null!;
-   public string PhoneNumber { get; set; } = null!;
-   public string Email { get; set; } = null!;
+   // public string PhoneNumber { get; set; } = null!;
+   // public string Email { get; set; } = null!;
 
    // FK
    public int UserId { get; set; }

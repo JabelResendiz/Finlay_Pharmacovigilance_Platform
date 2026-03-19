@@ -1,8 +1,8 @@
-using Finlay.PharmaVigilance.Application.DTO;
+// using Finlay.PharmaVigilance.Application.DTO;
 
-namespace Finlay.PharmaVigilance.Application.IServices;
+// namespace Finlay.PharmaVigilance.Application.IServices;
 
-public interface IReportCommandService : IGenericCommandService<ReportDto>
-{
+// public interface IReportCommandService : IGenericCommandService<ReportDto>
+// {
 
-}
+// }

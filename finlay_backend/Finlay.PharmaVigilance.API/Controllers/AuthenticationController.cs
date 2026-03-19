@@ -17,9 +17,9 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost]
-    [Route("register")]
+    [Route("register-medical-reviewer")]
     //[Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> RegisterUser(RegisterUserDto registerDto)
+    public async Task<IActionResult> RegisterMedicalReviewer(RegisterMedicalReviewerDto registerDto)
     {
         var result = await _identityService.RegisterUserAsync(registerDto);
 

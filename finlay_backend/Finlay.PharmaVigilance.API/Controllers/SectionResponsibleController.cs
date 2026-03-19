@@ -5,29 +5,29 @@ using Microsoft.AspNetCore.Mvc;
 namespace Finlay.PharmaVigilance.Api.Controllers;
 
 /// <summary>
-/// API Controller responsible for managing Medical Reviewer user operations.
-/// Provides endpoints for registration of Medical Reviewer users.
+/// API Controller responsible for managing Section Responsible user operations.
+/// Provides endpoints for registration of Section Responsible users.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class MedicalReviewerController : ControllerBase
+public class SectionResponsibleController : ControllerBase
 {
-    private readonly IMedicalReviewerService _medicalReviewerService;
+    private readonly ISectionResponsibleService _sectionResponsibleService;
 
     /// <summary>
-    /// Initializes a new instance of the MedicalReviewerController class.
+    /// Initializes a new instance of the SectionResponsibleController class.
     /// </summary>
-    public MedicalReviewerController(IMedicalReviewerService medicalReviewerService)
+    public SectionResponsibleController(ISectionResponsibleService sectionResponsibleService)
     {
-        _medicalReviewerService = medicalReviewerService;
+        _sectionResponsibleService = sectionResponsibleService;
     }
 
     /// <summary>
-    /// Registers a new Medical Reviewer user with their profile information.
+    /// Registers a new Section Responsible user with their profile information.
     /// </summary>
     /// <param name="registerDto">The DTO containing registration and profile details.</param>
     /// <returns>A response indicating successful registration.</returns>
-    /// <response code="200">Medical Reviewer successfully registered.</response>
+    /// <response code="200">Section Responsible successfully registered.</response>
     /// <response code="400">Bad request - validation failed.</response>
     /// <response code="409">Conflict - user email or username already exists.</response>
     /// <response code="500">Internal server error.</response>
@@ -36,11 +36,11 @@ public class MedicalReviewerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RegisterMedicalReviewer(RegisterMedicalReviewerDto registerDto)
+    public async Task<IActionResult> RegisterSectionResponsible(RegisterSectionResponsibleDto registerDto)
     {
         try
         {
-            var result = await _medicalReviewerService.RegisterMedicalReviewerAsync(registerDto);
+            var result = await _sectionResponsibleService.RegisterSectionResponsibleAsync(registerDto);
 
             return Ok(new
             {
@@ -67,7 +67,7 @@ public class MedicalReviewerController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
-                new { message = $"An error occurred while registering the Medical Reviewer: {ex.Message}", success = false });
+                new { message = $"An error occurred while registering the Section Responsible: {ex.Message}", success = false });
         }
     }
 }

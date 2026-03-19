@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Finlay.PharmaVigilance.Application.Repository;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -66,6 +67,8 @@ public static class DependencyInjection
         services.AddScoped<ISymptomRepository, SymptomRepository>();
         services.AddScoped<IVaccinationRepository, VaccinationRepository>();
         services.AddScoped<IVaccineRepository, VaccineRepository>();
+        services.AddScoped<ISectionResponsibleRepository, SectionResponsibleRepository>();
+        services.AddScoped<IMedicalReviewerRepository, MedicalReviewerRepository>();
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();
