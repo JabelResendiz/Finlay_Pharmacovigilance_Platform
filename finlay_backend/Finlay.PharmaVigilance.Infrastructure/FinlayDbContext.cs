@@ -282,10 +282,10 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
           .HasForeignKey(r => r.ReporterId)
           .OnDelete(DeleteBehavior.Restrict);
 
-      entity.HasOne(r=> r.MedicalReviewer)
-          .WithMany(mr => mr.AefiReports)
-          .HasForeignKey(r => r.MedicalReviewerId)
-          .OnDelete(DeleteBehavior.Restrict);
+      // entity.HasOne(r=> r.MedicalReviewer)
+      //     .WithMany(mr => mr.AefiReports)
+      //     .HasForeignKey(r => r.MedicalReviewerId)
+      //     .OnDelete(DeleteBehavior.Restrict);
 
       entity.HasOne(r => r.Vaccination)
             .WithMany(v => v.AefiReports)

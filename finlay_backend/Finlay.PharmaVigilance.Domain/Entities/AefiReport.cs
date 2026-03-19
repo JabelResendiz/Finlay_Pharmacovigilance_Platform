@@ -6,12 +6,12 @@ public class AefiReport : GenericEntity
     public DateTime ReportDate { get; set; }
 
     public int ReporterId { get; set; }
-    public int MedicalReviewerId { get; set; }
+    //public int MedicalReviewerId { get; set; }
     public int VaccinatedSubjectId { get; set; }
     public int VaccinationId {get;set;}
 
     public Reporter Reporter { get; set; } = null!;
-    public MedicalReviewer MedicalReviewer { get; set; } = null!;
+    //public MedicalReviewer MedicalReviewer { get; set; } = null!;
     public VaccinatedSubject VaccinatedSubject { get; set; } = null!;
 
     
