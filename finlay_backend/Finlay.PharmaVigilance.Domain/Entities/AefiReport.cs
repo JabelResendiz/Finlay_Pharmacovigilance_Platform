@@ -5,7 +5,6 @@ public class AefiReport : GenericEntity
 {
     public DateTime ReportDate { get; set; }
 
-
     public int ReporterId { get; set; }
     public int MedicalReviewerId { get; set; }
     public int VaccinatedSubjectId { get; set; }
@@ -19,4 +18,5 @@ public class AefiReport : GenericEntity
     public Vaccination Vaccination { get; set; } = null!;
     public ICollection<AdverseEvent> AdverseEvents { get; set; } = new List<AdverseEvent>();
 
+    //public ReporterStatus ReporterStatus {get;set;}
 }
