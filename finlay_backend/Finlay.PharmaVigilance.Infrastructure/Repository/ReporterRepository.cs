@@ -5,7 +5,7 @@ using Finlay.PharmaVigilance.Domain.Entities;
 
 namespace Finlay.PharmaVigilance.Infrastructure.Repository;
 
-public class PhysicianRepository : GenericRepository<Physician>, IPhysicianRepository
+public class ReporterRepository : GenericRepository<Reporter>, IReporterRepository
 {
-    public PhysicianRepository(FinlayDbContext context) : base(context) { }
+    public ReporterRepository(FinlayDbContext context) : base(context) { }
 }

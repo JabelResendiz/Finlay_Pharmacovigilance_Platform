@@ -1,9 +1,9 @@
-// using Finlay.PharmaVigilance.Application.DTO;
-// using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Domain.Entities;
 
-// namespace Finlay.PharmaVigilance.Application.IServices;
+namespace Finlay.PharmaVigilance.Application.IServices;
 
-// public interface IReportQueryService : IGenericQueryService<AefiReport, ReportDto>
-// {
+public interface IReportQueryService : IGenericQueryService<AefiReport, ReportDto>
+{
 
-// }
+}

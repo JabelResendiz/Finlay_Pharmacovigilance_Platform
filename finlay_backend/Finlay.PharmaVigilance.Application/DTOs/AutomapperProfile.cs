@@ -23,21 +23,40 @@ public class AutomapperProfile : Profile
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserRole));
 
-        // CreateMap<SymptomDto, Symptom>();
-
-        // CreateMap<VaccineDto, Vaccine>();
-
-        // CreateMap<AdverseEventDto, AdverseEvent>()
-        //     .ForMember(dest => dest.AdverseEventSymptoms, opt => opt.MapFrom(src => src.Symptoms.Select(s => new AdverseEventSymptom { Symptom = new Symptom { Name = s.Name, Description = s.Description, StandardCode = s.StandardCode } })));
-
-        // CreateMap<VaccinationDto, Vaccination>();
-
-        // CreateMap<ReportDto, AefiReport>();
-
         // Medical Reviewer Registration
         CreateMap<RegisterMedicalReviewerDto, MedicalReviewer>();
 
         // Section Responsible Registration
         CreateMap<RegisterSectionResponsibleDto, SectionResponsible>();
+
+
+        // Report Mappings
+        
+        CreateMap<VaccineDto, Vaccine>();
+        CreateMap<VaccinationDto, Vaccination>();
+
+        CreateMap<VaccinatedSubjectDto,VaccinatedSubject>();
+        CreateMap<ReporterDto, Reporter>();
+
+        CreateMap<AdverseEventDto, AdverseEvent>()
+             .ForMember(dest => dest.AdverseEventSymptoms, 
+                        opt => opt.MapFrom(
+                            src => src.Symptoms.Select(
+                                s => new AdverseEventSymptom { 
+                                    Symptom = new Symptom { 
+                                        Name = s.Name, 
+                                        Description = s.Description, 
+                                        StandardCode = s.StandardCode 
+                                    } 
+                                }
+                            )
+                        )
+                    );
+        CreateMap<SymptomDto, Symptom>();
+
+
+        CreateMap<ReportDto, AefiReport>();
+
+
     }
 }

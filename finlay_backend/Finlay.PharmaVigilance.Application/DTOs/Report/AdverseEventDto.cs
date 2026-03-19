@@ -15,4 +15,7 @@ public class AdverseEventDto
     public required string Notes { get; set; }
     public required string CurrentStatus { get; set; }
     public required List<SymptomDto> Symptoms { get; set; }
+    
+    // cuando se vaya a agregar evento adversos futuros, hay que asociarlo a un reporte
+    //public required int AefiReportId {get;set;}
 }

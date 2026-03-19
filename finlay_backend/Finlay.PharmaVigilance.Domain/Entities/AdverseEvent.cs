@@ -11,12 +11,10 @@ public class AdverseEvent : GenericEntity
     public string Treatment { get; set; } = null!;
     public string Notes { get; set; } = null!;
     public string CurrentStatus { get; set; } = null!;
-    // public DateTime CreatedAt { get; set; }
-
+    
     public int AefiReportId { get; set; }
     public AefiReport AefiReport { get; set; } = null!;
-    //public int AdverseEvent_SymptomId { get; set; }
-
+    
     public ICollection<AdverseEventSymptom> AdverseEventSymptoms { get; set; } = new List<AdverseEventSymptom>();
-    //public ICollection<Symptom> Symptoms { get; set; } = new List<Symptom>();
+
 }

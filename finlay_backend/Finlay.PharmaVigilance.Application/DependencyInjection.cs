@@ -29,8 +29,10 @@ public static class DependencyInjection
         // User Services
         services.AddScoped<IUserQueryServices, UserQueryService>();
         services.AddScoped<IUserCommandServices, UserCommandService>();
-        //services.AddScoped<IReportCommandService, ReportCommandService>();
-        //services.AddScoped<IReportQueryService, ReportQueryService>();
+
+        // reporter
+        services.AddScoped<IReportCommandService, ReportCommandService>();
+        services.AddScoped<IReportQueryService, ReportQueryService>();
 
 
         return services;

@@ -61,8 +61,8 @@ public static class DependencyInjection
         services.AddScoped<IIdentityManager, IdentityManager>();
         services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();
         services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();
-        services.AddScoped<IPatientRepository, PatientRepository>();
-        services.AddScoped<IPhysicianRepository, PhysicianRepository>();
+        services.AddScoped<IVaccinatedSubjectRepository, VaccinatedSubjectRepository>();
+        services.AddScoped<IReporterRepository, ReporterRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<ISymptomRepository, SymptomRepository>();
         services.AddScoped<IVaccinationRepository, VaccinationRepository>();
