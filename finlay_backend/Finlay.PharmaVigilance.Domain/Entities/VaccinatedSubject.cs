@@ -22,4 +22,6 @@ public class VaccinatedSubject : GenericEntity
     public string? PhoneNumber { get; set; }
     public string? Email { get; set; }
 
+    public ICollection<AefiReport> AefiReports { get; set; } = new List<AefiReport>();
+
 }

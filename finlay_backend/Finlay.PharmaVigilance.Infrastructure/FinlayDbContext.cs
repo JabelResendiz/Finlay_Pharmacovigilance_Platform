@@ -54,17 +54,18 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
   //public DbSet<Employee> Employees {get;set;}
   public DbSet<AdverseEvent> AdverseEvents { get; set; }
+  public DbSet<AdverseEventSymptom> AdverseEventSymptoms { get; set; }
   public DbSet<AefiReport> AefiReport { get; set; }
-  public DbSet<Province> Provinces {get; set; }
-  public DbSet<Municipality> Municipalities { get; set; }
-  public DbSet<VaccinatedSubject> VaccinatedSubjects { get; set; }
   public DbSet<MedicalReviewer> MedicalReviewers { get; set; }
+  public DbSet<Municipality> Municipalities { get; set; }
+  public DbSet<Province> Provinces {get; set; }
+  public DbSet<Reporter> Reporters { get; set; }
   public DbSet<SectionResponsible> SectionResponsibles { get; set; }
   public DbSet<Symptom> Symptoms { get; set; }
+  public DbSet<VaccinatedSubject> VaccinatedSubjects { get; set; }
   public DbSet<Vaccination> Vaccinations { get; set; }
   public DbSet<Vaccine> Vaccines { get; set; }
-  public DbSet<AdverseEventSymptom> AdverseEventSymptoms { get; set; }
-
+  
   protected override void OnModelCreating(ModelBuilder builder)
   {
     base.OnModelCreating(builder);
@@ -202,16 +203,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
       entity.Property(e => e.HealthArea)
                .IsRequired()
-               .HasMaxLength(100);
-
-      // entity.Property(e => e.PhoneNumber)
-      //          .IsRequired()
-      //          .HasMaxLength(20);
-        
-      // entity.Property(e => e.Email)
-      //          .IsRequired()
-      //          .HasMaxLength(150);
-      
+               .HasMaxLength(100);      
     });
 
     builder.Entity<SectionResponsible>(entity =>
@@ -227,74 +219,81 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
             .IsRequired();
     });
 
-  //   builder.Entity<AdverseEvent>(entity =>
-  //   {
-  //     entity.HasKey(e => e.Id);
-  //     entity.Property(e => e.StartDate)
-  //               .IsRequired();
-  //     entity.Property(e => e.Description)
-  //               .IsRequired();
-  //     entity.Property(e => e.Severity)
-  //               .IsRequired();
-  //     entity.Property(e => e.RequiredHospitalization)
-  //               .IsRequired();
-  //     entity.Property(e => e.Notes)
-  //               .IsRequired();
-  //     entity.Property(e => e.Treatment)
-  //               .IsRequired();
-  //     entity.Property(e => e.CurrentStatus)
-  //               .IsRequired();
 
-  //     entity.HasOne(e => e.AefiReport)
-  //           .WithMany(r => r.AdverseEvents)
-  //           .HasForeignKey(e => e.AefiReportId)
-  //           .OnDelete(DeleteBehavior.Cascade);
+    // Report DbContext configurations for relationships and constraints
+    builder.Entity<AdverseEvent>(entity =>
+    {
+      entity.HasKey(e => e.Id);
+      entity.Property(e => e.StartDate)
+                .IsRequired();
+      entity.Property(e => e.Description)
+                .IsRequired();
+      entity.Property(e => e.Severity)
+                .IsRequired();
+      entity.Property(e => e.RequiredHospitalization)
+                .IsRequired();
+      entity.Property(e => e.Notes)
+                .IsRequired();
+      entity.Property(e => e.Treatment)
+                .IsRequired();
+      entity.Property(e => e.CurrentStatus)
+                .IsRequired();
 
-  //   });
+      entity.HasOne(e => e.AefiReport)
+            .WithMany(r => r.AdverseEvents)
+            .HasForeignKey(e => e.AefiReportId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-  //   builder.Entity<AdverseEventSymptom>(entity =>
-  // {
+    });
 
-  //   entity.HasKey(e => new { e.AdverseEventId, e.SymptomId });
+    builder.Entity<AdverseEventSymptom>(entity =>
+  {
 
-  //   entity.HasOne(e => e.AdverseEvent)
-  //         .WithMany(r => r.AdverseEventSymptoms)
-  //         .HasForeignKey(e => e.AdverseEventId);
+    entity.HasKey(e => new { e.AdverseEventId, e.SymptomId });
 
-  //   entity.HasOne(e => e.Symptom)
-  //        .WithMany(r => r.AdverseEventSymptoms)
-  //        .HasForeignKey(e => e.SymptomId);
+    entity.HasOne(e => e.AdverseEvent)
+          .WithMany(r => r.AdverseEventSymptoms)
+          .HasForeignKey(e => e.AdverseEventId);
 
-
-  //   // entity.HasKey(e => e.Id);
-  //   // entity.HasIndex(e => new { e.AdverseEventId, e.SymptomId })
-  //   // .IsUnique();
-
-  // });
-
-    // builder.Entity<AefiReport>(entity =>
-    // {
-    //   entity.HasKey(e => e.Id);
-    //   entity.Property(e => e.ReportDate)
-    //             .IsRequired();
-
-    //   entity.HasOne(r => r.Patient)
-    //         .WithMany(p => p.AefiReports)
-    //         .HasForeignKey(r => r.PatientId)
-    //         .OnDelete(DeleteBehavior.Restrict);
-
-    //   entity.HasOne(r => r.Physician)
-    //       .WithMany(p => p.AefiReports)
-    //       .HasForeignKey(r => r.PhysicianId)
-    //       .OnDelete(DeleteBehavior.Restrict);
-
-    //   entity.HasOne(r => r.Vaccination)
-    //         .WithMany(v => v.AefiReports)
-    //         .HasForeignKey(r => r.VaccinationId)
-    //         .OnDelete(DeleteBehavior.Restrict);
+    entity.HasOne(e => e.Symptom)
+         .WithMany(r => r.AdverseEventSymptoms)
+         .HasForeignKey(e => e.SymptomId);
 
 
-    // });
+    // entity.HasKey(e => e.Id);
+    // entity.HasIndex(e => new { e.AdverseEventId, e.SymptomId })
+    // .IsUnique();
+
+  });
+
+    builder.Entity<AefiReport>(entity =>
+    {
+      entity.HasKey(e => e.Id);
+      entity.Property(e => e.ReportDate)
+                .IsRequired();
+
+      entity.HasOne(r => r.VaccinatedSubject)
+            .WithMany(p => p.AefiReports)
+            .HasForeignKey(r => r.VaccinatedSubjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(r => r.Reporter)
+          .WithMany(p => p.AefiReports)
+          .HasForeignKey(r => r.ReporterId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(r=> r.MedicalReviewer)
+          .WithMany(mr => mr.AefiReports)
+          .HasForeignKey(r => r.MedicalReviewerId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(r => r.Vaccination)
+            .WithMany(v => v.AefiReports)
+            .HasForeignKey(r => r.VaccinationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+    });
 
     // builder.Entity<Patient>(entity =>
     // {
@@ -346,72 +345,151 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
     // });
 
-    // builder.Entity<Symptom>(entity =>
-    // {
-    //   entity.HasKey(p => p.Id);
+    builder.Entity<Symptom>(entity =>
+    {
+      entity.HasKey(p => p.Id);
 
-    //   entity.Property(p => p.Name)
-    //       .IsRequired()
-    //       .HasMaxLength(120);
+      entity.Property(p => p.Name)
+          .IsRequired()
+          .HasMaxLength(120);
 
-    //   entity.Property(p => p.Description)
-    //       .IsRequired()
-    //       .HasMaxLength(800);
+      entity.Property(p => p.Description)
+          .IsRequired()
+          .HasMaxLength(800);
 
-    //   entity.Property(p => p.StandardCode)
-    //       .IsRequired()
-    //       .HasMaxLength(30);
+      entity.Property(p => p.StandardCode)
+          .IsRequired()
+          .HasMaxLength(30);
 
+    });
 
+    builder.Entity<Vaccination>(entity =>
+    {
+      entity.HasKey(e => e.Id);
 
-    // });
+      entity.Property(e => e.BatchNumber)
+            .IsRequired()
+            .HasMaxLength(50);
 
-    // builder.Entity<Vaccination>(entity =>
-    // {
-    //   entity.HasKey(e => e.Id);
+      entity.Property(e => e.AdministrationSite)
+            .IsRequired()
+            .HasMaxLength(100);
 
-    //   entity.Property(e => e.BatchNumber)
-    //         .IsRequired()
-    //         .HasMaxLength(50);
+      entity.Property(e => e.DoseNumber)
+            .IsRequired();
 
-    //   entity.Property(e => e.AdministrationSite)
-    //         .IsRequired()
-    //         .HasMaxLength(100);
-
-    //   entity.Property(e => e.DoseNumber)
-    //         .IsRequired();
-
-
-    //   entity.HasOne(v => v.Vaccine)
-    //         .WithMany(v => v.Vaccinations)
-    //         .HasForeignKey(v => v.VaccineId)
-    //         .OnDelete(DeleteBehavior.Restrict);
-
-    // });
-
-    // builder.Entity<Vaccine>(entity =>
-    // {
-    //   entity.HasKey(e => e.Id);
-
-    //   entity.Property(e => e.Name)
-    //         .IsRequired()
-    //         .HasMaxLength(150);
-
-    //   entity.Property(e => e.Manufacturer)
-    //         .IsRequired()
-    //         .HasMaxLength(150);
-
-    //   entity.Property(e => e.VaccineType)
-    //         .IsRequired()
-    //         .HasMaxLength(50);
-
-    //   entity.Property(e => e.Description)
-    //         .HasMaxLength(1000);
+      entity.Property(e => e.AdministrationDate)
+            .IsRequired();
 
 
-    // });
+      entity.HasOne(v => v.Vaccine)
+            .WithMany(v => v.Vaccinations)
+            .HasForeignKey(v => v.VaccineId)
+            .OnDelete(DeleteBehavior.Restrict);
 
+    });
 
+    builder.Entity<Vaccine>(entity =>
+    {
+      entity.HasKey(e => e.Id);
+
+      entity.Property(e => e.Name)
+            .IsRequired()
+            .HasMaxLength(150);
+
+      entity.Property(e => e.Manufacturer)
+            .IsRequired()
+            .HasMaxLength(150);
+
+      entity.Property(e => e.VaccineType)
+            .IsRequired()
+            .HasMaxLength(50);
+
+      entity.Property(e => e.Description)
+            .HasMaxLength(1000);
+    });
+
+    builder.Entity<VaccinatedSubject>(entity =>
+    {
+      entity.HasKey(e => e.Id);
+
+      entity.Property(e => e.FullName)
+          .IsRequired()
+          .HasMaxLength(150);
+
+      entity.Property(e => e.IdentityNumber)
+          .IsRequired()
+          .HasMaxLength(20);
+      
+      entity.HasIndex(e => e.IdentityNumber)
+          .IsUnique();
+
+      entity.Property(e => e.DateOfBirth)
+          .IsRequired();
+
+      entity.Property(e => e.Gender)
+          .IsRequired()
+          .HasConversion<string>(); 
+
+      entity.Property(e => e.IsPregnant)
+          .IsRequired(false); 
+
+      entity.Property(e => e.HealthArea)
+          .HasMaxLength(100);
+
+      entity.Property(e => e.Address)
+          .HasMaxLength(250);
+
+      entity.Property(e => e.PhoneNumber)
+          .HasMaxLength(20);
+
+      entity.Property(e => e.Email)
+          .HasMaxLength(100);
+
+      entity.HasOne(e => e.Province)
+          .WithMany()
+          .HasForeignKey(e => e.ProvinceId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Municipality)
+          .WithMany()
+          .HasForeignKey(e => e.MunicipalityId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+    });
+
+   builder.Entity<Reporter>(entity =>
+  {
+      entity.HasKey(e => e.Id);
+
+      entity.Property(e => e.FullName)
+          .IsRequired()
+          .HasMaxLength(150);
+
+      entity.Property(e => e.ReporterRelationship)
+          .IsRequired()
+          .HasConversion<string>(); 
+
+      entity.Property(e => e.DateOfBirth)
+          .IsRequired();
+
+      entity.Property(e => e.PhoneNumber)
+          .HasMaxLength(20);
+
+      entity.Property(e => e.Email)
+          .HasMaxLength(100);
+
+      entity.HasOne(e => e.Province)
+          .WithMany()
+          .HasForeignKey(e => e.ProvinceId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+      entity.HasOne(e => e.Municipality)
+          .WithMany()
+          .HasForeignKey(e => e.MunicipalityId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+  });
 
   }
 }
