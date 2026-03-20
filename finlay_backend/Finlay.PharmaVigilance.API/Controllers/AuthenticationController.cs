@@ -16,18 +16,18 @@ public class AuthenticationController : ControllerBase
         _identityService = identityService;
     }
 
-    [HttpPost]
-    [Route("register-medical-reviewer")]
-    //[Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> RegisterMedicalReviewer(RegisterMedicalReviewerDto registerDto)
-    {
-        var result = await _identityService.RegisterUserAsync(registerDto);
+    // [HttpPost]
+    // [Route("register/medical_reviewer")]
+    // //[Authorize(Roles = "Administrator")]
+    // public async Task<IActionResult> RegisterMedicalReviewer(RegisterMedicalReviewerDto registerDto)
+    // {
+    //     var result = await _identityService.RegisterUserAsync(registerDto);
 
-        return Ok(new
-        {
-            message = result
-        });
-    }
+    //     return Ok(new
+    //     {
+    //         message = result
+    //     });
+    // }
 
     [HttpPost]
     [Route("login")]

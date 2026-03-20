@@ -26,7 +26,7 @@ Content-Type:  application/json
 
 
 ####
-POST {{host}}/api/Authentication/register
+POST {{host}}/api/Authentication/r
 Content-Type:  application/json
 
 {

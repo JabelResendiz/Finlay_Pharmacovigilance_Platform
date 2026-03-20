@@ -70,4 +70,6 @@ public class MedicalReviewerController : ControllerBase
                 new { message = $"An error occurred while registering the Medical Reviewer: {ex.Message}", success = false });
         }
     }
+
+
 }

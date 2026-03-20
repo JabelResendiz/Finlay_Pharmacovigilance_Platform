@@ -26,8 +26,11 @@ public class ReportController : ControllerBase
 
         var result = await _reportCommandService.CreateAsync(reportDto);
 
-        return CreatedAtAction(nameof(GetReportById), new { reportId = result.ReportDate }, 
-            new { message = "Report successfully created.", data = result });
+        return StatusCode(StatusCodes.Status201Created, new
+        {
+            message = "Report successfully created",
+            data = result
+        });
     }
 
     [HttpGet]
@@ -79,4 +82,6 @@ public class ReportController : ControllerBase
 
         return NoContent();
     }
+
+
 }

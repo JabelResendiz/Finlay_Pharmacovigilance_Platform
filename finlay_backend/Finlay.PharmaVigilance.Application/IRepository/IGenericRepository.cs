@@ -33,10 +33,10 @@ public interface IGenericRepository<T> where T : GenericEntity
     /// <param name="cancellationToken">A token to cancel the operation, if needed.</param>
     /// <param name="includes">An optional array of expressions specifying the related entities to include in the query. </param>/// 
     /// <returns>A Task representing the asynchronous operation, returning the entity with the specified identifier.</returns>
-    Task<T> GetByIdAsync<TId>(TId elementId, CancellationToken cancellationToken = default, 
-                            params Expression<Func<T,object>>[] includes);
+    Task<T> GetByIdAsync<TId>(TId elementId, CancellationToken cancellationToken = default,
+                            params Expression<Func<T, object>>[] includes);
 
-                                                
+
     /// <summary>
     /// Retrieves all entities as an <see cref="IQueryable{T}"/>.
     /// </summary>
@@ -64,10 +64,12 @@ public interface IGenericRepository<T> where T : GenericEntity
     /// </summary>
     /// <param name="expressions">A collection of filter expressions to apply to the query.</param>
     /// <returns>An <see cref="IQueryable{T}"/> containing all entities that match the provided filters.</returns>
-    IQueryable<T> GetAllByItems(params Expression<Func<T,bool>>[] expressions);
+    IQueryable<T> GetAllByItems(params Expression<Func<T, bool>>[] expressions);
 
-    Task<T?> GetByItems (Expression<Func<T,bool>>[] expressions,
-                         Expression<Func<T,object>>[] includes);
+    Task<T?> GetByItems(Expression<Func<T, bool>>[] expressions,
+                         Expression<Func<T, object>>[] includes);
 
+    Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate,
+                                CancellationToken cancellationToken = default);
 }
 

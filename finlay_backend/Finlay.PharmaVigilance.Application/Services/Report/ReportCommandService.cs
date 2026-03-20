@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
@@ -59,10 +60,31 @@ public class ReportCommandService : IReportCommandService
                 throw new ArgumentException("Each adverse event must have at least one symptom.", nameof(ae.Symptoms));
         }
 
+        // Check if VaccinatedSubject already exists
+        var vaccinatedRepo = _unitOfWork.GetRepository<VaccinatedSubject>();
+        var existingSubject = await vaccinatedRepo.FirstOrDefaultAsync(
+            x => x.IdentityNumber == dto.VaccinatedSubject.IdentityNumber
+        );
+
+        VaccinatedSubject subjectEntity;
+        if (existingSubject != null)
+        {
+            // Use existing
+            subjectEntity = existingSubject;
+        }
+        else
+        {
+            // Map and create new
+            subjectEntity = _mapper.Map<VaccinatedSubject>(dto.VaccinatedSubject);
+            await vaccinatedRepo.CreateAsync(subjectEntity);
+        }
+
         // Mapping and save
         var report = _mapper.Map<AefiReport>(dto);
-        
+        report.VaccinatedSubjectId = subjectEntity.Id;
+        report.VaccinatedSubject = subjectEntity;
 
+        // Save report
         await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
         await _unitOfWork.CompleteAsync();
 

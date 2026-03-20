@@ -37,11 +37,17 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
 
     public virtual void Update(T element)
     {
-       Console.WriteLine(element);
+        Console.WriteLine(element);
         _entity.Update(element); // Update the provided entity in the DbSet.
-        
+
     }
 
+    public async Task<T?> FirstOrDefaultAsync(
+                    Expression<Func<T, bool>> predicate,
+                    CancellationToken cancellationToken = default)
+    {
+        return await _entity.FirstOrDefaultAsync(predicate, cancellationToken);
+    }
 
     public virtual async Task<T> GetByIdAsync<TId>(TId elementId,
                                                     CancellationToken cancellationToken = default,
@@ -102,8 +108,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
                                      Expression<Func<T, object>>[] includes)
     {
         IQueryable<T> query = _entity;
-
-
 
         if (expressions != null)
         {
