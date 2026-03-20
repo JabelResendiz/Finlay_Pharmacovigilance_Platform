@@ -39,15 +39,6 @@ public class SectionResponsibleService : ISectionResponsibleService
         if (registerDto == null)
             throw new ArgumentNullException(nameof(registerDto), "Registration DTO cannot be null.");
 
-        if (string.IsNullOrWhiteSpace(registerDto.Email))
-            throw new ArgumentException("Email is required.", nameof(registerDto.Email));
-
-        if (string.IsNullOrWhiteSpace(registerDto.UserName))
-            throw new ArgumentException("Username is required.", nameof(registerDto.UserName));
-
-        if (string.IsNullOrWhiteSpace(registerDto.Password) || registerDto.Password.Length < 6)
-            throw new ArgumentException("Password must be at least 6 characters long.", nameof(registerDto.Password));
-
         // Validate that province exists
         var province = await _unitOfWork.GetRepository<Province>().GetByIdAsync(registerDto.ProvinceId);
         if (province == null)

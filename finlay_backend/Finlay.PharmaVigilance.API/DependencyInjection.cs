@@ -1,4 +1,7 @@
 
+using Finlay.PharmaVigilance.Api.Common;
+using Finlay.PharmaVigilance.Application.IServices.Common;
+
 namespace Finlay.PharmaVigilance.Api;
 
 
@@ -29,6 +32,8 @@ public static class DependencyInjection
                        .AllowAnyMethod(); // allows any HTTP method (GET,POST,PUT,DELETE)
             });
         });
+
+        services.AddScoped<IUserContextService, UserContextService>();
 
         return services;
     }

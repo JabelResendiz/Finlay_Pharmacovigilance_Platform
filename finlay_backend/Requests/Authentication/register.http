@@ -1,38 +1,32 @@
 @host = http://localhost:5137
-
-POST {{host}}/api/Authentication/register
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMiIsImdpdmVuX25hbWUiOiJwZWRybzEiLCJqdGkiOiI5YTk3YTE2Ny1kZDhmLTRhOWItOWY5Yi1mNjBhYjBlNmM5ZjUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJTZWN0aW9uUmVzcG9uc2libGUiLCJleHAiOjE3NzQwNTMxNDgsImlzcyI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UiLCJhdWQiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIn0.s8zQwFHribJwfZx8zE6ZQxyrGtQd9wGsfXjs1634Whs
+POST {{host}}/api/MedicalReviewer/register
 Content-Type:  application/json
+Authorization: Bearer {{token}}
 
 {
-  "name": "Eduardo",
-  "userName": "eduardo",
-  "email": "eduardo@example.com",
+  "fullname": "Pablo",
+  "userName": "Pablo",
+  "email": "pablo@example.com",
   "password": "Password_123!",
-  "userRole": "Supervisor"
+  "dateOfBirth": "1986-01-20T22:54:04.023Z",
+  "gender": 0,
+  "healthArea": "Consultorio de Centro Habana",
+  "phoneNumber": "55664266",
+  "municipalityId": 1
 }
 
 ####
-POST {{host}}/api/Authentication/register
+POST {{host}}/api/SectionResponsible/register
 Content-Type:  application/json
 
 {
-  "name": "Jabel",
-  "userName": "jabel",
-  "email": "jabel@example.com",
+  "fullname": "Pedro",
+  "userName": "pedro1",
+  "email": "pedro1@example.com",
   "password": "Password_123!",
-  "userRole": "Supervisor"
+  "userRole": "SectionResponsible",
+  "provinceId": 1
 }
 
 
-
-####
-POST {{host}}/api/Authentication/r
-Content-Type:  application/json
-
-{
-  "name": "Carlos",
-  "userName": "carlos",
-  "email": "carlos@example.com",
-  "password": "Password_123!",
-  "userRole": "Physician"
-}

@@ -38,36 +38,16 @@ public class SectionResponsibleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegisterSectionResponsible(RegisterSectionResponsibleDto registerDto)
     {
-        try
-        {
-            var result = await _sectionResponsibleService.RegisterSectionResponsibleAsync(registerDto);
+        if (registerDto == null)
+            throw new ArgumentNullException(nameof(registerDto), "Request body cannot be null");
 
-            return Ok(new
-            {
-                message = result,
-                success = true
-            });
-        }
-        catch (ArgumentNullException ex)
+        var result = await _sectionResponsibleService.RegisterSectionResponsibleAsync(registerDto);
+
+        return Ok(new
         {
-            return BadRequest(new { message = ex.Message, success = false });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message, success = false });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message, success = false });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message, success = false });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                new { message = $"An error occurred while registering the Section Responsible: {ex.Message}", success = false });
-        }
+            message = result,
+            success = true
+        });
+
     }
 }

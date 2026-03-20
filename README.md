@@ -429,3 +429,189 @@ Para un sistema institucional como este:
 ❌ No usar autenticación sin contraseña
 
 ---
+
+# Email alerta:
+
+
+# Sistema de alertas por correo electrónico (usando el email suministrado por usuarios)
+
+## Objetivo
+
+Explicar cómo diseñar e implementar un sistema de alertas por correo electrónico que, a partir de un reporte creado en la plataforma, notifique a un médico o responsable de un área de salud determinada sobre un sujeto vacunado usando el email provisto por los usuarios.
+
+## Requisitos funcionales
+
+- Usar el correo suministrado por los usuarios para notificaciones.
+- Permitir configurar destinatarios por área de salud y rol (ej. médico de zona X).
+- Generar y enviar notificaciones al momento de crear un reporte relevante.
+- Garantizar entrega fiable (reintentos, encolado) y registro (logs).
+
+## Requisitos no funcionales
+
+- Seguridad y privacidad: cumplir GDPR/leyes locales, opt-in/consentimiento.
+- Escalabilidad: soportar picos de reportes (colas y workers).
+- Observabilidad: métricas, trazas y alertas sobre fallos de envío.
+
+## Arquitectura propuesta (visión general)
+
+- Frontend / API: recibe el reporte y lo persiste en la base de datos.
+- Capa de negocio: publica un evento `ReportCreated` al crear el reporte.
+- Servicio/Worker de notificaciones (background): suscrito a eventos, genera el email y lo envía.
+- Cola de mensajes (opcional, recomendado): RabbitMQ, Azure Service Bus, Redis Streams para desacoplar y permitir reintentos.
+- Servicio de email/SMTP: SMTP propio o proveedor (SendGrid, Mailgun, Amazon SES).
+- Almacenamiento: tabla para `EmailQueue` / logs de envío y plantilla de email.
+
+Diagrama simplificado de flujo:
+
+1. Usuario crea reporte → 2. API guarda reporte → 3. Publica evento `ReportCreated` → 4. Worker toma evento → 5. Consulta destinatarios/plantilla → 6. Encola email → 7. Servicio de envío procesa la cola y entrega el email → 8. Log / métricas
+
+## Cambios en el modelo de datos (sugeridos)
+
+- Tabla `Reports` (existente) — sin cambios obligatorios.
+- Tabla `AreaContacts` o `HealthAreaRecipients`:
+  - `Id` (PK)
+  - `AreaCode` / `AreaId`
+  - `Role` (ej. `MEDICO_RESPONSABLE`)
+  - `Email` (destinatario)
+  - `Name` (opcional)
+  - `IsActive`, `CreatedAt`
+- Tabla `EmailQueue` (para auditoría/reintentos):
+  - `Id`, `ToEmail`, `Subject`, `Body`, `Status` (Pending/Sent/Failed), `Attempts`, `LastError`, `CreatedAt`, `NextAttemptAt`
+
+También guardar consentimientos si el email pertenece a un usuario y se requiere permiso explícito.
+
+## Integración con la creación de reportes
+
+- En el flujo donde se crea el reporte (por ejemplo `ReportController.Create`):
+  1. Persistir el reporte en BD.
+  2. Identificar el área de salud y los contactos activos para esa área (leer `AreaContacts`).
+  3. Publicar un evento `ReportCreated` con datos mínimos: `ReportId`, `AreaId`, `VaccinatedSubjectId`, `Severity`, `Timestamp`.
+  4. Responder al usuario (no bloquear por envío de email).
+
+El worker de notificaciones se suscribe a `ReportCreated` y realiza la lógica de envío.
+
+## Diseño del worker de notificaciones
+
+- Responsabilidades:
+  - Recibir eventos (o leer la `EmailQueue`).
+  - Generar contenido del correo (plantilla) con datos del reporte.
+  - Validar dirección de correo.
+  - Encolar y/o enviar el email.
+  - Registrar el resultado y realizar reintentos con backoff.
+
+- Componentes:
+  - `IEmailSender` (interfaz) — método `SendAsync(EmailMessage)`.
+  - Implementación SMTP/proveedor: `SmtpEmailSender`, `SendGridEmailSender`.
+  - `NotificationWorker` (background service o Hangfire job) que procesa la cola.
+
+## Estrategia de fiabilidad y reintentos
+
+- Al enviar, usar patrón de encolado con estados:
+  - `Pending` → `Processing` → `Sent` o `Failed`.
+- Reintentos exponenciales: 3–5 intentos con backoff (ej. 1m, 5m, 20m, 1h).
+- Registrar `LastError` y, si excede intentos, marcar `Failed` y crear una alerta operacional.
+
+## Seguridad y cumplimiento
+
+- Validar emails y evitar inyección en plantillas.
+- Almacenar credenciales SMTP/proveedor en variables de entorno (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, `SENDGRID_API_KEY`).
+- Asegurarse del consentimiento del propietario del email si la legislación lo exige.
+- Cifrar datos sensibles en reposo si necesario (emails personales o historiales).
+
+## Plantillas de correo y personalización
+
+- Usar un motor de plantillas (RazorLight, Liquid, Handlebars) para separar lógica y presentación.
+- Mantener plantillas en BD o en archivos versionados.
+- Ejemplo de campos en la plantilla:
+  - Nombre del médico, ID del reporte, fecha, datos mínimos del sujeto vacunado (sin PHI excesiva), enlace seguro al reporte en la plataforma.
+
+Ejemplo simple de asunto y cuerpo:
+
+Asunto: "Nuevo reporte de sujeto vacunado — Report #{ReportId}"
+
+Cuerpo (resumido):
+
+"Estimado Dr/a {RecipientName},\n\nSe ha creado un nuevo reporte (ID {ReportId}) para el área {AreaName}. Datos relevantes: Fecha: {Date}, Edad: {Age}, Estado: {Severity}.\n\nVer reporte: https://mi-plataforma/reports/{ReportId}\n\nAtentamente,\nEquipo de Farmacovigilancia"
+
+## Ejemplo de pseudocódigo (C#) — worker simplificado
+
+```csharp
+public class NotificationWorker : BackgroundService
+{
+    private readonly IEmailSender _emailSender;
+    private readonly IAreaRepository _areaRepo;
+    private readonly IEmailQueueRepository _queueRepo;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while(!stoppingToken.IsCancellationRequested)
+        {
+            var job = await _queueRepo.DequeuePendingAsync(); // bloqueante/long-polling
+            if (job == null) { await Task.Delay(1000); continue; }
+
+            try
+            {
+                await _emailSender.SendAsync(new EmailMessage(job.ToEmail, job.Subject, job.Body));
+                job.MarkSent();
+            }
+            catch(Exception ex)
+            {
+                job.IncrementAttempts(ex.Message);
+                if (job.AttemptsExceeded) job.MarkFailed();
+            }
+            await _queueRepo.UpdateAsync(job);
+        }
+    }
+}
+```
+
+Y el código que publica la tarea de email cuando se crea el reporte:
+
+```csharp
+// En ReportService después de guardar reporte
+var recipients = _areaRepo.GetRecipients(report.AreaId);
+var template = _templateService.Render("new-report", model);
+foreach(var r in recipients){
+    _queueRepo.Enqueue(new EmailQueueItem { ToEmail = r.Email, Subject = subject, Body = template });
+}
+```
+
+## Configuración recomendada (variables de entorno)
+
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
+- `EMAIL_FROM_NAME`, `EMAIL_FROM_ADDRESS`
+- `QUEUE_TYPE` (db/rabbit/azure)
+- `MAX_EMAIL_ATTEMPTS`, `EMAIL_RETRY_BASE_SECONDS`
+
+## Monitorización y observabilidad
+
+- Exponer métricas: emails enviados, fallidos, latencia, tamaño de cola.
+- Logs estructurados con `ReportId`, `RecipientEmail`, `Status`.
+- Integrar con sistema de alertas (PagerDuty/Teams/Slack) si la cola crece o hay muchas fallas.
+
+## Pruebas
+
+- Unit tests para: renderizado de plantillas, validación de emails, política de reintentos.
+- Integration tests: usar proveedor de email de sandbox (SendGrid Sandbox, Amazon SES sandbox) o un servidor SMTP de prueba.
+- End-to-end: crear reporte en ambiente de staging y verificar que la cola y el worker entregan el correo.
+
+## Consideraciones legales y de privacidad
+
+- Minimizar PHI en email; si se envía información sensible, usar enlaces seguros que requieran autenticación.
+- Registrar consentimiento para comunicaciones cuando aplique.
+
+## Puntos de decisión / alternativas
+
+- Encolado vs envío en línea: encolado recomendado (no bloquear el request del usuario).
+- SMTP propio vs proveedor: proveedores facilitan entrega (rechazos, reputación, templates), pero añaden coste.
+- Retry en worker vs reintentos del proveedor: combinar ambos para mayor resiliencia.
+
+## Próximos pasos de implementación
+
+1. Añadir la tabla `AreaContacts` y `EmailQueue` en la BD.
+2. Implementar `IEmailSender` con proveedor elegido.
+3. Publicar evento `ReportCreated` al guardar reportes.
+4. Implementar `NotificationWorker` que consuma la cola/eventos.
+5. Agregar pruebas y despliegue en staging.
+
+---

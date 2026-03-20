@@ -34,12 +34,6 @@ public class RegisterMedicalReviewerDto : RegisterUserDto
     public string PhoneNumber { get; set; } = string.Empty;
 
     /// <summary>
-    /// Province identifier where the Medical Reviewer operates.
-    /// </summary>
-    [Required(ErrorMessage = "Province ID is required")]
-    public int ProvinceId { get; set; }
-
-    /// <summary>
     /// Municipality identifier where the Medical Reviewer operates.
     /// </summary>
     [Required(ErrorMessage = "Municipality ID is required")]

@@ -1,5 +1,6 @@
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.Api.Controllers;
@@ -32,44 +33,25 @@ public class MedicalReviewerController : ControllerBase
     /// <response code="409">Conflict - user email or username already exists.</response>
     /// <response code="500">Internal server error.</response>
     [HttpPost("register")]
+    [Authorize(Roles = "SectionResponsible")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegisterMedicalReviewer(RegisterMedicalReviewerDto registerDto)
     {
-        try
-        {
-            var result = await _medicalReviewerService.RegisterMedicalReviewerAsync(registerDto);
 
-            return Ok(new
-            {
-                message = result,
-                success = true
-            });
-        }
-        catch (ArgumentNullException ex)
+        if (registerDto == null)
+            throw new ArgumentNullException(nameof(registerDto), "Request body cannot be null");
+
+        var result = await _medicalReviewerService.RegisterMedicalReviewerAsync(registerDto);
+
+        return Ok(new
         {
-            return BadRequest(new { message = ex.Message, success = false });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message, success = false });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message, success = false });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message, success = false });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                new { message = $"An error occurred while registering the Medical Reviewer: {ex.Message}", success = false });
-        }
+            message = result,
+            success = true
+        });
+
     }
-
 
 }

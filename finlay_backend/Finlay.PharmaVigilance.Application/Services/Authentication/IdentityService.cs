@@ -46,10 +46,10 @@ public class IdentityService : IIdentityService
     /// <returns>A JWT token if authentication is successful, otherwise null.</returns>
     public async Task<UserResponseDTO> LoginUserAsync(LoginUserDto loginDto)
     {
-        
+
         // Validate the user's credentials.
         var savedUser = await _identityManager.CheckCredentialsAsync(
-            loginDto.Email, 
+            loginDto.Email,
             loginDto.Password
         );
 
@@ -68,7 +68,7 @@ public class IdentityService : IIdentityService
             Email = savedUser.Email!,
             UserRole = savedUser.UserRole!,
             Token = token
-        } ;
+        };
 
     }
 
@@ -79,30 +79,30 @@ public class IdentityService : IIdentityService
     /// </summary>
     /// <param name="userDto">The register DTO containing user details.</param>
     /// <returns>A JWT token upon successful registration.</returns>
-    
-    public async Task<string> RegisterUserAsync(RegisterUserDto userDto)
-    {
-        //validate that the provided role is allowed
-        if (!UserRoleHelper.IsValidRole(userDto.UserRole))
-            throw new Exception("Invalid Role");
 
-        // Map the DTO to the User entity
-        var user = _mapper.Map<User>(userDto);
+    // public async Task<string> RegisterUserAsync(RegisterUserDto userDto)
+    // {
+    //     //validate that the provided role is allowed
+    //     if (!UserRoleHelper.IsValidRole(userDto.UserRole))
+    //         throw new Exception("Invalid Role");
 
-        // Create the user in ASP.NET Identity with the provided password
-        var savedUser = await _identityManager.CreateUserAsync(user, userDto.Password);
-    
-        if (savedUser == null)
-            throw new Exception("User creation failed");
+    //     // Map the DTO to the User entity
+    //     var user = _mapper.Map<User>(userDto);
 
-        // Assign the specified role to the newly created user
-        await _identityManager.AddRoles(savedUser.Id.ToString(), userDto.UserRole);
+    //     // Create the user in ASP.NET Identity with the provided password
+    //     var savedUser = await _identityManager.CreateUserAsync(user, userDto.Password);
 
-        // Commit all changes to the database
-        await _unitOfWork.CompleteAsync();
+    //     if (savedUser == null)
+    //         throw new Exception("User creation failed");
 
-        return "User created successfully";
-    }
+    //     // Assign the specified role to the newly created user
+    //     await _identityManager.AddRoles(savedUser.Id.ToString(), userDto.UserRole);
+
+    //     // Commit all changes to the database
+    //     await _unitOfWork.CompleteAsync();
+
+    //     return "User created successfully";
+    // }
 
     /// <summary>
     /// Updates an existing user's details.
@@ -117,9 +117,9 @@ public class IdentityService : IIdentityService
     //         var employee = _mapper.Map<Employee>(updateDto);
 
     //         _unitOfWork.GetRepository<Employee>().Update(employee);
-            
+
     //         // Update user email if not ShippingSupervisor
-            
+
     //         await _unitOfWork.UserRepository.UpdateByIdAsync(updateDto.Id, updateDto.Email);
     //         // Save changes to database
     //         await _unitOfWork.CompleteAsync();

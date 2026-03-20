@@ -1,6 +1,6 @@
 @host = http://localhost:5137
 
-# SUpervisor
+# MedicalReviewer
 POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
@@ -11,12 +11,12 @@ Content-Type:  application/json
 
 
 ####
-#Physician
+# SectionResponsible
 POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
 {
-  "email": "carlos@example.com",
+  "email": "pedro1@example.com",
   "password": "Password_123!"
 }
 
