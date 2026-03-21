@@ -58,14 +58,14 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
   public DbSet<AefiReport> AefiReport { get; set; }
   public DbSet<MedicalReviewer> MedicalReviewers { get; set; }
   public DbSet<Municipality> Municipalities { get; set; }
-  public DbSet<Province> Provinces {get; set; }
+  public DbSet<Province> Provinces { get; set; }
   public DbSet<Reporter> Reporters { get; set; }
   public DbSet<SectionResponsible> SectionResponsibles { get; set; }
   public DbSet<Symptom> Symptoms { get; set; }
   public DbSet<VaccinatedSubject> VaccinatedSubjects { get; set; }
   public DbSet<Vaccination> Vaccinations { get; set; }
   public DbSet<Vaccine> Vaccines { get; set; }
-  
+
   protected override void OnModelCreating(ModelBuilder builder)
   {
     base.OnModelCreating(builder);
@@ -196,14 +196,14 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
       entity.Property(e => e.DateOfBirth)
                .IsRequired();
-      
+
       entity.Property(e => e.Gender)
                .IsRequired()
                .HasConversion<string>();
 
       entity.Property(e => e.HealthArea)
                .IsRequired()
-               .HasMaxLength(100);      
+               .HasMaxLength(100);
     });
 
     builder.Entity<SectionResponsible>(entity =>
@@ -272,6 +272,18 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
       entity.Property(e => e.ReportDate)
                 .IsRequired();
 
+      entity.Property(e => e.Status)
+            .HasConversion<string>()
+            .IsRequired()
+            .HasMaxLength(50);
+
+      entity.Property(e => e.NotificationNumber)
+                .IsRequired()
+                .HasMaxLength(100);
+
+      entity.HasIndex(e => e.NotificationNumber)
+          .IsUnique();
+
       entity.HasOne(r => r.VaccinatedSubject)
             .WithMany(p => p.AefiReports)
             .HasForeignKey(r => r.VaccinatedSubjectId)
@@ -282,11 +294,6 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
           .HasForeignKey(r => r.ReporterId)
           .OnDelete(DeleteBehavior.Restrict);
 
-      // entity.HasOne(r=> r.MedicalReviewer)
-      //     .WithMany(mr => mr.AefiReports)
-      //     .HasForeignKey(r => r.MedicalReviewerId)
-      //     .OnDelete(DeleteBehavior.Restrict);
-
       entity.HasOne(r => r.Vaccination)
             .WithMany(v => v.AefiReports)
             .HasForeignKey(r => r.VaccinationId)
@@ -294,56 +301,6 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
 
     });
-
-    // builder.Entity<Patient>(entity =>
-    // {
-    //   entity.HasKey(p => p.Id);
-
-    //   entity.Property(p => p.FullName)
-    //       .IsRequired()
-    //       .HasMaxLength(150);
-
-    //   entity.Property(p => p.Address)
-    //       .IsRequired()
-    //       .HasMaxLength(250);
-
-    //   entity.Property(p => p.Age)
-    //       .IsRequired();
-
-    //   entity.Property(p => p.DateOfBirth)
-    //       .IsRequired();
-
-
-    //   entity.Property(p => p.Gender)
-    //       .IsRequired()
-    //       .HasConversion<string>();
-
-    //   entity.Property(p => p.Province)
-    //       .IsRequired()
-    //       .HasConversion<string>();
-    // });
-
-    // builder.Entity<Physician>(entity =>
-    // {
-    //   entity.HasKey(p => p.Id);
-
-    //   entity.Property(p => p.FullName)
-    //       .IsRequired()
-    //       .HasMaxLength(150);
-
-    //   entity.Property(p => p.MedicalHistory)
-    //       .IsRequired()
-    //       .HasMaxLength(1000);
-
-    //   entity.Property(p => p.DateOfBirth)
-    //       .IsRequired();
-
-
-    //   entity.Property(p => p.Gender)
-    //       .IsRequired()
-    //       .HasConversion<string>();
-
-    // });
 
     builder.Entity<Symptom>(entity =>
     {
@@ -420,7 +377,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
       entity.Property(e => e.IdentityNumber)
           .IsRequired()
           .HasMaxLength(20);
-      
+
       entity.HasIndex(e => e.IdentityNumber)
           .IsUnique();
 
@@ -429,10 +386,10 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
       entity.Property(e => e.Gender)
           .IsRequired()
-          .HasConversion<string>(); 
+          .HasConversion<string>();
 
       entity.Property(e => e.IsPregnant)
-          .IsRequired(false); 
+          .IsRequired(false);
 
       entity.Property(e => e.HealthArea)
           .HasMaxLength(100);
@@ -458,38 +415,38 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
     });
 
-   builder.Entity<Reporter>(entity =>
-  {
-      entity.HasKey(e => e.Id);
+    builder.Entity<Reporter>(entity =>
+   {
+     entity.HasKey(e => e.Id);
 
-      entity.Property(e => e.FullName)
-          .IsRequired()
-          .HasMaxLength(150);
+     entity.Property(e => e.FullName)
+        .IsRequired()
+        .HasMaxLength(150);
 
-      entity.Property(e => e.ReporterRelationship)
-          .IsRequired()
-          .HasConversion<string>(); 
+     entity.Property(e => e.ReporterRelationship)
+        .IsRequired()
+        .HasConversion<string>();
 
-      entity.Property(e => e.DateOfBirth)
-          .IsRequired();
+     entity.Property(e => e.DateOfBirth)
+        .IsRequired();
 
-      entity.Property(e => e.PhoneNumber)
-          .HasMaxLength(20);
+     entity.Property(e => e.PhoneNumber)
+        .HasMaxLength(20);
 
-      entity.Property(e => e.Email)
-          .HasMaxLength(100);
+     entity.Property(e => e.Email)
+        .HasMaxLength(100);
 
-      entity.HasOne(e => e.Province)
-          .WithMany()
-          .HasForeignKey(e => e.ProvinceId)
-          .OnDelete(DeleteBehavior.Restrict);
+     entity.HasOne(e => e.Province)
+        .WithMany()
+        .HasForeignKey(e => e.ProvinceId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-      entity.HasOne(e => e.Municipality)
-          .WithMany()
-          .HasForeignKey(e => e.MunicipalityId)
-          .OnDelete(DeleteBehavior.Restrict);
+     entity.HasOne(e => e.Municipality)
+        .WithMany()
+        .HasForeignKey(e => e.MunicipalityId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-  });
+   });
 
   }
 }

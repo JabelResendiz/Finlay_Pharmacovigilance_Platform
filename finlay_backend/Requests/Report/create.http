@@ -1,0 +1,61 @@
+@host = http://localhost:5137
+
+# MedicalReviewer
+POST {{host}}/api/Report
+Content-Type:  application/json
+
+{
+  "reportDate": "2026-03-21T17:36:05.081Z",
+  "reporter": {
+    "fullName": "Jabel Resendiz Aguirre",
+    "reporterRelationship": 0,
+    "dateOfBirth": "2003-03-21T17:36:05.081Z",
+    "provinceId": 1,
+    "municipalityId": 2,
+    "phoneNumber": "55664266",
+    "email": "jabel@example.com"
+  },
+  "vaccinatedSubject": {
+    "fullName": "Carlos",
+    "identityNumber": "08091223234",
+    "dateOfBirth": "2006-03-21T17:36:05.081Z",
+    "gender": 0,
+    "isPregnant": true,
+    "provinceId": 1,
+    "municipalityId": 2,
+    "healthArea": "string",
+    "address": "string",
+    "phoneNumber": "22323",
+    "email": "user@example.com"
+  },
+  "vaccination": {
+    "vaccine": {
+      "name": "string",
+      "vaccineType": "string",
+      "description": "string",
+      "manufacturer": "string"
+    },
+    "batchNumber": "string",
+    "administrationSite": "string",
+    "doseNumber": 2147483647,
+    "administrationDate": "2026-03-21T17:36:05.081Z"
+  },
+  "adverseEvents": [
+    {
+      "startDate": "2026-03-21T17:36:05.081Z",
+      "description": "string",
+      "severity": 0,
+      "requiredHospitalization": true,
+      "treatment": "string",
+      "notes": "string",
+      "currentStatus": "string",
+      "symptoms": [
+        {
+          "name": "string",
+          "description": "string",
+          "standardCode": "string"
+        }
+      ]
+    }
+  ]
+}

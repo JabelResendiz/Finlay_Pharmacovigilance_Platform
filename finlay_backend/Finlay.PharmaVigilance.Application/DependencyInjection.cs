@@ -34,6 +34,8 @@ public static class DependencyInjection
         services.AddScoped<IReportCommandService, ReportCommandService>();
         services.AddScoped<IReportQueryService, ReportQueryService>();
 
+        // Notification Number Generator
+        services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
 
         return services;
 

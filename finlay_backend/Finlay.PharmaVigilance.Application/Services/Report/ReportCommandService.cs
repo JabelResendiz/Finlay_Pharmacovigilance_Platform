@@ -16,11 +16,16 @@ public class ReportCommandService : IReportCommandService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly INotificationNumberGenerator _generator;
 
-    public ReportCommandService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ReportCommandService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        INotificationNumberGenerator generator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _generator = generator;
     }
 
     /// <summary>
@@ -33,7 +38,7 @@ public class ReportCommandService : IReportCommandService
     /// <exception cref="ArgumentException">Thrown when required fields are invalid or empty</exception>
     /// <exception cref="KeyNotFoundException">Thrown when referenced entities don't exist in database</exception>
     /// <exception cref="InvalidOperationException">Thrown when database operation fails</exception>
-    public async Task<ReportDto> CreateAsync(ReportDto dto)
+    public async Task<CreateReportResponseDto> CreateAsync(ReportDto dto)
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
@@ -45,11 +50,17 @@ public class ReportCommandService : IReportCommandService
         var reporterMunicipality = await _unitOfWork.GetRepository<Municipality>()
             .GetByIdAsync(dto.Reporter.MunicipalityId) ?? throw new KeyNotFoundException($"Municipality {dto.Reporter.MunicipalityId} not found.");
 
+        if (reporterMunicipality.ProvinceId != reporterProvince.Id)
+            throw new ArgumentException($"The reporter's municipality {reporterMunicipality.Id} does not belong to province {reporterProvince.Id}.");
+
         var patientProvince = await _unitOfWork.GetRepository<Province>()
             .GetByIdAsync(dto.VaccinatedSubject.ProvinceId) ?? throw new KeyNotFoundException($"Province {dto.VaccinatedSubject.ProvinceId} not found.");
 
         var patientMunicipality = await _unitOfWork.GetRepository<Municipality>()
             .GetByIdAsync(dto.VaccinatedSubject.MunicipalityId) ?? throw new KeyNotFoundException($"Municipality {dto.VaccinatedSubject.MunicipalityId} not found.");
+
+        if (patientMunicipality.ProvinceId != patientProvince.Id)
+            throw new ArgumentException($"The vaccinated subject's municipality {patientMunicipality.Id} does not   belong to province {patientProvince.Id}.");
 
         if (dto.AdverseEvents == null || !dto.AdverseEvents.Any())
             throw new ArgumentException("At least one adverse event is required.", nameof(dto.AdverseEvents));
@@ -83,12 +94,17 @@ public class ReportCommandService : IReportCommandService
         var report = _mapper.Map<AefiReport>(dto);
         report.VaccinatedSubjectId = subjectEntity.Id;
         report.VaccinatedSubject = subjectEntity;
+        report.Status = Domain.Enum.ReportStatus.Submitted;
+        report.NotificationNumber = _generator.Generate();
 
         // Save report
         await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
         await _unitOfWork.CompleteAsync();
 
-        return dto;
+        return new CreateReportResponseDto
+        {
+            NotificationNumber = report.NotificationNumber
+        };
     }
     /// <summary>
     /// Updates an existing report (placeholder for future implementation).

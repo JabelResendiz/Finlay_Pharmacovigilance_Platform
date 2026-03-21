@@ -4,14 +4,14 @@
 namespace Finlay.PharmaVigilance.Application.IServices;
 
 
-public interface IGenericCommandService<TDto>
+public interface IGenericCommandService<TDto, TDtoOut>
 {
-     /// <summary>
+    /// <summary>
     /// Creates a new entity based on the provided DTO.
     /// </summary>
     /// <param name="dto">The DTO containing the details of the entity to create.</param>
     /// <returns>A Task representing the asynchronous operation, returning the created DTO.</returns>
-    Task<TDto> CreateAsync(TDto dto);
+    Task<TDtoOut> CreateAsync(TDto dto);
 
     /// <summary>
     /// Updates an existing entity based on the provided DTO.
