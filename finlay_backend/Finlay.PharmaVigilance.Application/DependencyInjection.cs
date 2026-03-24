@@ -2,6 +2,7 @@ using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
 using Finlay.PharmaVigilance.Application.Services.Authentication;
+using Finlay.PharmaVigilance.Application.Services.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,9 @@ public static class DependencyInjection
         // Registers AutoMapper to enable mapping between DTOs and domain models.
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+        // Email Service
+        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<IContactCommandService, ContactCommandService>();
 
         // Registers services related to Entities
         services.AddScoped<IIdentityService, IdentityService>();

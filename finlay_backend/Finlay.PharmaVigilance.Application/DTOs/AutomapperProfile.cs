@@ -25,6 +25,10 @@ public class AutomapperProfile : Profile
 
         // Medical Reviewer Registration
         CreateMap<RegisterMedicalReviewerDto, MedicalReviewer>();
+        CreateMap<MedicalReviewer, GetMedicalReviewerDto>()
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
+
         CreateMap<RegisterMedicalReviewerDto, User>();
 
         // Section Responsible Registration
@@ -60,6 +64,9 @@ public class AutomapperProfile : Profile
 
         CreateMap<ReportDto, AefiReport>();
 
+        // Email
+        CreateMap<CreateContactDto, Contact>();
+        CreateMap<Contact, ContactDto>();
 
     }
 }

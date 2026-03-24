@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +52,35 @@ public class MedicalReviewerController : ControllerBase
             message = result,
             success = true
         });
+
+    }
+
+
+    [HttpGet("{municipalityId:int}")]
+    [Authorize(Roles = "SectionResponsible")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IEnumerable<GetMedicalReviewerDto>>> GetMedicalReviewerByMunicipalities(int municipalityId)
+    {
+
+        var users = await _medicalReviewerService.ListByMunicipalityAsync(municipalityId);
+        return Ok(users);
+
+    }
+
+    [HttpGet("getbyProvince")]
+    [Authorize(Roles = "SectionResponsible")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IEnumerable<GetMedicalReviewerDto>>> GetMedicalReviewerByProvince()
+    {
+
+        var users = await _medicalReviewerService.ListByProvinceAsync();
+        return Ok(users);
 
     }
 

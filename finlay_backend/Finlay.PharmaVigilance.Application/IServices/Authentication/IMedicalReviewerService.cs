@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 
 namespace Finlay.PharmaVigilance.Application.IServices.Authentication;
@@ -14,4 +15,9 @@ public interface IMedicalReviewerService
     /// <param name="registerDto">The DTO containing registration and profile details.</param>
     /// <returns>A task representing the asynchronous operation, returning a response message.</returns>
     Task<string> RegisterMedicalReviewerAsync(RegisterMedicalReviewerDto registerDto);
+
+    Task<IEnumerable<GetMedicalReviewerDto>> ListByMunicipalityAsync(int municipalityId, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<GetMedicalReviewerDto>> ListByProvinceAsync(CancellationToken cancellationToken = default);
+
 }

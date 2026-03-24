@@ -1,21 +1,20 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6InBlZHJvMSIsImp0aSI6IjIzODU5MDIyLTRmYzYtNGNiNi05MzJmLWRhZGU5MGUwNjkwMCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlY3Rpb25SZXNwb25zaWJsZSIsImV4cCI6MTc3NDExODA4NiwiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.642gyKi_88sKi4pOPi0NwXNmqax9UxT9rW9Q62HzNs0
-
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6InBlZHJvMSIsImp0aSI6IjgyMWY4YmIyLTJiM2UtNDI1NC1hMTljLTVmNDMzYzRkMGVlZSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlY3Rpb25SZXNwb25zaWJsZSIsImV4cCI6MTc3NDIwMTc5NywiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.Nyn43VbQhay6IiIov7lFYUs95WMbLHSQSB3dwr6-ToA
 
 POST {{host}}/api/MedicalReviewer/register
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "fullname": "Pablo",
-  "userName": "Pablo",
-  "email": "pablo@example.com",
+  "fullname": "Juan",
+  "userName": "juan",
+  "email": "juan@example.com",
   "password": "Password_123!",
   "dateOfBirth": "1986-01-20T22:54:04.023Z",
   "gender": 0,
-  "healthArea": "Consultorio de Centro Habana",
+  "healthArea": "Consultorio de Vedado",
   "phoneNumber": "55664266",
-  "municipalityId": 1
+  "municipalityId": 2
 }
 
 ####

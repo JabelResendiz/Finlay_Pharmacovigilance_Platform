@@ -39,8 +39,6 @@ public class MedicalReviewerRepository : GenericRepository<MedicalReviewer>, IMe
         return await _entity
             .Where(mr => mr.ProvinceId == provinceId)
             .Include(mr => mr.User)
-            .Include(mr => mr.Province)
-            .Include(mr => mr.Municipality)
             .ToListAsync();
     }
 
@@ -52,8 +50,6 @@ public class MedicalReviewerRepository : GenericRepository<MedicalReviewer>, IMe
         return await _entity
             .Where(mr => mr.MunicipalityId == municipalityId)
             .Include(mr => mr.User)
-            .Include(mr => mr.Province)
-            .Include(mr => mr.Municipality)
             .ToListAsync();
     }
 
