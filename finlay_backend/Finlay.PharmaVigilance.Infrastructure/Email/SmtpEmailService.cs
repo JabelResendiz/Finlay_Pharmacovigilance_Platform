@@ -3,13 +3,9 @@ using MailKit.Security;
 using MimeKit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Finlay.PharmaVigilance.Application.IServices;
 
-namespace Finlay.PharmaVigilance.Application.Services.Email;
-
-public interface IEmailService
-{
-    Task<bool> SendEmailAsync(string toEmail, string subject, string message);
-}
+namespace Finlay.PharmaVigilance.Infrastructure.Email;
 
 public class SmtpEmailService : IEmailService
 {
@@ -22,7 +18,7 @@ public class SmtpEmailService : IEmailService
         _logger = logger;
     }
 
-    public async Task<bool> SendEmailAsync(string toEmail, string subject, string message)
+    public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
         try
         {
@@ -36,7 +32,7 @@ public class SmtpEmailService : IEmailService
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
             {
                 _logger.LogError("SMTP configuration is incomplete. Check appsettings.json Email:Smtp settings.");
-                return false;
+                throw new InvalidOperationException("SMTP configuration is incomplete.");
             }
 
             var message_obj = new MimeMessage();
@@ -55,13 +51,12 @@ public class SmtpEmailService : IEmailService
                 await client.DisconnectAsync(true);
 
                 _logger.LogInformation($"Email enviado exitosamente a {toEmail}");
-                return true;
             }
         }
         catch (Exception ex)
         {
             _logger.LogError($"Error al enviar email a {toEmail}: {ex.Message}\n{ex.InnerException?.Message}");
-            return false;
+            throw;
         }
     }
 }

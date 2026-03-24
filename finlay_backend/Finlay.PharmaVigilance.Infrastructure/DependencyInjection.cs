@@ -17,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using Finlay.PharmaVigilance.Application.Repository;
+using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Infrastructure.Email;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -59,6 +61,7 @@ public static class DependencyInjection
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IContactRepository, ContactRepository>();
+        services.AddScoped<IEmailService, SmtpEmailService>();
         services.AddScoped<IIdentityManager, IdentityManager>();
         services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();
         services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();

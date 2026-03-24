@@ -1,7 +1,5 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
-using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
-using Finlay.PharmaVigilance.Application.Services.Email;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.API.Controllers;
@@ -10,19 +8,16 @@ namespace Finlay.PharmaVigilance.API.Controllers;
 [Route("api/[controller]")]
 public class EmailController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IEmailService _emailService;
     private readonly IContactCommandService _contactCommandService;
     private readonly IContactQueryService _contactQueryService;
+    private readonly IEmailAppService _emailAppService;
 
     public EmailController(
-        IUnitOfWork unitOfWork,
-        IEmailService emailService,
+        IEmailAppService emailAppService,
         IContactCommandService contactCommandService,
         IContactQueryService contactQueryService)
     {
-        _unitOfWork = unitOfWork;
-        _emailService = emailService;
+        _emailAppService = emailAppService;
         _contactCommandService = contactCommandService;
         _contactQueryService = contactQueryService;
     }
@@ -44,24 +39,10 @@ public class EmailController : ControllerBase
     [HttpPost("send")]
     public async Task<IActionResult> SendEmail([FromBody] SendEmailDto dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        await _emailAppService.SendEmailToContactAsync(dto);
 
-        // Get contact from database
-        var contact = await _unitOfWork.ContactRepository.GetByIdAsync(dto.ContactId);
-        if (contact == null)
-            return NotFound($"Contacto con ID {dto.ContactId} no encontrado");
+        return Ok(new { message = "Successfully sent email to contact" });
 
-        if (!contact.IsActive)
-            return BadRequest("El contacto está inactivo y no puede recibir emails");
-
-        // Send email
-        var success = await _emailService.SendEmailAsync(contact.Email, dto.Subject, dto.Message);
-
-        if (!success)
-            return StatusCode(500, "Error al enviar el email. Intente más tarde.");
-
-        return Ok(new { message = "Email enviado exitosamente", email = contact.Email });
     }
 
     /// <summary>
