@@ -19,6 +19,6 @@ public class MedicalReviewer : GenericEntity
    public int UserId { get; set; }
    public User User { get; set; } = null!;
 
-   //public ICollection<AefiReport> AefiReports { get; set; } = new List<AefiReport>();
+   public ICollection<MedicalReview> MedicalReviews { get; set; } = new List<MedicalReview>();
 
 }
