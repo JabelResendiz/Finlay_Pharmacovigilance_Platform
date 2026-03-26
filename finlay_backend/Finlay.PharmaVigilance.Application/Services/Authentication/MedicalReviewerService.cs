@@ -8,7 +8,6 @@ using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
-using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Application.Services.Authentication;
 

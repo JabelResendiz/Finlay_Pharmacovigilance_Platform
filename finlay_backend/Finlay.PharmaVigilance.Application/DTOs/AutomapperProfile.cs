@@ -77,5 +77,10 @@ public class AutomapperProfile : Profile
 
         CreateMap<Contact, ContactDto>();
 
+        // Medical Review
+
+        CreateMap<CreateMedicalReviewDto, MedicalReview>();
+
+
     }
 }

@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<IVaccineRepository, VaccineRepository>();
         services.AddScoped<ISectionResponsibleRepository, SectionResponsibleRepository>();
         services.AddScoped<IMedicalReviewerRepository, MedicalReviewerRepository>();
+        services.AddScoped<IMedicalReviewRepository, MedicalReviewRepository>();
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();

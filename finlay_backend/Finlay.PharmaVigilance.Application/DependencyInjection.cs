@@ -41,6 +41,11 @@ public static class DependencyInjection
         // Notification Number Generator
         services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
 
+        // Medical review
+        services.AddScoped<IMedicalReviewCommandService, MedicalReviewCommandService>();
+        services.AddScoped<IMedicalReviewQueryService, MedicalReviewQueryService>();
+
+
         return services;
 
 

@@ -1,0 +1,14 @@
+@host = http://localhost:5137
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZ2l2ZW5fbmFtZSI6Imp1YW4iLCJqdGkiOiIwNTkwMjEwZi1mNzNlLTQ1MmMtYTNiYy0zNmE4MTVmMzQzZDMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJNZWRpY2FsUmV2aWV3ZXIiLCJleHAiOjE3NzQ0OTY4MjQsImlzcyI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UiLCJhdWQiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIn0.CyWZtqSRn3WQdf_XNB-YzQ3jJrp8CQPqRziFbI98RQM
+
+POST {{host}}/api/MedicalReview
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+{
+  "aefiReportId": 1,
+  "clinicalDescription": "string",
+  "medDraTerm": "string",
+  "temperature": 0,
+  "reviewedAt": "2026-03-26T02:35:02.317Z"
+}
