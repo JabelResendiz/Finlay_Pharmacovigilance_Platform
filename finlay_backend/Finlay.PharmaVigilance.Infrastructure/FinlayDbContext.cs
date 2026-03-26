@@ -66,6 +66,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
   public DbSet<VaccinatedSubject> VaccinatedSubjects { get; set; }
   public DbSet<Vaccination> Vaccinations { get; set; }
   public DbSet<Vaccine> Vaccines { get; set; }
+  public DbSet<MedicalReview> MedicalReviews { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
@@ -448,6 +449,35 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
         .OnDelete(DeleteBehavior.Restrict);
 
    });
+
+    builder.Entity<MedicalReview>(entity =>
+    {
+      entity.HasKey(e => e.Id);
+
+      entity.Property(e => e.ClinicalDescription)
+         .IsRequired()
+         .HasMaxLength(1000);
+
+      entity.Property(e => e.Temperature)
+         .IsRequired(false);
+
+      entity.Property(e => e.MedDraTerm)
+         .IsRequired()
+         .HasMaxLength(200);
+
+      entity.Property(e => e.ReviewedAt)
+         .IsRequired();
+
+      entity.HasOne(mr => mr.AefiReport)
+            .WithOne(ar => ar.MedicalReview)
+            .HasForeignKey<MedicalReview>(mr => mr.AefiReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+      entity.HasOne(mr => mr.MedicalReviewer)
+            .WithMany(mr => mr.MedicalReviews)
+            .HasForeignKey(mr => mr.MedicalReviewerId)
+            .OnDelete(DeleteBehavior.Restrict);
+    });
 
   }
 }

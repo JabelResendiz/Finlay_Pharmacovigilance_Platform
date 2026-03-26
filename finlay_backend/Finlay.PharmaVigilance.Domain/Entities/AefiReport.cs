@@ -22,4 +22,6 @@ public class AefiReport : GenericEntity
     public Vaccination Vaccination { get; set; } = null!;
     public ICollection<AdverseEvent> AdverseEvents { get; set; } = new List<AdverseEvent>();
 
+
+    public MedicalReview? MedicalReview { get; set; }
 }

@@ -2,7 +2,6 @@ using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
 using Finlay.PharmaVigilance.Application.Services.Authentication;
-using Finlay.PharmaVigilance.Application.Services.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,8 +21,9 @@ public static class DependencyInjection
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         // Email Service
-        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<IEmailAppService, EmailAppService>();
         services.AddScoped<IContactCommandService, ContactCommandService>();
+        services.AddScoped<IContactQueryService, ContactQueryService>();
 
         // Registers services related to Entities
         services.AddScoped<IIdentityService, IdentityService>();
@@ -40,6 +40,11 @@ public static class DependencyInjection
 
         // Notification Number Generator
         services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
+
+        // Medical review
+        services.AddScoped<IMedicalReviewCommandService, MedicalReviewCommandService>();
+        services.AddScoped<IMedicalReviewQueryService, MedicalReviewQueryService>();
+
 
         return services;
 

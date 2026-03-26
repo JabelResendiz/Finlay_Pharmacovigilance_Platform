@@ -24,4 +24,9 @@ public class ContactRepository : GenericRepository<Contact>, IContactRepository
             .Where(c => c.IsActive)
             .ToListAsync();
     }
+
+    public IQueryable<Contact> GetActiveContacts()
+    {
+        return _context.Contacts.Where(c => c.IsActive);
+    }
 }
