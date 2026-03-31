@@ -432,9 +432,6 @@ Para un sistema institucional como este:
 
 # Email alerta:
 
-
-# Sistema de alertas por correo electrónico (usando el email suministrado por usuarios)
-
 ## Objetivo
 
 Explicar cómo diseñar e implementar un sistema de alertas por correo electrónico que, a partir de un reporte creado en la plataforma, notifique a un médico o responsable de un área de salud determinada sobre un sujeto vacunado usando el email provisto por los usuarios.
@@ -615,3 +612,150 @@ foreach(var r in recipients){
 5. Agregar pruebas y despliegue en staging.
 
 ---
+
+# 📄 PDF Editable
+
+## 🧠 Descripción
+
+El sistema permite la generación y uso de un **formulario en formato PDF editable (AcroForm)** para el registro de reportes de eventos adversos.
+
+El usuario puede:
+
+* Descargar un formulario PDF oficial
+* Completarlo de forma offline en su computadora
+* Subirlo nuevamente al sistema para su procesamiento
+
+Este enfoque permite **accesibilidad sin autenticación** y recolección estandarizada de datos.
+
+---
+
+## 🔄 Flujo del sistema
+
+```text
+1. Usuario accede al sistema público
+2. Descarga PDF editable
+3. Completa el formulario offline
+4. Sube el PDF al sistema
+5. Backend valida y procesa el archivo
+6. Se genera un ID de caso (tracking)
+```
+
+---
+
+## 🧾 Estructura del PDF
+
+El PDF contiene campos editables organizados en secciones:
+
+### 🏥 Datos del reportante
+
+* Nombre del reportante
+* Email
+* Teléfono / contacto
+* CI del reportante
+
+---
+
+### 💉 Datos del sujeto vacunado
+
+* Nombre completo
+* CI
+* Provincia
+* Municipio
+* Área de salud
+
+---
+
+### 🧪 Datos de la vacuna
+
+* Tipo de vacuna
+* Fecha de administración
+* Lote (si aplica)
+
+---
+
+### ⚠️ Evento adverso
+
+* Descripción de síntomas (campo multilinea)
+* Fecha de aparición
+* Severidad
+
+---
+
+### ✍️ Firma
+
+* Firma del reportante
+* Fecha
+
+---
+
+## 🔐 Seguridad del sistema
+
+Debido a que el sistema es público (sin login), se implementan medidas de seguridad:
+
+### 🛡️ Validación de archivos
+
+* Solo se aceptan archivos PDF
+* Tamaño máximo permitido
+* Verificación de estructura PDF válida
+
+---
+
+### 🤖 Protección anti-bots
+
+* CAPTCHA en el formulario de subida
+* Rate limiting por IP para evitar abuso
+
+---
+
+### 🦠 Escaneo de archivos
+
+* Escaneo antivirus antes de procesar el archivo (ej: ClamAV)
+* Rechazo de archivos corruptos o inválidos
+
+---
+
+### 🧾 Integridad del sistema
+
+* Generación de ID único de caso (tracking number)
+* El PDF es tratado como **documento de evidencia**, no como fuente confiable de datos
+
+---
+
+## ⚠️ Consideraciones importantes
+
+* El contenido del PDF **NO se considera fuente de verdad**
+* Los datos pueden ser revisados manualmente
+* El sistema prioriza accesibilidad sobre autenticación
+* Se recomienda complementar con un sistema autenticado para personal médico
+
+---
+
+## 🧱 Tecnologías sugeridas
+
+* PDF editable (AcroForm)
+
+  * iText7
+  * PdfSharp
+
+* Antivirus:
+
+  * ClamAV
+
+* Protección API:
+
+  * Rate Limiting (ASP.NET Middleware)
+  * CAPTCHA (reCAPTCHA)
+
+---
+
+## 🎯 Objetivo
+
+Proveer un mecanismo accesible para el reporte de eventos adversos mediante un **formulario PDF estándar editable**, garantizando:
+
+* facilidad de uso
+* compatibilidad offline
+* trazabilidad mediante ID de caso
+* seguridad básica contra abuso
+
+---
+
