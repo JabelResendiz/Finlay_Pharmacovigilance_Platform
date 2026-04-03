@@ -1,60 +1,81 @@
 @host = http://localhost:5137
 
 # MedicalReviewer
-POST {{host}}/api/Report
+POST {{host}}/api/Report/createPublic
 Content-Type:  application/json
 
 {
-  "reportDate": "2026-03-21T17:36:05.081Z",
+  "reportDate": "2026-04-03T14:13:59.418Z",
   "reporter": {
-    "fullName": "Jabel Resendiz Aguirre",
+    "fullName": "Jabel09",
     "reporterRelationship": 0,
-    "dateOfBirth": "2003-03-21T17:36:05.081Z",
+    "identityNumber": "03041868160",
+    "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "provinceId": 1,
-    "municipalityId": 2,
+    "municipalityId": 1,
     "phoneNumber": "55664266",
-    "email": "jabel@example.com"
+    "email": "jabel@example.com",
+    "professionalLicense": "string",
+    "institution": "string"
   },
   "vaccinatedSubject": {
-    "fullName": "Carlos",
-    "identityNumber": "08091223234",
-    "dateOfBirth": "2006-03-21T17:36:05.081Z",
+    "fullName": "Jabel09",
+    "identityNumber": "03041868160",
+    "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 0,
-    "isPregnant": true,
+    "isPregnant": false,
     "provinceId": 1,
-    "municipalityId": 2,
+    "municipalityId": 1,
     "healthArea": "string",
     "address": "string",
-    "phoneNumber": "22323",
-    "email": "user@example.com"
+    "phoneNumber": "55664266",
+    "email": "jabel@example.com",
+    "currentMedications": "string",
+    "allergies": "string",
+    "medicalHistory": "string"
   },
-  "vaccination": {
-    "vaccine": {
-      "name": "string",
-      "vaccineType": "string",
-      "description": "string",
-      "manufacturer": "string"
+  "vaccinations": [
+    {
+      "vaccineId": 1,
+      "batchNumber": "qweqweq",
+      "site": 0,
+      "doseNumber": 2,
+      "administrationDate": "2026-04-02T18:13:59.418Z",
+      "vaccinationCenter": "string"
     },
-    "batchNumber": "string",
-    "administrationSite": "string",
-    "doseNumber": 2147483647,
-    "administrationDate": "2026-03-21T17:36:05.081Z"
-  },
+    {
+      "vaccineId": 2,
+      "batchNumber": "qweqweq",
+      "site": 0,
+      "doseNumber": 2,
+      "administrationDate": "2026-04-02T18:13:59.418Z",
+      "vaccinationCenter": "string"
+    },
+    {
+      "vaccineId": 3,
+      "batchNumber": "qweqweq",
+      "site": 0,
+      "doseNumber": 2,
+      "administrationDate": "2026-04-02T18:13:59.418Z",
+      "vaccinationCenter": "string"
+    }
+  ],
   "adverseEvents": [
     {
-      "startDate": "2026-03-21T17:36:05.081Z",
+      "startDate": "2026-04-03T12:13:59.418Z",
       "description": "string",
-      "severity": 0,
-      "requiredHospitalization": true,
-      "treatment": "string",
-      "notes": "string",
-      "currentStatus": "string",
+      "visitedDoctor": true,
+      "wentToEmergencyRoom": true,
+      "permanentDisability": true,
+      "isLifeThreatening": true,
+      "resultedInDeath": true,
+      "deathDate": "2026-04-03T12:16:59.418Z",
+      "currentStatus": 0,
+      "laboratoryResults": "string",
+      "medDRACode": "string",
+      "retClassification": "string",
       "symptoms": [
-        {
-          "name": "string",
-          "description": "string",
-          "standardCode": "string"
-        }
+        1,2,3
       ]
     }
   ]

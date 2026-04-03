@@ -10,34 +10,43 @@ public class AdverseEventDto
 {
 
     [Required(ErrorMessage = "Start date is required.")]
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Adverse Event description is required.")]
     [StringLength(500, MinimumLength = 1)]
     public string Description { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Severity level is required.")]
-    public SeverityLevel Severity { get; set; }
+    [Required(ErrorMessage = "VisitedDoctor is required.")]
+    public bool VisitedDoctor { get; set; }
 
-    [Required]
-    public bool RequiredHospitalization { get; set; }
+    [Required(ErrorMessage = "WentToEmergency is required.")]
+    public bool WentToEmergencyRoom { get; set; }
 
-    [Required]
-    [StringLength(500, MinimumLength = 1)]
-    public string Treatment { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Permanent Disability is required.")]
+    public bool PermanentDisability { get; set; }
 
-    [Required]
-    [StringLength(1000, MinimumLength = 1)]
-    public string Notes { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Is Life Threatening is required.")]
+    public bool IsLifeThreatening { get; set; }
 
-    [Required]
-    [StringLength(200, MinimumLength = 1)]
-    public string CurrentStatus { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Resulted In Death is required.")]
+    public bool ResultedInDeath { get; set; }
+    public DateTime? DeathDate { get; set; }
 
-    [Required]
-    [MinLength(1, ErrorMessage = "At least one symptom is required.")]
-    public List<SymptomDto> Symptoms { get; set; } = new();
+    [Required(ErrorMessage = "Current Status is required.")]
+    public PatientStatus CurrentStatus { get; set; }
 
-    // cuando se vaya a agregar evento adversos futuros, hay que asociarlo a un reporte
-    //public required int AefiReportId {get;set;}
+    [StringLength(300, MinimumLength = 1, ErrorMessage = "Laboratory results must be between 1 and 300 characters.")]
+    public string? LaboratoryResults { get; set; }
+
+    [StringLength(200, MinimumLength = 1, ErrorMessage = "MedDRACode must be between 1 and 200 characters.")]
+    public string? MedDRACode { get; set; }
+
+    [StringLength(200, MinimumLength = 1, ErrorMessage = "Ret Classification must be between 1 and 200 characters.")]
+    public string? RetClassification { get; set; }
+
+
+    [Required(ErrorMessage = "At least one symptom is required.")]
+    [MinLength(1, ErrorMessage = "At least one symptom must be provided.")]
+    public List<int> Symptoms { get; set; } = new();
+
 }

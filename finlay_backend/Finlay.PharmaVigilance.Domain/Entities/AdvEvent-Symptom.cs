@@ -8,5 +8,4 @@ public class AdverseEventSymptom : GenericEntity
     public int SymptomId { get; set; }
     public Symptom Symptom { get; set; } = null!;
 
-    public string? SpecificDetail { get; set; }
 }

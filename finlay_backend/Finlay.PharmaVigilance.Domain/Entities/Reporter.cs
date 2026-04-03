@@ -7,6 +7,7 @@ public class Reporter : GenericEntity
 {
     public string FullName { get; set; } = null!;
     public ReporterRelationship ReporterRelationship { get; set; }
+    public string IdentityNumber { get; set; } = null!;
     public DateTime DateOfBirth { get; set; }
 
     public int ProvinceId { get; set; }

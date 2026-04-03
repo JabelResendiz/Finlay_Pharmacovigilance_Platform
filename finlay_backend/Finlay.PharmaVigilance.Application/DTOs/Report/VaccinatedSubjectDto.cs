@@ -12,19 +12,19 @@ public class VaccinatedSubjectDto
     public string IdentityNumber { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Date of birth is required.")]
-    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "Gender is required.")]
     public Gender Gender { get; set; }
 
     public bool? IsPregnant { get; set; }
 
-    [Range(1, 16, ErrorMessage = "A valid Province ID (1–16) is required.")]
+    [Range(1, 16, ErrorMessage = "A valid Province ID (1-16) is required.")]
     public int ProvinceId { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "A valid Municipality ID is required.")]
     public int MunicipalityId { get; set; }
-    
+
     [StringLength(100, ErrorMessage = "Health area cannot exceed 100 characters.")]
     public string? HealthArea { get; set; }
 
@@ -36,4 +36,15 @@ public class VaccinatedSubjectDto
 
     [EmailAddress(ErrorMessage = "Email format is not valid.")]
     public string? Email { get; set; }
+
+    [StringLength(250, ErrorMessage = "Current Medications cannot exceed 250 characters")]
+    public string? CurrentMedications { get; set; }
+
+
+    [StringLength(250, ErrorMessage = "Allergies cannot exceed 250 characters")]
+    public string? Allergies { get; set; }
+
+
+    [StringLength(400, ErrorMessage = "Medical History cannot exceed 400 characters")]
+    public string? MedicalHistory { get; set; }
 }

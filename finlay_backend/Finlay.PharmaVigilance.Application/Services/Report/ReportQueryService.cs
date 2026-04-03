@@ -7,7 +7,7 @@ using Finlay.PharmaVigilance.Domain.Entities;
 namespace Finlay.PharmaVigilance.Application.Services;
 
 
-public class ReportQueryService : GenericQueryService<AefiReport, ReportDto>,
+public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiReportDto>,
                                   IReportQueryService
 {
     public ReportQueryService(IUnitOfWork unitOfWork, IMapper mapper)

@@ -296,9 +296,9 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
                       entity.HasKey(e => new { e.AdverseEventId, e.SymptomId });
 
-                      entity.Property(e => e.SpecificDetail)
-                    .IsRequired(false)
-                    .HasMaxLength(300);
+                      //       entity.Property(e => e.SpecificDetail)
+                      //     .IsRequired(false)
+                      //     .HasMaxLength(300);
 
 
                       entity.HasOne(e => e.AdverseEvent)
@@ -524,6 +524,13 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
               .IsRequired()
               .HasMaxLength(150);
 
+                       entity.Property(p => p.IdentityNumber)
+              .IsRequired()
+              .HasMaxLength(20);
+
+                       entity.HasIndex(e => e.IdentityNumber)
+                .IsUnique();
+
                        entity.Property(e => e.ReporterRelationship)
               .IsRequired()
               .HasConversion<string>();
@@ -577,7 +584,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                .IsRequired();
 
                         entity.HasOne(mr => mr.AefiReport)
-                  .WithOne(ar => ar.MedicalReview)
+                  .WithOne()
                   .HasForeignKey<MedicalReview>(mr => mr.AefiReportId)
                   .OnDelete(DeleteBehavior.Cascade);
 

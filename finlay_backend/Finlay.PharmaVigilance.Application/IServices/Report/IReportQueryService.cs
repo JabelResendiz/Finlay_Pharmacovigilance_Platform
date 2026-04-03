@@ -3,7 +3,7 @@ using Finlay.PharmaVigilance.Domain.Entities;
 
 namespace Finlay.PharmaVigilance.Application.IServices;
 
-public interface IReportQueryService : IGenericQueryService<AefiReport, ReportDto>
+public interface IReportQueryService : IGenericQueryService<AefiReport, PublicAefiReportDto>
 {
 
 }
