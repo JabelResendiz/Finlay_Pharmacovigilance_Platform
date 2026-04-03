@@ -2,6 +2,7 @@ using AutoMapper;
 using Finlay.PharmaVigilance.Application.Authentication;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
+using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
@@ -16,6 +17,7 @@ public class SectionResponsibleService : ISectionResponsibleService
     private readonly IIdentityManager _identityManager;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IUserContextService _userContextService;
 
     /// <summary>
     /// Initializes a new instance of the SectionResponsibleService class.
@@ -23,11 +25,13 @@ public class SectionResponsibleService : ISectionResponsibleService
     public SectionResponsibleService(
         IIdentityManager identityManager,
         IUnitOfWork unitOfWork,
-        IMapper mapper)
+        IMapper mapper,
+        IUserContextService userContextService)
     {
         _identityManager = identityManager;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _userContextService = userContextService;
     }
 
     /// <summary>
@@ -39,18 +43,29 @@ public class SectionResponsibleService : ISectionResponsibleService
         if (registerDto == null)
             throw new ArgumentNullException(nameof(registerDto), "Registration DTO cannot be null.");
 
+        var userId = _userContextService.GetUserId();
+
+        var administrator = await _unitOfWork.GetRepository<Admin>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (administrator == null)
+            throw new UnauthorizedAccessException("User is not an administrato.");
+
         // Validate that province exists
         var province = await _unitOfWork.GetRepository<Province>().GetByIdAsync(registerDto.ProvinceId);
         if (province == null)
             throw new KeyNotFoundException($"Province with ID {registerDto.ProvinceId} does not exist.");
 
-        // Create User account
-        var user = new User
-        {
-            UserName = registerDto.UserName,
-            Email = registerDto.Email,
-            UserRole = UserRole.SectionResponsible.ToString()
-        };
+        var municipality = await _unitOfWork.GetRepository<Municipality>().GetByIdAsync(registerDto.MunicipalityId);
+        if (municipality == null)
+            throw new KeyNotFoundException($"Municipality with ID {registerDto.MunicipalityId} does not exist.");
+
+        if (municipality.ProvinceId != province.Id)
+            throw new ArgumentException($"The municipality {registerDto.MunicipalityId} does not belong to province {registerDto.ProvinceId}.");
+
+        var user = _mapper.Map<User>(registerDto);
+
+        user.UserRole = UserRole.SectionResponsible.ToString();
 
         var createdUser = await _identityManager.CreateUserAsync(user, registerDto.Password);
         if (createdUser == null)
@@ -59,12 +74,11 @@ public class SectionResponsibleService : ISectionResponsibleService
         // Assign SectionResponsible role
         await _identityManager.AddRoles(createdUser.Id.ToString(), UserRole.SectionResponsible.ToString());
 
-        // Create SectionResponsible profile
-        var sectionResponsible = new SectionResponsible
-        {
-            UserId = createdUser.Id,
-            ProvinceId = registerDto.ProvinceId
-        };
+        var sectionResponsible = _mapper.Map<SectionResponsible>(registerDto);
+        sectionResponsible.UserId = createdUser.Id;
+        sectionResponsible.User = createdUser;
+        sectionResponsible.AdminId = administrator.Id;
+        sectionResponsible.Admin = administrator;
 
         // Add to repository and save
         await _unitOfWork.GetRepository<SectionResponsible>().CreateAsync(sectionResponsible);

@@ -1,0 +1,16 @@
+@host = http://localhost:5137
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkphYmVsIiwianRpIjoiMmQ5NTc3ZWYtNDFkOS00ZmY0LTk3YmUtNmNhNzFmMDU0MzUwIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3NzUxODY5NTcsImlzcyI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UiLCJhdWQiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIn0.EeXLGSZZ5ZhaRVt98vKbMQdEvCXSs6GozuoEdO5d_Hw
+
+
+POST {{host}}/api/Catalog/register/symptom
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "asma",
+  "standardCode": "12121223",
+  "codingSystem": "12312312",
+  "category": "General",
+  "isActive": true,
+  "description": "Elevación de la temperatura corporal por encima de lo normal, comúnmente asociada a infecciones o inflamaciones."
+}

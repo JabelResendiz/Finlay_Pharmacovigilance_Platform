@@ -1,3 +1,5 @@
+using Finlay.PharmaVigilance.Domain.Enum;
+
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
 public class MedicalReview : GenericEntity
@@ -8,11 +10,11 @@ public class MedicalReview : GenericEntity
     public int MedicalReviewerId { get; set; }
     public MedicalReviewer MedicalReviewer { get; set; } = null!;
 
-
-    public string ClinicalDescription { get; set; } = null!;
-    public float? Temperature { get; set; }
-    public string MedDraTerm { get; set; } = null!;
+    public ClinicalSignificance ClinicalSignificance { get; set; }
+    public CausalityLevel Causality { get; set; }
 
     public DateTime ReviewedAt { get; set; }
+    public int SectionResponsibleId { get; set; }
+    public SectionResponsible SectionResponsible { get; set; } = null!;
 
 }

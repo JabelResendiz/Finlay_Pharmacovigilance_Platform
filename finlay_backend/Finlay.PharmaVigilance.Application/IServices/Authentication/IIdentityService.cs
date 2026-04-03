@@ -25,7 +25,7 @@ public interface IIdentityService
     //Task<string> LoginUserAsync(LoginUserDto userDto);
     Task<UserResponseDTO> LoginUserAsync(LoginUserDto loginDto);
 
-
+    Task<string> RegisterAdminAsync(RegisterUserDto registerAdminDto);
     /// <summary>
     /// Update a user with the provided update credentials
     /// </summary>

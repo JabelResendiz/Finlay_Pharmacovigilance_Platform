@@ -55,20 +55,19 @@ public class MedicalReviewerController : ControllerBase
 
     }
 
+    // [HttpGet("{municipalityId:int}")]
+    // [Authorize(Roles = "SectionResponsible")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // [ProducesResponseType(StatusCodes.Status409Conflict)]
+    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // public async Task<ActionResult<IEnumerable<GetMedicalReviewerDto>>> GetMedicalReviewerByMunicipalities(int municipalityId)
+    // {
 
-    [HttpGet("{municipalityId:int}")]
-    [Authorize(Roles = "SectionResponsible")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<GetMedicalReviewerDto>>> GetMedicalReviewerByMunicipalities(int municipalityId)
-    {
+    //     var users = await _medicalReviewerService.ListByMunicipalityAsync(municipalityId);
+    //     return Ok(users);
 
-        var users = await _medicalReviewerService.ListByMunicipalityAsync(municipalityId);
-        return Ok(users);
-
-    }
+    // }
 
     [HttpGet("getbyProvince")]
     [Authorize(Roles = "SectionResponsible")]

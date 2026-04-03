@@ -9,33 +9,14 @@ namespace Finlay.PharmaVigilance.Application.DTO.Authentication;
 public class RegisterMedicalReviewerDto : RegisterUserDto
 {
     /// <summary>
-    /// Date of birth of the Medical Reviewer.
-    /// </summary>
-    [Required(ErrorMessage = "Date of birth is required")]
-    public DateTime DateOfBirth { get; set; }
-
-    /// <summary>
-    /// Gender of the Medical Reviewer.
-    /// </summary>
-    [Required(ErrorMessage = "Gender is required")]
-    public Gender Gender { get; set; }
-
-    /// <summary>
     /// Health area where the Medical Reviewer works.
     /// </summary>
-    [Required(ErrorMessage = "Health area is required")]
-    public string HealthArea { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Institution is required")]
+    public string Institution { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Phone number of the Medical Reviewer.
-    /// </summary>
-    [Required(ErrorMessage = "Phone number is required")]
-    [Phone(ErrorMessage = "Phone number is not in a valid format.")]
-    public string PhoneNumber { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Professional License is required")]
+    public string ProfessionalLicense { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Municipality identifier where the Medical Reviewer operates.
-    /// </summary>
-    [Required(ErrorMessage = "Municipality ID is required")]
-    public int MunicipalityId { get; set; }
+    public string? Specialty { get; set; }
+
 }

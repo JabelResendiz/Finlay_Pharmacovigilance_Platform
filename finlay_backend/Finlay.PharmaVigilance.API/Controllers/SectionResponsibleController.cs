@@ -1,5 +1,6 @@
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.Api.Controllers;
@@ -36,6 +37,7 @@ public class SectionResponsibleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RegisterSectionResponsible(RegisterSectionResponsibleDto registerDto)
     {
         if (registerDto == null)

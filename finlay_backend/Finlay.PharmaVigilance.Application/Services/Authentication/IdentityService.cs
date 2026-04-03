@@ -65,7 +65,6 @@ public class IdentityService : IIdentityService
         {
             Id = savedUser.Id,
             UserName = savedUser.UserName!,
-            Email = savedUser.Email!,
             UserRole = savedUser.UserRole!,
             Token = token
         };
@@ -73,64 +72,32 @@ public class IdentityService : IIdentityService
     }
 
 
+    public async Task<string> RegisterAdminAsync(RegisterUserDto registerAdminDto)
+    {
+        if (registerAdminDto == null)
+            throw new ArgumentNullException(nameof(registerAdminDto), "Registration DTO cannot be null.");
 
-    /// <summary>
-    /// Registers a new user in the system.
-    /// </summary>
-    /// <param name="userDto">The register DTO containing user details.</param>
-    /// <returns>A JWT token upon successful registration.</returns>
+        var user = _mapper.Map<User>(registerAdminDto);
+        user.UserRole = UserRole.Admin.ToString();
 
-    // public async Task<string> RegisterUserAsync(RegisterUserDto userDto)
-    // {
-    //     //validate that the provided role is allowed
-    //     if (!UserRoleHelper.IsValidRole(userDto.UserRole))
-    //         throw new Exception("Invalid Role");
+        var createdUser = await _identityManager.CreateUserAsync(user, registerAdminDto.Password);
+        if (createdUser == null)
+            throw new InvalidOperationException("Failed to create user account.");
 
-    //     // Map the DTO to the User entity
-    //     var user = _mapper.Map<User>(userDto);
+        // Assign Administrator role
+        await _identityManager.AddRoles(createdUser.Id.ToString(), UserRole.Admin.ToString());
 
-    //     // Create the user in ASP.NET Identity with the provided password
-    //     var savedUser = await _identityManager.CreateUserAsync(user, userDto.Password);
+        var admin = new Admin
+        {
+            UserId = createdUser.Id,
+            User = createdUser
+        };
 
-    //     if (savedUser == null)
-    //         throw new Exception("User creation failed");
+        await _unitOfWork.GetRepository<Admin>().CreateAsync(admin);
+        await _unitOfWork.CompleteAsync();
 
-    //     // Assign the specified role to the newly created user
-    //     await _identityManager.AddRoles(savedUser.Id.ToString(), userDto.UserRole);
-
-    //     // Commit all changes to the database
-    //     await _unitOfWork.CompleteAsync();
-
-    //     return "User created successfully";
-    // }
-
-    /// <summary>
-    /// Updates an existing user's details.
-    /// </summary>
-    /// <param name="updateDto">The update DTO containing user details.</param>
-
-    // public async Task UpdateUserAsync(UpdateUserDto updateDto)
-    // {
-    //     try
-    //     {
-
-    //         var employee = _mapper.Map<Employee>(updateDto);
-
-    //         _unitOfWork.GetRepository<Employee>().Update(employee);
-
-    //         // Update user email if not ShippingSupervisor
-
-    //         await _unitOfWork.UserRepository.UpdateByIdAsync(updateDto.Id, updateDto.Email);
-    //         // Save changes to database
-    //         await _unitOfWork.CompleteAsync();
-
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         // Log any errors
-    //         throw new Exception(ex.Message);
-    //     }
-    // }
+        return "Administrator registered successfully.";
+    }
 
 
 }

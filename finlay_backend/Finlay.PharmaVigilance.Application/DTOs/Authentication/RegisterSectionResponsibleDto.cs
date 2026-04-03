@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Application.DTO.Authentication;
 
@@ -13,4 +12,8 @@ public class RegisterSectionResponsibleDto : RegisterUserDto
     /// </summary>
     [Required(ErrorMessage = "Province ID is required")]
     public int ProvinceId { get; set; }
+
+    [Required(ErrorMessage = "Municipality ID is required")]
+    public int MunicipalityId { get; set; }
+
 }

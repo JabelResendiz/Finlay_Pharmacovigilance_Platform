@@ -57,11 +57,12 @@ public class MedicalReviewerService : IMedicalReviewerService
             throw new UnauthorizedAccessException("User is not a section responsible.");
 
         var provinceId = sectionResponsible.ProvinceId;
+        var municipalityId = sectionResponsible.MunicipalityId;
 
-        // Validate that municipality exists and belongs to the province
-        var municipality = await _unitOfWork.GetRepository<Municipality>().GetByIdAsync(registerDto.MunicipalityId);
-        if (municipality == null || municipality.ProvinceId != provinceId)
-            throw new KeyNotFoundException($"Municipality with ID {registerDto.MunicipalityId} does not exist or does not belong to the specified province.");
+        // // Validate that municipality exists and belongs to the province
+        // var municipality = await _unitOfWork.GetRepository<Municipality>().GetByIdAsync(registerDto.MunicipalityId);
+        // if (municipality == null || municipality.ProvinceId != provinceId)
+        //     throw new KeyNotFoundException($"Municipality with ID {registerDto.MunicipalityId} does not exist or does not belong to the specified province.");
 
         var user = _mapper.Map<User>(registerDto);
         user.UserRole = UserRole.MedicalReviewer.ToString();
@@ -75,7 +76,11 @@ public class MedicalReviewerService : IMedicalReviewerService
 
         var medicalReviewer = _mapper.Map<MedicalReviewer>(registerDto);
         medicalReviewer.UserId = createdUser.Id;
+        medicalReviewer.User = createdUser;
         medicalReviewer.ProvinceId = provinceId;
+        medicalReviewer.MunicipalityId = municipalityId;
+        medicalReviewer.SectionResponsibleId = sectionResponsible.Id;
+        medicalReviewer.SectionResponsible = sectionResponsible;
 
         // Add to repository and save
         await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);

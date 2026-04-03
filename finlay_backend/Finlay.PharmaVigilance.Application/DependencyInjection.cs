@@ -25,6 +25,9 @@ public static class DependencyInjection
         services.AddScoped<IContactCommandService, ContactCommandService>();
         services.AddScoped<IContactQueryService, ContactQueryService>();
 
+        // Catalog Service
+        services.AddScoped<ICatalogCommandService, CatalogCommandService>();
+
         // Registers services related to Entities
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IMedicalReviewerService, MedicalReviewerService>();

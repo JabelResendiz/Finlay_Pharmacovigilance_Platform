@@ -4,9 +4,6 @@ namespace Finlay.PharmaVigilance.Application.DTO.Authentication;
 
 public class RegisterUserDto
 {
-    [Required(ErrorMessage = "Full name is required")]
-    public string FullName { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "Username is required")]
     [MinLength(1, ErrorMessage = "Username cannot be empty or whitespace.")]
     public string UserName { get; set; } = string.Empty;
@@ -19,7 +16,11 @@ public class RegisterUserDto
     [MinLength(6, ErrorMessage = "Password must be at least 6 characters long.")]
     public string Password { get; set; } = string.Empty;
 
-    // [Required(ErrorMessage = "User role is required")]
-    // public string UserRole { get; set; } = string.Empty;
+    /// <summary>
+    /// Phone number of the Medical Reviewer.
+    /// </summary>
+    [Required(ErrorMessage = "Phone number is required")]
+    [Phone(ErrorMessage = "Phone number is not in a valid format.")]
+    public string PhoneNumber { get; set; } = string.Empty;
 
 }
