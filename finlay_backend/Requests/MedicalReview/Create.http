@@ -1,14 +1,21 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZ2l2ZW5fbmFtZSI6Imp1YW4iLCJqdGkiOiIwNTkwMjEwZi1mNzNlLTQ1MmMtYTNiYy0zNmE4MTVmMzQzZDMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJNZWRpY2FsUmV2aWV3ZXIiLCJleHAiOjE3NzQ0OTY4MjQsImlzcyI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UiLCJhdWQiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIn0.CyWZtqSRn3WQdf_XNB-YzQ3jJrp8CQPqRziFbI98RQM
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZ2l2ZW5fbmFtZSI6IkphYmVsIiwianRpIjoiNzMyMThhOTAtZDM5ZC00NDFkLTg5MTktYmQ4YmQ2M2U0MTIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWVkaWNhbFJldmlld2VyIiwiZXhwIjoxNzc1MzIwNzM3LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.3GYdR66EQ1vaiACbMnQU2gnCiKLI-LWCGlPYl9tAPQM
 
 POST {{host}}/api/MedicalReview
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "aefiReportId": 1,
-  "clinicalDescription": "string",
-  "medDraTerm": "string",
-  "temperature": 0,
-  "reviewedAt": "2026-03-26T02:35:02.317Z"
+  "medicalReviewAssignmentId": 1,
+  "clinicalSignificance": 1,
+  "causality": 1,
+  "reviewedAt": "2026-04-04T11:38:12.913Z",
+  "clinicalMedicalReviews": [
+    {
+      "adverseEventId": 1,
+      "laboratoryResults": "Evaluacion no arroja nada",
+      "medDRACode": "23232323",
+      "retClassification": "Posiblemente nada"
+    }
+  ]
 }

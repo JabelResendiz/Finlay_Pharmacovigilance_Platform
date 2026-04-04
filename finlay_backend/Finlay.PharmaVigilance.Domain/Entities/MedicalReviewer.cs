@@ -19,6 +19,6 @@ public class MedicalReviewer : GenericEntity
    public int SectionResponsibleId { get; set; }
    public SectionResponsible SectionResponsible { get; set; } = null!;
 
-   public ICollection<MedicalReview> MedicalReviews { get; set; } = new List<MedicalReview>();
+   public ICollection<MedicalReviewAssignment> MedicalReviews { get; set; } = new List<MedicalReviewAssignment>();
 
 }

@@ -73,8 +73,9 @@ public class AutomapperProfile : Profile
 
         // Medical Review
 
-        CreateMap<CreateMedicalReviewDto, MedicalReview>();
+        CreateMap<MedicalReviewDto, MedicalReview>();
 
-
+        CreateMap<MedicalReviewAssignmentDTO,
+                    MedicalReviewAssignment>();
     }
 }

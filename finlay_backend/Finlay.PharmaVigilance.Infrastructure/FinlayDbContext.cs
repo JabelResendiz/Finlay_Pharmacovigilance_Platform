@@ -67,7 +67,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
         public DbSet<VaccinatedSubject> VaccinatedSubjects { get; set; }
         public DbSet<Vaccination> Vaccinations { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }
-
+        public DbSet<MedicalReviewAssignment> MedicalReviewAssignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -583,20 +583,25 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                         entity.Property(e => e.ReviewedAt)
                .IsRequired();
 
-                        entity.HasOne(mr => mr.AefiReport)
-                  .WithOne()
-                  .HasForeignKey<MedicalReview>(mr => mr.AefiReportId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                        entity.HasOne(mr => mr.MedicalReviewAssignment)
+                .WithOne()
+                .HasForeignKey<MedicalReview>(mr => mr.MedicalReviewAssignmentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-                        entity.HasOne(mr => mr.MedicalReviewer)
-                  .WithMany(mr => mr.MedicalReviews)
-                  .HasForeignKey(mr => mr.MedicalReviewerId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                        //         entity.HasOne(mr => mr.AefiReport)
+                        //   .WithOne()
+                        //   .HasForeignKey<MedicalReview>(mr => mr.AefiReportId)
+                        //   .OnDelete(DeleteBehavior.Cascade);
 
-                        entity.HasOne(mr => mr.SectionResponsible)
-                    .WithMany(sr => sr.ManagedReviews)
-                    .HasForeignKey(mr => mr.SectionResponsibleId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                        //         entity.HasOne(mr => mr.MedicalReviewer)
+                        //   .WithMany(mr => mr.MedicalReviews)
+                        //   .HasForeignKey(mr => mr.MedicalReviewerId)
+                        //   .OnDelete(DeleteBehavior.Restrict);
+
+                        //         entity.HasOne(mr => mr.SectionResponsible)
+                        //     .WithMany(sr => sr.ManagedReviews)
+                        //     .HasForeignKey(mr => mr.SectionResponsibleId)
+                        //     .OnDelete(DeleteBehavior.Restrict);
 
 
                 });
@@ -641,5 +646,42 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                    .OnDelete(DeleteBehavior.Restrict);
 
                });
+
+
+                builder.Entity<MedicalReviewAssignment>(entity =>
+                {
+                        entity.HasKey(e => e.Id);
+
+                        entity.Property(a => a.AssignedAt)
+                    .IsRequired();
+
+                        entity.Property(a => a.Status)
+                    .IsRequired()
+                    .HasConversion<string>();
+
+                        entity.Property(a => a.RejectionReason)
+                    .IsRequired(false)
+                    .HasMaxLength(300);
+
+
+                        entity.HasOne(a => a.SectionResponsible)
+                    .WithMany(sr => sr.ManagedReviews)
+                    .HasForeignKey(a => a.SectionResponsibleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+
+                        entity.HasOne(a => a.AefiReport)
+                    .WithMany(ar => ar.MedicalReviewAssignments)
+                    .HasForeignKey(a => a.AefiReportId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                        entity.HasOne(a => a.MedicalReviewer)
+                   .WithMany(ar => ar.MedicalReviews)
+                   .HasForeignKey(a => a.MedicalReviewerId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+
+
+                });
         }
 }

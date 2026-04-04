@@ -1,12 +1,12 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6IjdjODAxODRkLWZjM2QtNDYzNy04MjE0LTQ1YTU1NTQwOWJjYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1Mjg5NTA0LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.Rm0qqUvNRND-jDoMYt0N89y0VIs6bbw1RZcNg0mfHy4
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImZjYTcwY2ZlLTRiZjYtNGJlYi1iZDQ4LTVjZTFhYzlhNDkwYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1MzIwNDYzLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.gtItXskvFH0AFM7ya4Ssrn3KCsK1-lKBk7B8NxqmLTI
 
 POST {{host}}/api/Catalog/register/symptom
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Náuseas",
+  "name": "Migraña",
   "standardCode": "12121223",
   "codingSystem": "12312312",
   "category": "General",

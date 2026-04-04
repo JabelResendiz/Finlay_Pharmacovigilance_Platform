@@ -1,0 +1,129 @@
+using System.Linq.Expressions;
+using AutoMapper;
+using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Application.IServices.Common;
+using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Application.Services.Report.Helpers;
+using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
+
+namespace Finlay.PharmaVigilance.Application.Services;
+
+public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCommandService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IUserContextService _userContextService;
+
+    public MedicalReviewAssignmentCommandService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IUserContextService userContextService)
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _userContextService = userContextService;
+    }
+
+    public async Task<MedicalReviewAssignmentDTO> CreateAsync(MedicalReviewAssignmentDTO dto)
+    {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException("User is not a section responsible.");
+
+        var report = await _unitOfWork.GetRepository<AefiReport>()
+                                .GetByIdAsync(dto.AefiReportId);
+
+        if (report == null)
+            throw new KeyNotFoundException("Aefi Report not found.");
+
+        var medicalReviewer = await _unitOfWork.GetRepository<MedicalReviewer>()
+                                    .GetByIdAsync(dto.MedicalReviewerId);
+        if (medicalReviewer == null)
+            throw new KeyNotFoundException("Medical Reviewer not found.");
+
+        if (medicalReviewer.MunicipalityId != sectionResponsible.MunicipalityId)
+            throw new InvalidOperationException(
+                "Medical Reviewer must be from the same municipality as the Section Responsible.");
+
+        var easternNowDate = TimeZoneHelper.GetEasternNowDate();
+        if (dto.AssignedAt > easternNowDate)
+            throw new ArgumentException("Assigned At date cannot be in the future. It must be less than or equal to the current date (Eastern Time UTC-5).",
+                            nameof(dto.AssignedAt));
+
+        Console.WriteLine($"========================dto.AssignedAt : {dto.AssignedAt}=======================");
+        Console.WriteLine($"========================report.ReportDate : {report.ReportDate}=======================");
+
+        if (dto.AssignedAt < report.ReportDate)
+            throw new ArgumentException("Assigned At date cannot be before the report creation date.",
+                            nameof(dto.AssignedAt));
+
+        var medicalReviewAssignment = _mapper.Map<MedicalReviewAssignment>(dto);
+        medicalReviewAssignment.SectionResponsible = sectionResponsible;
+        medicalReviewAssignment.MedicalReviewer = medicalReviewer;
+        medicalReviewAssignment.AefiReport = report;
+        medicalReviewAssignment.SectionResponsibleId = sectionResponsible.Id;
+        medicalReviewAssignment.Status = ReviewAssignmentStatus.Pending;
+
+        await _unitOfWork.GetRepository<MedicalReviewAssignment>().CreateAsync(medicalReviewAssignment);
+        await _unitOfWork.CompleteAsync();
+
+        return dto;
+    }
+
+    public async Task<MedicalReviewAssignmentDTO> UpdateAsync(MedicalReviewAssignmentDTO dto)
+    {
+        try
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Report DTO cannot be null.");
+
+            // TODO: Implement update logic with proper validation
+            await _unitOfWork.CompleteAsync();
+            return dto;
+        }
+        catch (ArgumentNullException ex)
+        {
+            throw new InvalidOperationException($"Validation error: {ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"An error occurred while updating the report: {ex.Message}", ex);
+        }
+    }
+    public async Task DeleteAsync(int medicalReviewId)
+    {
+        try
+        {
+            if (medicalReviewId <= 0)
+                throw new ArgumentException("Medical Review ID must be greater than zero.", nameof(medicalReviewId));
+
+            var report = await _unitOfWork.GetRepository<MedicalReview>().GetByIdAsync(medicalReviewId);
+            if (report == null)
+                throw new KeyNotFoundException($"Medical Review with ID {medicalReviewId} does not exist.");
+
+            await _unitOfWork.GetRepository<MedicalReview>().DeleteByIdAsync(medicalReviewId);
+            await _unitOfWork.CompleteAsync();
+        }
+        catch (ArgumentException ex)
+        {
+            throw new InvalidOperationException($"Validation error: {ex.Message}", ex);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"An error occurred while deleting the report: {ex.Message}", ex);
+        }
+    }
+}
