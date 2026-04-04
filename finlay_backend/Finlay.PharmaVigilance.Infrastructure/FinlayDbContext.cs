@@ -344,10 +344,10 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                 .HasForeignKey(r => r.ReporterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                        entity.HasOne(r => r.Alert)
-                    .WithOne(a => a.AefiReport)
-                    .HasForeignKey<AefiReport>(r => r.AlertId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                        //         entity.HasOne(r => r.Alert)
+                        //     .WithOne(a => a.AefiReport)
+                        //     .HasForeignKey<AefiReport>(r => r.AlertId)
+                        //     .OnDelete(DeleteBehavior.Restrict);
 
 
                 });
@@ -620,7 +620,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                        entity.HasKey(e => e.Id);
 
                        entity.Property(a => a.ReadAt)
-                   .IsRequired();
+                   .IsRequired(false);
 
                        entity.Property(a => a.IsActive)
                    .IsRequired();
@@ -636,8 +636,8 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
 
                        entity.HasOne(a => a.AefiReport)
-                   .WithOne(ar => ar.Alert)
-                   .HasForeignKey<Alert>(a => a.AefiReportId)
+                   .WithMany(ar => ar.Alerts)
+                   .HasForeignKey(a => a.AefiReportId)
                    .OnDelete(DeleteBehavior.Restrict);
 
                });

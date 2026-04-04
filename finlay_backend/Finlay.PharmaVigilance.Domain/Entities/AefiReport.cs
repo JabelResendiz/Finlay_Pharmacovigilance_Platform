@@ -13,10 +13,7 @@ public class AefiReport : GenericEntity
 
     public int ReporterId { get; set; }
     public int VaccinatedSubjectId { get; set; }
-    public int AlertId { get; set; }
 
-
-    public Alert Alert { get; set; } = null!;
     public Reporter Reporter { get; set; } = null!;
 
     public VaccinatedSubject VaccinatedSubject { get; set; } = null!;
@@ -24,7 +21,7 @@ public class AefiReport : GenericEntity
 
     public ICollection<Vaccination> Vaccinations { get; set; } = new List<Vaccination>();
     public ICollection<AdverseEvent> AdverseEvents { get; set; } = new List<AdverseEvent>();
-
+    public ICollection<Alert> Alerts { get; set; } = new List<Alert>();
 
 
 }

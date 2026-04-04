@@ -3,7 +3,7 @@ namespace Finlay.PharmaVigilance.Domain.Entities;
 public class Alert : GenericEntity
 {
     public string Description { get; set; } = null!;
-    public DateTime ReadAt { get; set; }
+    public DateTime? ReadAt { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsRead { get; set; } = false;
 
