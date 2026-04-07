@@ -8,7 +8,7 @@ namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 /// <summary>
 /// Validates adverse event information including symptom existence, date consistency, and death-related data.
 /// </summary>
-public class AdverseEventValidator : IReportValidator
+public class AdverseEventValidator : IReportValidator<ReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -25,7 +25,7 @@ public class AdverseEventValidator : IReportValidator
     /// - Event start date must be after vaccination and before report date
     /// - If death occurred, death date must be provided and fall between event date and report date
     /// </summary>
-    public async Task ValidateAsync(PublicAefiReportDto reportDto)
+    public async Task ValidateAsync(ReportDto reportDto)
     {
         if (reportDto?.AdverseEvents == null || !reportDto.AdverseEvents.Any())
             throw new ArgumentException(

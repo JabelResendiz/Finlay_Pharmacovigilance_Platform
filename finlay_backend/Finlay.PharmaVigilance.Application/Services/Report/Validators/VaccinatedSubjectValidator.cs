@@ -8,7 +8,7 @@ namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 /// <summary>
 /// Validates vaccinated subject (patient) information including age, location, pregnancy status, and identity validation.
 /// </summary>
-public class VaccinatedSubjectValidator : IReportValidator
+public class VaccinatedSubjectValidator : IReportValidator<ReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -24,7 +24,7 @@ public class VaccinatedSubjectValidator : IReportValidator
     /// - If subject is female, IsPregnant status must be explicitly set
     /// - Identity number format must be consistent with date of birth
     /// </summary>
-    public async Task ValidateAsync(PublicAefiReportDto reportDto)
+    public async Task ValidateAsync(ReportDto reportDto)
     {
         if (reportDto?.VaccinatedSubject == null)
             throw new ArgumentNullException(nameof(reportDto.VaccinatedSubject), "Vaccinated subject information is required.");

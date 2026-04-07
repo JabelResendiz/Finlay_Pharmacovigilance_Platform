@@ -40,7 +40,7 @@ public class ReportController : ControllerBase
 
 
     [HttpPost("createMedical")]
-    [Authorize(Roles = "Medical Reviewer")]
+    [Authorize(Roles = "MedicalReviewer")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -58,58 +58,6 @@ public class ReportController : ControllerBase
             data = result
         });
     }
-
-
-
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<ReportDto>>> GetAllReports()
-    // {
-    //     var reports = await _reportQueryService.ListAsync();
-    //     return Ok(new { message = "Reports retrieved successfully.", data = reports, count = reports.Count() });
-    // }
-
-    // [HttpGet("{reportId:int}")]
-    // public async Task<ActionResult<ReportDto>> GetReportById(int reportId)
-    // {
-    //     if (reportId <= 0)
-    //         throw new ArgumentException("Report ID must be a valid positive number.");
-
-    //     var report = await _reportQueryService.GetByIdAsync(reportId);
-
-    //     if (report == null)
-    //         throw new KeyNotFoundException($"Report with ID {reportId} was not found.");
-
-    //     return Ok(new { message = "Report retrieved successfully.", data = report });
-    // }
-
-    // [HttpPut("{reportId:int}")]
-    // public async Task<IActionResult> UpdateReport(int reportId, [FromBody] ReportDto reportDto)
-    // {
-    //     if (reportId <= 0)
-    //         throw new ArgumentException("Report ID must be a valid positive number.");
-
-    //     if (reportDto == null)
-    //         throw new ArgumentNullException(nameof(reportDto), "Report data is required.");
-
-    //     var existingReport = await _reportQueryService.GetByIdAsync(reportId);
-    //     if (existingReport == null)
-    //         throw new KeyNotFoundException($"Report with ID {reportId} was not found.");
-
-    //     var result = await _reportCommandService.UpdateAsync(reportDto);
-
-    //     return Ok(new { message = "Report successfully updated.", data = result });
-    // }
-
-    // [HttpDelete("{reportId:int}")]
-    // public async Task<IActionResult> DeleteReport(int reportId)
-    // {
-    //     if (reportId <= 0)
-    //         throw new ArgumentException("Report ID must be a valid positive number.");
-
-    //     await _reportCommandService.DeleteAsync(reportId);
-
-    //     return NoContent();
-    // }
 
 
 }

@@ -8,7 +8,7 @@ public class AefiReport : GenericEntity
     public DateTime ReportDate { get; set; }
     public ReportStatus Status { get; set; }
     public string NotificationNumber { get; set; } = null!;
-    public bool isMedicalReport { get; init; }
+    public bool isMedicalReport { get; set; }
 
 
     public int ReporterId { get; set; }

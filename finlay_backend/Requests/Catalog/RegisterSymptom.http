@@ -1,5 +1,5 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6ImNhcmxvcyIsImp0aSI6IjAzZDZjOTJlLTQ1ZjMtNDBmNS1hZGM1LTI2MDYzNDFhNzk5MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NDQwMzQ1LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.GO0kFthrcL53ray8U41o4CM2zbdog6MVKRrPuvq34T0
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImE5NGNhMTkxLTUyNjItNGE0Mi04ODY2LWUzZTI4ODBkMWY3MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NTk0MDg2LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.VYcCDdDIktbOhviixk7RIQ8H8MAbFfasP5IJzQAGA_M
 
 
 POST {{host}}/api/Catalog/register/symptom
@@ -7,7 +7,7 @@ Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Catarro",
+  "name": "Dolor de garganta",
   "standardCode": "12121223",
   "codingSystem": "12312312",
   "category": "General",

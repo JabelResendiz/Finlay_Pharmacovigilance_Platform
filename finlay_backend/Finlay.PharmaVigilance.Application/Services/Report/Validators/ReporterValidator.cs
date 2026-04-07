@@ -8,7 +8,7 @@ namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 /// <summary>
 /// Validates reporter information including age, location hierarchy, and professional requirements.
 /// </summary>
-public class ReporterValidator : IReportValidator
+public class ReporterValidator : IReportValidator<PublicAefiReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 

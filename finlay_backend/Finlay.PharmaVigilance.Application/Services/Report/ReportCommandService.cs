@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Application.Services.Report.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
@@ -22,19 +23,31 @@ public class ReportCommandService : IReportCommandService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly INotificationNumberGenerator _generator;
-    private readonly IEnumerable<IReportValidator> _validators;
+    private readonly IEnumerable<IReportValidator<ReportDto>> _validators;
+    private readonly IEnumerable<IReportValidator<PublicAefiReportDto>> _publicValidators;
+    private readonly IUserContextService _userContextService;
+
+    private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
+                            { e => e.User! };
 
     public ReportCommandService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         INotificationNumberGenerator generator,
-        IEnumerable<IReportValidator> validators)
+        IEnumerable<IReportValidator<ReportDto>> validators,
+        IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
+        IUserContextService userContextService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _generator = generator ?? throw new ArgumentNullException(nameof(generator));
         _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+        _publicValidators = publicValidators ?? throw new ArgumentNullException(nameof(publicValidators));
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
     }
+
+    public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;
+
 
     public async Task<CreateReportResponseDto> CreatePublicReportAsync(PublicAefiReportDto reportDto)
     {
@@ -45,6 +58,11 @@ public class ReportCommandService : IReportCommandService
         {
             // Execute all validators in sequence using Chain of Responsibility pattern
             foreach (var validator in _validators)
+            {
+                await validator.ValidateAsync(reportDto);
+            }
+
+            foreach (var validator in _publicValidators)
             {
                 await validator.ValidateAsync(reportDto);
             }
@@ -121,7 +139,7 @@ public class ReportCommandService : IReportCommandService
         }
     }
 
-    public Task<string> CreateMedicalReportAsync(MedicalReportDto reportDto)
+    public async Task<CreateReportResponseDto> CreateMedicalReportAsync(MedicalReportDto reportDto)
     {
         if (reportDto == null)
             throw new ArgumentNullException(nameof(reportDto), "Medical report data is required.");
@@ -129,7 +147,111 @@ public class ReportCommandService : IReportCommandService
         // TODO: Implement medical report creation with validation
         // Medical reports may have different validation rules than public reports
 
-        return Task.FromResult(string.Empty);
+        try
+        {
+
+            // Execute all validators in sequence using Chain of Responsibility pattern
+            foreach (var validator in _validators)
+            {
+                await validator.ValidateAsync(reportDto);
+            }
+
+            // Step 1: Get or create VaccinatedSubject (patient)
+            var vaccinatedSubjectRepository = _unitOfWork.GetRepository<VaccinatedSubject>();
+            var existingVaccinatedSubject = await vaccinatedSubjectRepository
+                .FirstOrDefaultAsync(x => x.IdentityNumber == reportDto.VaccinatedSubject.IdentityNumber);
+
+            VaccinatedSubject vaccinatedSubject;
+            if (existingVaccinatedSubject != null)
+            {
+                vaccinatedSubject = existingVaccinatedSubject;
+            }
+            else
+            {
+                vaccinatedSubject = _mapper.Map<VaccinatedSubject>(reportDto.VaccinatedSubject);
+            }
+
+            // Step 2: Get or create Reporter by normalized full name
+
+            var userId = _userContextService.GetUserId();
+
+            var includes = GetIncludes();
+
+            var medicalReviewer = await _unitOfWork.GetRepository<MedicalReviewer>()
+                                        .FirstOrDefaultAsync(mr => mr.UserId == userId, default, includes);
+
+
+            if (medicalReviewer == null)
+                throw new UnauthorizedAccessException("User is not a medicalReviewer.");
+
+            var reporterRepository = _unitOfWork.GetRepository<Reporter>();
+            var existingReporter = await reporterRepository
+                .FirstOrDefaultAsync(x => x.IdentityNumber == medicalReviewer.IdentityNumber);
+
+            Reporter reporter;
+            if (existingReporter != null)
+            {
+                reporter = existingReporter;
+            }
+            else
+            {
+                reporter = _mapper.Map<Reporter>(medicalReviewer);
+                reporter.ReporterRelationship = ReporterRelationship.Doctor;
+                reporter.UserId = medicalReviewer.UserId;
+
+            }
+
+
+            // Step 3
+            var report = _mapper.Map<AefiReport>(reportDto);
+            report.VaccinatedSubjectId = vaccinatedSubject.Id;
+            report.VaccinatedSubject = vaccinatedSubject;
+
+            //var reporter = _mapper.Map<Reporter>(medicalReviewer);
+            // reporter.ReporterRelationship = ReporterRelationship.Doctor;
+            // reporter.UserId = medicalReviewer.UserId;
+            report.Reporter = reporter;
+            report.ReporterId = reporter.Id;
+
+
+            report.Status = ReportStatus.UnderReview;
+            report.isMedicalReport = true;
+            report.NotificationNumber = _generator.Generate();
+
+            var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                .FirstOrDefaultAsync(sr => sr.MunicipalityId == reportDto.VaccinatedSubject.MunicipalityId);
+
+            if (sectionResponsible == null)
+                throw new InvalidOperationException("No SectionResponsible found.");
+
+            var alert = new Alert
+            {
+                Description = "New AEFI report submitted",
+                IsActive = true,
+                IsRead = false,
+                ReadAt = null,
+                SectionResponsibleId = sectionResponsible.Id
+            };
+
+            report.Alerts.Add(alert);
+
+            await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
+            await _unitOfWork.CompleteAsync();
+
+            return new CreateReportResponseDto
+            {
+                NotificationNumber = report.NotificationNumber
+            };
+
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Error to create AEFI report: {ex.Message}",
+                ex);
+        }
+
+        //return Task.FromResult(string.Empty);
     }
 
 }

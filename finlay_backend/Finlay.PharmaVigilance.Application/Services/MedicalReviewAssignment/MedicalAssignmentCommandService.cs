@@ -21,9 +21,9 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
         IMapper mapper,
         IUserContextService userContextService)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        _userContextService = userContextService;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService)); ;
     }
 
     public async Task<MedicalReviewAssignmentDTO> CreateAsync(MedicalReviewAssignmentDTO dto)

@@ -215,6 +215,18 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                           .IsRequired(false)
                           .HasMaxLength(100);
 
+                        entity.Property(e => e.DateOfBirth)
+                     .IsRequired();
+
+                        entity.Property(e => e.IdentityNumber)
+                        .IsRequired()
+                        .HasMaxLength(20);
+
+                        entity.HasIndex(e => e.IdentityNumber)
+                .IsUnique();
+
+
+
                 });
 
                 builder.Entity<SectionResponsible>(entity =>

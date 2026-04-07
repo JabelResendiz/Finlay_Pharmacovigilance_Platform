@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Finlay.PharmaVigilance.Domain.Enum;
-
 namespace Finlay.PharmaVigilance.Application.DTO.Authentication;
 
 /// <summary>
@@ -17,6 +15,14 @@ public class RegisterMedicalReviewerDto : RegisterUserDto
     [Required(ErrorMessage = "Professional License is required")]
     public string ProfessionalLicense { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Identity number is required.")]
+    [StringLength(20, MinimumLength = 5, ErrorMessage = "Identity number must be between 5 and 20 characters.")]
+    public string IdentityNumber { get; set; } = null!;
+
+    [Required(ErrorMessage = "Date Of Birth is required.")]
+    public DateTime? DateOfBirth { get; set; }
+
+    [StringLength(100, MinimumLength = 1, ErrorMessage = "Specialty must be between 1 and 100 characters.")]
     public string? Specialty { get; set; }
 
 }

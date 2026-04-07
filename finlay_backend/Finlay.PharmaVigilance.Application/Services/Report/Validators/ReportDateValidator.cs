@@ -7,14 +7,14 @@ namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 /// Validates that the report date is not in the future.
 /// All date validations use Eastern Time (UTC-5) as the reference timezone.
 /// </summary>
-public class ReportDateValidator : IReportValidator
+public class ReportDateValidator : IReportValidator<ReportDto>
 {
     /// <summary>
     /// Validates that the report date is less than or equal to the current date in Eastern Time (UTC-5).
     /// </summary>
     /// <param name="reportDto">The report data to validate</param>
     /// <exception cref="ArgumentException">Thrown when report date is in the future</exception>
-    public Task ValidateAsync(PublicAefiReportDto reportDto)
+    public Task ValidateAsync(ReportDto reportDto)
     {
         if (reportDto == null)
             throw new ArgumentNullException(nameof(reportDto));

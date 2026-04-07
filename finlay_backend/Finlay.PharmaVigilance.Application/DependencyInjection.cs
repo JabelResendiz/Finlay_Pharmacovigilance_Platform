@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
@@ -43,11 +44,11 @@ public static class DependencyInjection
         services.AddScoped<IReportQueryService, ReportQueryService>();
 
         // Report Validators - Chain of Responsibility pattern for comprehensive validation
-        services.AddScoped<IReportValidator, ReportDateValidator>();
-        services.AddScoped<IReportValidator, ReporterValidator>();
-        services.AddScoped<IReportValidator, VaccinatedSubjectValidator>();
-        services.AddScoped<IReportValidator, VaccinationValidator>();
-        services.AddScoped<IReportValidator, AdverseEventValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, ReportDateValidator>();
+        services.AddScoped<IReportValidator<PublicAefiReportDto>, ReporterValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, VaccinatedSubjectValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, VaccinationValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, AdverseEventValidator>();
 
         // Notification Number Generator
         services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
