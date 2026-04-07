@@ -22,12 +22,12 @@ public class ReportDateValidator : IReportValidator
         if (!reportDto.ReportDate.HasValue)
             throw new ArgumentException("Report date is required.", nameof(reportDto.ReportDate));
 
-        var easternNowDate = TimeZoneHelper.GetEasternNowDate();
+        var easternNow = TimeZoneHelper.GetEasternNow();
 
-        Console.WriteLine($"================{easternNowDate}==================");
+        Console.WriteLine($"================{easternNow}==================");
 
 
-        if (reportDto.ReportDate.Value.Date > easternNowDate)
+        if (reportDto.ReportDate > easternNow)
             throw new ArgumentException(
                 "Report date cannot be in the future. The report date must be less than or equal to the current date (Eastern Time UTC-5).",
                 nameof(reportDto.ReportDate));

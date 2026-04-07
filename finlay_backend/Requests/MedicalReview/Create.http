@@ -1,20 +1,25 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZ2l2ZW5fbmFtZSI6IkphYmVsIiwianRpIjoiNzMyMThhOTAtZDM5ZC00NDFkLTg5MTktYmQ4YmQ2M2U0MTIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWVkaWNhbFJldmlld2VyIiwiZXhwIjoxNzc1MzIwNzM3LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.3GYdR66EQ1vaiACbMnQU2gnCiKLI-LWCGlPYl9tAPQM
-
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZ2l2ZW5fbmFtZSI6IkphYmVsIiwianRpIjoiMWFlNjAxMWMtYjllYS00NzJlLTlmMzgtZjgwYzQ2MWJlMjVkIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWVkaWNhbFJldmlld2VyIiwiZXhwIjoxNzc1NDQzNDQyLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.mG0DtqgFa45L7moSn1bcWMJZAX05LFmZ9ZJAcxGQhJs
 POST {{host}}/api/MedicalReview
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "medicalReviewAssignmentId": 1,
-  "clinicalSignificance": 1,
+  "medicalReviewAssignmentId": 3,
   "causality": 1,
+  "clinicalSignificance":1,
   "reviewedAt": "2026-04-04T11:38:12.913Z",
   "clinicalMedicalReviews": [
     {
-      "adverseEventId": 1,
+      "adverseEventId": 17,
       "laboratoryResults": "Evaluacion no arroja nada",
       "medDRACode": "23232323",
+      "retClassification": "Posiblemente nada"
+    },
+     {
+      "adverseEventId": 16,
+      "laboratoryResults": "Evaluacion no arroja nada",
+      "medDRACode": "julioasodiasodias",
       "retClassification": "Posiblemente nada"
     }
   ]

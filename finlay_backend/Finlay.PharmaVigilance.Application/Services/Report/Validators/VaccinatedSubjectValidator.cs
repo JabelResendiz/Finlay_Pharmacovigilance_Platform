@@ -63,6 +63,14 @@ public class VaccinatedSubjectValidator : IReportValidator
 
         // Validate identity number consistency with date of birth
         ValidateIdentityNumberFormat(subject.IdentityNumber, subject.DateOfBirth);
+
+        if (!EnumHelper<Gender>.IsValid(subject.Gender.ToString()!))
+        {
+            throw new ArgumentException(
+                "Vaccinated Subject's Gender must be valid",
+                nameof(subject.Gender)
+            );
+        }
     }
 
     /// <summary>

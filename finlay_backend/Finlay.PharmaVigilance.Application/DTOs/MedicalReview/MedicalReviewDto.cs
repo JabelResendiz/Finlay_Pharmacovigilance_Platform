@@ -10,10 +10,10 @@ public class MedicalReviewDto
     public int MedicalReviewAssignmentId { get; set; }
 
     [Required(ErrorMessage = "Clinical Significance is required")]
-    public ClinicalSignificance ClinicalSignificance { get; set; }
+    public ClinicalSignificance? ClinicalSignificance { get; set; }
 
     [Required(ErrorMessage = "Causality is required")]
-    public CausalityLevel Causality { get; set; }
+    public CausalityLevel? Causality { get; set; }
 
     [Required(ErrorMessage = "Reviewed At is required.")]
     public DateTime? ReviewedAt { get; set; }

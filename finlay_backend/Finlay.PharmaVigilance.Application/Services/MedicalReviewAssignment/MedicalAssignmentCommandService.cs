@@ -54,8 +54,8 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
             throw new InvalidOperationException(
                 "Medical Reviewer must be from the same municipality as the Section Responsible.");
 
-        var easternNowDate = TimeZoneHelper.GetEasternNowDate();
-        if (dto.AssignedAt > easternNowDate)
+        var easternNow = TimeZoneHelper.GetEasternNow();
+        if (dto.AssignedAt > easternNow)
             throw new ArgumentException("Assigned At date cannot be in the future. It must be less than or equal to the current date (Eastern Time UTC-5).",
                             nameof(dto.AssignedAt));
 

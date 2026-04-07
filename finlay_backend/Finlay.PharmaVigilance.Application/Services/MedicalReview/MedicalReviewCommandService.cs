@@ -32,6 +32,22 @@ public class MedicalReviewCommandService : IMedicalReviewCommandService
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
 
+        if (!EnumHelper<CausalityLevel>.IsValid(dto.Causality.ToString()!))
+        {
+            throw new ArgumentException(
+                                          "Causality Level must be valid",
+                                          nameof(dto.Causality)
+                                      );
+        }
+
+        if (!EnumHelper<ClinicalSignificance>.IsValid(dto.ClinicalSignificance.ToString()!))
+        {
+            throw new ArgumentException(
+                                          "Clinical Significance must be valid",
+                                          nameof(dto.ClinicalSignificance)
+                                      );
+        }
+
         var userId = _userContextService.GetUserId();
 
         var medicalReviewer = await _unitOfWork.GetRepository<MedicalReviewer>()

@@ -1,5 +1,6 @@
 
 
+using Finlay.PharmaVigilance.Application.Services.Report.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +23,13 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                 {
                         if (entry.State == EntityState.Added)
                         {
-                                entry.Entity.CreatedAt = DateTime.UtcNow;
-                                entry.Entity.UpdatedAt = DateTime.UtcNow;
+                                entry.Entity.CreatedAt = TimeZoneHelper.GetEasternNow();
+                                entry.Entity.UpdatedAt = TimeZoneHelper.GetEasternNow();
                         }
 
                         if (entry.State == EntityState.Modified)
                         {
-                                entry.Entity.UpdatedAt = DateTime.UtcNow;
+                                entry.Entity.UpdatedAt = TimeZoneHelper.GetEasternNow();
                         }
                 }
 

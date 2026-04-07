@@ -1,6 +1,7 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 
@@ -46,6 +47,14 @@ public class AdverseEventValidator : IReportValidator
                 throw new ArgumentException(
                     "Each adverse event must have at least one symptom.",
                     nameof(adverseEvent.Symptoms));
+
+            if (!EnumHelper<PatientStatus>.IsValid(adverseEvent.CurrentStatus.ToString()!))
+            {
+                throw new ArgumentException(
+                                "Patient Status must be valid",
+                                nameof(adverseEvent.CurrentStatus)
+                            );
+            }
 
             // Validate each symptom exists in database
             foreach (var symptomId in adverseEvent.Symptoms)
@@ -94,6 +103,15 @@ public class AdverseEventValidator : IReportValidator
                         $"Death date: {deathDate:yyyy-MM-dd}, " +
                         $"Report date: {reportDto.ReportDate:yyyy-MM-dd}",
                         nameof(adverseEvent.DeathDate));
+            }
+
+            else
+            {
+                if (adverseEvent.DeathDate.HasValue)
+                    throw new ArgumentException(
+                        "Death date dont must be provided when 'Resulted In Death' is marked as false.",
+                        nameof(adverseEvent.DeathDate));
+
             }
         }
     }

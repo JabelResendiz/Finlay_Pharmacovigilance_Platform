@@ -77,6 +77,16 @@ public class ReporterValidator : IReportValidator
 
 
         ValidateIdentityNumberFormat(reporter.IdentityNumber, reporter.DateOfBirth.Value);
+
+        Console.WriteLine($"==========================={reporter.ReporterRelationship}=======================");
+
+        if (!EnumHelper<ReporterRelationship>.IsValid(reporter.ReporterRelationship.ToString()!))
+        {
+            throw new ArgumentException(
+                "Reporter Relationship must be valid",
+                nameof(reporter.ReporterRelationship)
+            );
+        }
     }
 
     /// <summary>

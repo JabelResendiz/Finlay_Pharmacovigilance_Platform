@@ -1,6 +1,7 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
 
@@ -52,6 +53,13 @@ public class VaccinationValidator : IReportValidator
                     $"Adverse event date: {minAdverseEventDate:yyyy-MM-dd}",
                     nameof(vaccination.AdministrationDate));
 
+            if (!EnumHelper<AdministrationSite>.IsValid(vaccination.Site.ToString()!))
+            {
+                throw new ArgumentException(
+                    "Administration Site must be valid",
+                    nameof(vaccination.Site)
+                );
+            }
 
         }
     }

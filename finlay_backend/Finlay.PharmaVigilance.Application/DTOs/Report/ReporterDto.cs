@@ -10,7 +10,7 @@ public class ReporterDto
     public string FullName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Reporter Relationship is required.")]
-    public ReporterRelationship ReporterRelationship { get; set; }
+    public ReporterRelationship? ReporterRelationship { get; set; }
 
     [Required(ErrorMessage = "Identity number is required.")]
     [StringLength(20, MinimumLength = 5, ErrorMessage = "Identity number must be between 5 and 20 characters.")]
