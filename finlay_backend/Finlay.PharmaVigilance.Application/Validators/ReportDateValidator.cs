@@ -1,7 +1,7 @@
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.Services.Report.Helpers;
+using Finlay.PharmaVigilance.Application.Helpers;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Validates that the report date is not in the future.
@@ -23,9 +23,6 @@ public class ReportDateValidator : IReportValidator<ReportDto>
             throw new ArgumentException("Report date is required.", nameof(reportDto.ReportDate));
 
         var easternNow = TimeZoneHelper.GetEasternNow();
-
-        Console.WriteLine($"================{easternNow}==================");
-
 
         if (reportDto.ReportDate > easternNow)
             throw new ArgumentException(

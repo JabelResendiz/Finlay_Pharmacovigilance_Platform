@@ -1,6 +1,6 @@
 
 
-using Finlay.PharmaVigilance.Application.Services.Report.Helpers;
+using Finlay.PharmaVigilance.Application.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

@@ -6,6 +6,7 @@ using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Application.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 
@@ -21,6 +22,7 @@ public class MedicalReviewerService : IMedicalReviewerService
     private readonly IMapper _mapper;
     private readonly IUserContextService _userContextService;
     private readonly IMedicalReviewerRepository _medical;
+    private readonly IEnumerable<IReportValidator<RegisterMedicalReviewerDto>> _validators;
 
     /// <summary>
     /// Initializes a new instance of the MedicalReviewerService class.
@@ -30,13 +32,15 @@ public class MedicalReviewerService : IMedicalReviewerService
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IUserContextService userContextService,
-        IMedicalReviewerRepository medical)
+        IMedicalReviewerRepository medical,
+        IEnumerable<IReportValidator<RegisterMedicalReviewerDto>> validators)
     {
-        _identityManager = identityManager;
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        _userContextService = userContextService;
-        _medical = medical;
+        _identityManager = identityManager ?? throw new ArgumentNullException(nameof(identityManager)); ;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService)); ;
+        _medical = medical ?? throw new ArgumentNullException(nameof(medical)); ;
+        _validators = validators ?? throw new ArgumentNullException(nameof(validators));
     }
 
     /// <summary>
@@ -48,45 +52,63 @@ public class MedicalReviewerService : IMedicalReviewerService
         if (registerDto == null)
             throw new ArgumentNullException(nameof(registerDto), "Registration DTO cannot be null.");
 
-        var userId = _userContextService.GetUserId();
+        try
+        {
+            foreach (var validator in _validators)
+            {
+                await validator.ValidateAsync(registerDto);
+            }
 
-        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
-                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+            var userId = _userContextService.GetUserId();
 
-        if (sectionResponsible == null)
-            throw new UnauthorizedAccessException("User is not a section responsible.");
+            var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                            .FirstOrDefaultAsync(sr => sr.UserId == userId);
 
-        var provinceId = sectionResponsible.ProvinceId;
-        var municipalityId = sectionResponsible.MunicipalityId;
+            if (sectionResponsible == null)
+                throw new UnauthorizedAccessException("User is not a section responsible.");
 
-        // // Validate that municipality exists and belongs to the province
-        // var municipality = await _unitOfWork.GetRepository<Municipality>().GetByIdAsync(registerDto.MunicipalityId);
-        // if (municipality == null || municipality.ProvinceId != provinceId)
-        //     throw new KeyNotFoundException($"Municipality with ID {registerDto.MunicipalityId} does not exist or does not belong to the specified province.");
+            var provinceId = sectionResponsible.ProvinceId;
+            var municipalityId = sectionResponsible.MunicipalityId;
 
-        var user = _mapper.Map<User>(registerDto);
-        user.UserRole = UserRole.MedicalReviewer.ToString();
+            // // Validate that municipality exists and belongs to the province
+            // var municipality = await _unitOfWork.GetRepository<Municipality>().GetByIdAsync(registerDto.MunicipalityId);
+            // if (municipality == null || municipality.ProvinceId != provinceId)
+            //     throw new KeyNotFoundException($"Municipality with ID {registerDto.MunicipalityId} does not exist or does not belong to the specified province.");
 
-        var createdUser = await _identityManager.CreateUserAsync(user, registerDto.Password);
-        if (createdUser == null)
-            throw new InvalidOperationException("Failed to create user account.");
+            var user = _mapper.Map<User>(registerDto);
+            user.UserRole = UserRole.MedicalReviewer.ToString();
 
-        // Assign MedicalReviewer role
-        await _identityManager.AddRoles(createdUser.Id.ToString(), UserRole.MedicalReviewer.ToString());
+            var createdUser = await _identityManager.CreateUserAsync(user, registerDto.Password);
+            if (createdUser == null)
+                throw new InvalidOperationException("Failed to create user account.");
 
-        var medicalReviewer = _mapper.Map<MedicalReviewer>(registerDto);
-        medicalReviewer.UserId = createdUser.Id;
-        medicalReviewer.User = createdUser;
-        medicalReviewer.ProvinceId = provinceId;
-        medicalReviewer.MunicipalityId = municipalityId;
-        medicalReviewer.SectionResponsibleId = sectionResponsible.Id;
-        medicalReviewer.SectionResponsible = sectionResponsible;
+            // Assign MedicalReviewer role
+            await _identityManager.AddRoles(createdUser.Id.ToString(), UserRole.MedicalReviewer.ToString());
 
-        // Add to repository and save
-        await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);
-        await _unitOfWork.CompleteAsync();
+            var medicalReviewer = _mapper.Map<MedicalReviewer>(registerDto);
+            medicalReviewer.UserId = createdUser.Id;
+            medicalReviewer.User = createdUser;
+            medicalReviewer.ProvinceId = provinceId;
+            medicalReviewer.MunicipalityId = municipalityId;
+            medicalReviewer.SectionResponsibleId = sectionResponsible.Id;
+            medicalReviewer.SectionResponsible = sectionResponsible;
 
-        return "Medical Reviewer successfully registered";
+            // Add to repository and save
+            await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);
+            await _unitOfWork.CompleteAsync();
+
+            return "Medical Reviewer successfully registered";
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Error to register Medical Reviewer: {ex.Message}",
+                ex);
+        }
+
+
+
+
     }
 
 

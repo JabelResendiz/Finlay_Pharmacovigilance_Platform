@@ -3,7 +3,7 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Validates adverse event information including symptom existence, date consistency, and death-related data.

@@ -4,7 +4,7 @@ using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
-using Finlay.PharmaVigilance.Application.Services.Report.Validators;
+using Finlay.PharmaVigilance.Application.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 

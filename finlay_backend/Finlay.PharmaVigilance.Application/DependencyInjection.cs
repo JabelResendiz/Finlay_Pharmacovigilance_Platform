@@ -1,9 +1,10 @@
 using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
 using Finlay.PharmaVigilance.Application.Services.Authentication;
-using Finlay.PharmaVigilance.Application.Services.Report.Validators;
+using Finlay.PharmaVigilance.Application.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -49,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IReportValidator<ReportDto>, VaccinatedSubjectValidator>();
         services.AddScoped<IReportValidator<ReportDto>, VaccinationValidator>();
         services.AddScoped<IReportValidator<ReportDto>, AdverseEventValidator>();
+        services.AddScoped<IReportValidator<RegisterMedicalReviewerDto>, MedicalReviewerValidator>();
 
         // Notification Number Generator
         services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
