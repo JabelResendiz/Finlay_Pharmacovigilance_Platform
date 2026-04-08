@@ -57,12 +57,12 @@ public class ContactCommandService : IContactCommandService
         }
     }
 
-    public async Task DeleteAsync(int contactId)
+    public async Task DeleteAsync<TId>(TId contactId)
     {
         try
         {
-            if (contactId <= 0)
-                throw new ArgumentException("Report ID must be greater than zero.", nameof(contactId));
+            if (contactId == null)
+                throw new ArgumentException("Report ID must be different than null.", nameof(contactId));
 
             var report = await _unitOfWork.ContactRepository.GetByIdAsync(contactId);
             if (report == null)

@@ -22,7 +22,7 @@ public class VaccinatedSubjectDto
     [Range(1, 16, ErrorMessage = "A valid Province ID (1-16) is required.")]
     public int ProvinceId { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "A valid Municipality ID is required.")]
+    [Range(1, 18, ErrorMessage = "A valid Municipality ID is required.")]
     public int MunicipalityId { get; set; }
 
     [StringLength(100, ErrorMessage = "Health area cannot exceed 100 characters.")]

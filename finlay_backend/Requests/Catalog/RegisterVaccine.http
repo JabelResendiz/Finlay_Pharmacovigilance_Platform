@@ -1,5 +1,5 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImE5NGNhMTkxLTUyNjItNGE0Mi04ODY2LWUzZTI4ODBkMWY3MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NTk0MDg2LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.VYcCDdDIktbOhviixk7RIQ8H8MAbFfasP5IJzQAGA_M
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6IjRiZmEwMzJhLTJkZWUtNDM2NC1hZTM4LTJiZjA1ZjYzZjVjZSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NjA5MDQ1LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.OsTUJvW7YgSu6W8DRfBvMw5PQ-pje2GOOmF4CpTjJdI
 
 
 POST {{host}}/api/Catalog/register/vaccine
@@ -7,7 +7,7 @@ Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Soberana 04",
+  "name": "abdala",
   "type": 0,
   "code": "TC12323",
   "isActive": true,

@@ -15,7 +15,7 @@ Content-Type:  application/json
     "identityNumber": "03041868163",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "provinceId": 1,
-    "municipalityId": 1,
+    "municipalityId": 2,
     "phoneNumber": "55664266",
     "email": "jabel@example.com",
     "professionalLicense": "string",
@@ -28,7 +28,7 @@ Content-Type:  application/json
     "gender": 1,
     "isPregnant": false,
     "provinceId": 1,
-    "municipalityId": 1,
+    "municipalityId": 2,
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
@@ -39,7 +39,7 @@ Content-Type:  application/json
   },
   "vaccinations": [
     {
-      "vaccineId": 1,
+      "vaccineId": "08de9500-1a6a-45fe-8f1b-73b439462b79",
       "batchNumber": "qweqweq",
       "site": 3,
       "doseNumber": 5,
@@ -54,16 +54,7 @@ Content-Type:  application/json
       "resultedInDeath": false,
       "currentStatus": 2,
       "symptoms": [
-        1,2,3
-      ]
-    },
-    {
-      "startDate": "2026-04-03T12:13:59.418Z",
-      "description": "string",
-      "resultedInDeath": false,
-      "currentStatus": 2,
-      "symptoms": [
-        2,3
+        "08de9500-0beb-4683-8fc7-e362aca745d2"
       ]
     }
   ]

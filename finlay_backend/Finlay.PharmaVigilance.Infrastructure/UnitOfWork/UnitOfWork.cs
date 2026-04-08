@@ -26,7 +26,7 @@ public class UnitOfWork : IUnitOfWork
 
     }
 
-    public IGenericRepository<T> GetRepository<T>() where T : GenericEntity
+    public IGenericRepository<T> GetRepository<T>() where T : BasicEntity
     {
         var type = typeof(T);
 

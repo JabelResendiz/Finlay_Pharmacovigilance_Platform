@@ -3,7 +3,7 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Reporter : GenericEntity
+public class Reporter : GuidEntity
 {
     public string FullName { get; set; } = null!;
     public ReporterRelationship ReporterRelationship { get; set; }

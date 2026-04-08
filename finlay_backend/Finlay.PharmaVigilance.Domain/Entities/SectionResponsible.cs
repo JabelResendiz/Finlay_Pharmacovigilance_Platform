@@ -1,6 +1,6 @@
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class SectionResponsible : GenericEntity
+public class SectionResponsible : GuidEntity
 {
     public int ProvinceId { get; set; }
     public Province Province { get; set; } = null!;
@@ -11,7 +11,7 @@ public class SectionResponsible : GenericEntity
     public ICollection<Alert> ReceivedAlerts { get; set; } = new List<Alert>();
     public ICollection<MedicalReviewAssignment> ManagedReviews { get; set; } = new List<MedicalReviewAssignment>();
     public ICollection<MedicalReviewer> MedicalReviewers { get; set; } = new List<MedicalReviewer>();
-    public int AdminId { get; set; }
+    public Guid AdminId { get; set; }
     public Admin Admin { get; set; } = null!;
 
 }

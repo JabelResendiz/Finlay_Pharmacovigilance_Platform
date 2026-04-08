@@ -17,7 +17,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-                var entriesGeneric = ChangeTracker.Entries<GenericEntity>();
+                var entriesGeneric = ChangeTracker.Entries<BasicEntity>();
 
                 foreach (var entry in entriesGeneric)
                 {

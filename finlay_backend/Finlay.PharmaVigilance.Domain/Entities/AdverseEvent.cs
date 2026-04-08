@@ -2,7 +2,7 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class AdverseEvent : GenericEntity
+public class AdverseEvent : GuidEntity
 {
     public DateTime StartDate { get; set; }
 
@@ -24,7 +24,7 @@ public class AdverseEvent : GenericEntity
 
 
 
-    public int AefiReportId { get; set; }
+    public Guid AefiReportId { get; set; }
     public AefiReport AefiReport { get; set; } = null!;
     public ICollection<AdverseEventSymptom> AdverseEventSymptoms { get; set; } = new List<AdverseEventSymptom>();
 

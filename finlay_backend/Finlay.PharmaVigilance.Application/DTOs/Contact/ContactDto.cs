@@ -29,7 +29,7 @@ public class ContactDto
 public class SendEmailDto
 {
     [Required(ErrorMessage = "ContactID is required")]
-    public int ContactId { get; set; }
+    public Guid ContactId { get; set; }
 
     [Required(ErrorMessage = "Subject is required")]
     public string Subject { get; set; } = string.Empty;

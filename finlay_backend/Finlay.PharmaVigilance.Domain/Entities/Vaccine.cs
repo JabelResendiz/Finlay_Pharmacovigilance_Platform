@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Vaccine : GenericEntity
+public class Vaccine : GuidEntity
 {
     private string _name = null!;
 

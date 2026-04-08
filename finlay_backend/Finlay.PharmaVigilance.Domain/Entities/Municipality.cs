@@ -1,6 +1,6 @@
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Municipality : GenericEntity
+public class Municipality : CatalogEntity
 {
     public string Name { get; set; } = null!;
 

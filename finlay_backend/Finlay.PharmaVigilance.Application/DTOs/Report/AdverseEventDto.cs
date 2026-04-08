@@ -47,6 +47,6 @@ public class AdverseEventDto
 
     [Required(ErrorMessage = "At least one symptom is required.")]
     [MinLength(1, ErrorMessage = "At least one symptom must be provided.")]
-    public List<int> Symptoms { get; set; } = new();
+    public List<Guid> Symptoms { get; set; } = new();
 
 }

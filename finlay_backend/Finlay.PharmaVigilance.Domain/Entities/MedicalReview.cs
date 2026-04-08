@@ -2,9 +2,9 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class MedicalReview : GenericEntity
+public class MedicalReview : GuidEntity
 {
-    public int MedicalReviewAssignmentId { get; set; }
+    public Guid MedicalReviewAssignmentId { get; set; }
     public ClinicalSignificance ClinicalSignificance { get; set; }
     public CausalityLevel Causality { get; set; }
     public DateTime ReviewedAt { get; set; }

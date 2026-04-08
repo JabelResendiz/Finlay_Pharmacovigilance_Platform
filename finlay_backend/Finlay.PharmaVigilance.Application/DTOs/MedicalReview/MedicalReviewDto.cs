@@ -7,7 +7,7 @@ namespace Finlay.PharmaVigilance.Application.DTO;
 public class MedicalReviewDto
 {
     [Required(ErrorMessage = "Medical Review Assignment Id is required")]
-    public int MedicalReviewAssignmentId { get; set; }
+    public Guid MedicalReviewAssignmentId { get; set; }
 
     [Required(ErrorMessage = "Clinical Significance is required")]
     public ClinicalSignificance? ClinicalSignificance { get; set; }
@@ -26,7 +26,7 @@ public class MedicalReviewDto
 public class ClinicalMedicalReviewDto
 {
     [Required(ErrorMessage = "Adverse Event Id is required")]
-    public int AdverseEventId { get; set; }
+    public Guid AdverseEventId { get; set; }
 
     [StringLength(300, ErrorMessage = "Description cannot exceed 300 characters.")]
     public string? LaboratoryResults { get; set; }

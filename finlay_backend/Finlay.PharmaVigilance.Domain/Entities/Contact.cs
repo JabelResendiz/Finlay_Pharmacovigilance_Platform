@@ -1,6 +1,6 @@
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Contact : GenericEntity
+public class Contact : GuidEntity
 {
     public string Email { get; set; } = null!;
     public string Name { get; set; } = null!;

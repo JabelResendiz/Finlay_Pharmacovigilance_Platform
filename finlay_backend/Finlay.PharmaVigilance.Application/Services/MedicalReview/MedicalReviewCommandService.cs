@@ -132,12 +132,12 @@ public class MedicalReviewCommandService : IMedicalReviewCommandService
             throw new InvalidOperationException($"An error occurred while updating the report: {ex.Message}", ex);
         }
     }
-    public async Task DeleteAsync(int medicalReviewId)
+    public async Task DeleteAsync<TId>(TId medicalReviewId)
     {
         try
         {
-            if (medicalReviewId <= 0)
-                throw new ArgumentException("Medical Review ID must be greater than zero.", nameof(medicalReviewId));
+            if (medicalReviewId == null)
+                throw new ArgumentException("Medical Review ID must be different than null.", nameof(medicalReviewId));
 
             var report = await _unitOfWork.GetRepository<MedicalReview>().GetByIdAsync(medicalReviewId);
             if (report == null)
