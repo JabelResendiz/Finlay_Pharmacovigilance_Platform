@@ -26,6 +26,7 @@ public class ReportCommandService : IReportCommandService
     private readonly IEnumerable<IReportValidator<ReportDto>> _validators;
     private readonly IEnumerable<IReportValidator<PublicAefiReportDto>> _publicValidators;
     private readonly IUserContextService _userContextService;
+    private readonly IEmailAppService _emailAppService;
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
                             { e => e.User! };
@@ -36,7 +37,8 @@ public class ReportCommandService : IReportCommandService
         INotificationNumberGenerator generator,
         IEnumerable<IReportValidator<ReportDto>> validators,
         IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
-        IUserContextService userContextService)
+        IUserContextService userContextService,
+        IEmailAppService emailAppService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -44,6 +46,7 @@ public class ReportCommandService : IReportCommandService
         _validators = validators ?? throw new ArgumentNullException(nameof(validators));
         _publicValidators = publicValidators ?? throw new ArgumentNullException(nameof(publicValidators));
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
+        _emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
     }
 
     public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;
@@ -124,6 +127,9 @@ public class ReportCommandService : IReportCommandService
 
             await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
             await _unitOfWork.CompleteAsync();
+
+            await _emailAppService.SendEmailToSectionResponsibleAsync(sectionResponsible);
+            await _emailAppService.SendEmailToReporterAsync(reporter);
 
             return new CreateReportResponseDto
             {

@@ -15,15 +15,18 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserContextService _userContextService;
+    private readonly IEmailAppService _emailAppService;
 
     public MedicalReviewAssignmentCommandService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        IUserContextService userContextService)
+        IUserContextService userContextService,
+        IEmailAppService emailAppService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
-        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService)); ;
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
+        _emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
     }
 
     public async Task<MedicalReviewAssignmentDTO> CreateAsync(MedicalReviewAssignmentDTO dto)
@@ -75,6 +78,8 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
 
         await _unitOfWork.GetRepository<MedicalReviewAssignment>().CreateAsync(medicalReviewAssignment);
         await _unitOfWork.CompleteAsync();
+
+        await _emailAppService.SendEmailToMedicalReviewerAsync(medicalReviewer);
 
         return dto;
     }
