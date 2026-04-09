@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using AutoMapper;
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
@@ -54,48 +55,43 @@ public class GenericQueryService<TEntity, TDto> : IGenericQueryService<TEntity, 
     }
 
 
-    // public async Task<PagedResultDto<TDto>> GetPagedResultByQueryAsync(PagedRequestDto paged, IQueryable<TEntity> query)
-    // {
-    //     var includes = GetIncludes();
+    public async Task<PagedResultDto<TDto>> GetAllPagedResultAsync(PagedRequestDto paged)
+    {
+        var query = _unitOfWork.GetRepository<TEntity>()
+                        .GetAll();
 
-    //     if (includes != null)
-    //     {
-    //         foreach (var exp in includes) // Loop through each filter expression.
-    //         {
-    //             query = query.Include(exp); // Apply the filter expression to the query.
-    //         }
-    //     }
+        var includes = GetIncludes();
 
-    //     var totalCount = await query.CountAsync();
+        if (includes != null)
+        {
+            foreach (var exp in includes) // Loop through each filter expression.
+            {
+                query = query.Include(exp); // Apply the filter expression to the query.
+            }
+        }
 
-    //     var items = await query // Apply pagination to the query.
-    //                     .Skip((paged.PageNumber - 1) * paged.PageSize) // Skip the appropriate number of items based on the current page
-    //                     .Take(paged.PageSize) // Take only the number of items specified by the page size.
-    //                     .ToListAsync(); // Convert the result to a list asynchronously.
+        var totalCount = await query.CountAsync();
 
 
-    //     return new PagedResultDto<TDto>
-    //     {
-    //         Items = items?.Select(_mapper.Map<TDto>) ?? Enumerable.Empty<TDto>(),
-    //         TotalCount = totalCount,
-    //         PageNumber = paged.PageNumber,
-    //         PageSize = paged.PageSize,
-    //         NextPageUrl = paged.PageNumber * paged.PageSize < totalCount
-    //                     ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
-    //                     : null,
-    //         PreviousPageUrl = paged.PageNumber > 1
-    //                     ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
-    //                     : null
+        var items = await _unitOfWork.GetRepository<TEntity>()
+                        .GetAllPaged((paged.PageNumber - 1) * paged.PageSize, paged.PageSize)
+                        .ToListAsync();
 
-    //     };
-    // }
 
-    // public async Task<PagedResultDto<TDto>> GetAllPagedResultAsync (PagedRequestDto paged)
-    // {
-    //     IQueryable<TEntity> query = _unitOfWork.GetRepository<TEntity>()
-    //                                             .GetAll();
+        return new PagedResultDto<TDto>
+        {
+            Items = items?.Select(_mapper.Map<TDto>) ?? Enumerable.Empty<TDto>(),
+            TotalCount = totalCount,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalCount
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
 
-    //     return await GetPagedResultByQueryAsync(paged,query);
-    // }
+        };
+    }
 
 }

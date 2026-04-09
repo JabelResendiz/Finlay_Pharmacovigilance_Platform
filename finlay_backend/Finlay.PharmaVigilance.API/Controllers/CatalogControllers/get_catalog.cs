@@ -6,7 +6,7 @@ using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Finlay.PharmaVigilance.Api.Controllers;
+namespace Finlay.PharmaVigilance.Api.Controllers.CatalogControllers;
 
 /// <summary>
 /// API Controller responsible for managing Medical Reviewer user operations.
@@ -14,31 +14,52 @@ namespace Finlay.PharmaVigilance.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class CatalogController : ControllerBase
+public class GetCatalogController : ControllerBase
 {
-    private readonly ICatalogCommandService _catalogCommandService;
+    private readonly IVaccineQueryService _vaccineQueryService;
+    private readonly ISymptomQueryService _symptomsQueryService;
 
     /// <summary>
     /// Initializes a new instance of the CatalogController class.
     /// </summary>
-    public CatalogController(ICatalogCommandService catalogCommandService)
+    public GetCatalogController(
+        IVaccineQueryService vaccineQueryService,
+        ISymptomQueryService symptomQueryService)
     {
-        _catalogCommandService = catalogCommandService;
+        _vaccineQueryService = vaccineQueryService;
+        _symptomsQueryService = symptomQueryService;
     }
 
-    [HttpPost("register/symptom")]
-    [Authorize(Roles = "Admin")]
+
+    [HttpGet("vaccines")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RegisterSymptom(SymptomDto symptomDto)
+    public async Task<ActionResult> GetVaccine([FromQuery] PagedRequestDto paged)
     {
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        if (symptomDto == null)
-            throw new ArgumentNullException(nameof(symptomDto), "Request body cannot be null");
+        var result = await _vaccineQueryService.GetAllPagedResultAsync(paged);
 
-        var result = await _catalogCommandService.CreateSymptomAsync(symptomDto);
+        return Ok(new
+        {
+            message = result,
+            success = true
+        });
+
+    }
+
+    [HttpGet("symptoms")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetSymptoms([FromQuery] PagedRequestDto paged)
+    {
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+        var result = await _symptomsQueryService.GetAllPagedResultAsync(paged);
 
         return Ok(new
         {
@@ -49,26 +70,6 @@ public class CatalogController : ControllerBase
     }
 
 
-    [HttpPost("register/vaccine")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RegisterVaccine(VaccineDto vaccineDto)
-    {
 
-        if (vaccineDto == null)
-            throw new ArgumentNullException(nameof(vaccineDto), "Request body cannot be null");
-
-        var result = await _catalogCommandService.CreateVaccineAsync(vaccineDto);
-
-        return Ok(new
-        {
-            message = result,
-            success = true
-        });
-
-    }
 
 }

@@ -35,6 +35,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
         return _entity; // Return the entire DbSet as an IQueryable.
     }
 
+    public virtual IQueryable<T> GetAllPaged(int skip, int take)
+    {
+        var query = GetAll();
+
+        return query
+                .Skip(skip)
+                .Take(take);
+    }
+
     public virtual void Update(T element)
     {
         Console.WriteLine(element);

@@ -35,16 +35,23 @@ public class AutomapperProfile : Profile
         CreateMap<RegisterSectionResponsibleDto, SectionResponsible>();
         CreateMap<RegisterSectionResponsibleDto, User>();
 
-        // Report Mappings
+        // Catalog Dtos
 
         CreateMap<VaccineDto, Vaccine>();
+        CreateMap<Vaccine, GetVaccineDto>();
+
+        CreateMap<SymptomDto, Symptom>();
+        CreateMap<Symptom, GetSymptomDto>();
+
+        // Vaccination-VaccinatedSubject Dtos
+        CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
         CreateMap<VaccinationDto, Vaccination>();
 
-        CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
-        CreateMap<ReporterDto, Reporter>();
-        // CreateMap<Reporter, ReporterDto>();
-        // CreateMap<MedicalReportDto, PublicAefiReportDto>();
 
+
+
+
+        // AdverseEvent - AefiReport - Reporter
         CreateMap<AdverseEventDto, AdverseEvent>()
             .ForMember(dest => dest.AdverseEventSymptoms,
                 opt => opt.MapFrom(src =>
@@ -55,13 +62,26 @@ public class AutomapperProfile : Profile
                 )
             );
 
-        CreateMap<SymptomDto, Symptom>();
+        CreateMap<ReporterDto, Reporter>();
 
 
         CreateMap<PublicAefiReportDto, AefiReport>();
         CreateMap<MedicalReportDto, AefiReport>();
 
-        // Email
+        CreateMap<MedicalReviewer, Reporter>()
+                        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.UserName))
+                        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+
+
+
+        // medicalAssignment - Medical Reviews Dtos
+
+        CreateMap<MedicalReviewDto, MedicalReview>();
+        CreateMap<MedicalReviewAssignmentDTO,
+                 MedicalReviewAssignment>();
+
+        // Contact Dtos
         CreateMap<CreateContactDto, Contact>()
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Trim().ToLowerInvariant()))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Trim()))
@@ -72,20 +92,6 @@ public class AutomapperProfile : Profile
 
 
         CreateMap<Contact, ContactDto>();
-
-        // Medical Review
-
-        CreateMap<MedicalReviewDto, MedicalReview>();
-
-        CreateMap<MedicalReviewAssignmentDTO,
-                    MedicalReviewAssignment>();
-
-        CreateMap<MedicalReviewer, Reporter>()
-                        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.UserName))
-                        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
-
-
 
 
 
