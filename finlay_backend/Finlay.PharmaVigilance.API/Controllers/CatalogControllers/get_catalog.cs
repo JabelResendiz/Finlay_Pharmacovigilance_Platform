@@ -1,9 +1,6 @@
 
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices;
-using Finlay.PharmaVigilance.Application.IServices.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.Api.Controllers.CatalogControllers;
@@ -36,7 +33,7 @@ public class GetCatalogController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> GetVaccine([FromQuery] PagedRequestDto paged)
+    public async Task<ActionResult> GetVaccines([FromQuery] PagedRequestDto paged)
     {
         paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
