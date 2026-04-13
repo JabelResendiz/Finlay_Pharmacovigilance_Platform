@@ -1,12 +1,14 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.Interfaces;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Application.Services.Report.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
+using Finlay.PharmaVigilance.Domain.Events;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -27,6 +29,7 @@ public class ReportCommandService : IReportCommandService
     private readonly IEnumerable<IReportValidator<PublicAefiReportDto>> _publicValidators;
     private readonly IUserContextService _userContextService;
     private readonly IEmailAppService _emailAppService;
+    private readonly IMessageBus _messageBus;
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
                             { e => e.User! };
@@ -38,7 +41,8 @@ public class ReportCommandService : IReportCommandService
         IEnumerable<IReportValidator<ReportDto>> validators,
         IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
         IUserContextService userContextService,
-        IEmailAppService emailAppService)
+        IEmailAppService emailAppService,
+        IMessageBus messageBus)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -47,6 +51,7 @@ public class ReportCommandService : IReportCommandService
         _publicValidators = publicValidators ?? throw new ArgumentNullException(nameof(publicValidators));
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
         _emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
+        _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
     }
 
     public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;
@@ -128,8 +133,14 @@ public class ReportCommandService : IReportCommandService
             await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
             await _unitOfWork.CompleteAsync();
 
-            await _emailAppService.SendEmailToSectionResponsibleAsync(sectionResponsible);
-            await _emailAppService.SendEmailToReporterAsync(reporter);
+            // await _emailAppService.SendEmailToSectionResponsibleAsync(sectionResponsible);
+            // await _emailAppService.SendEmailToReporterAsync(reporter);
+            await _messageBus.PublishAsync(new ReportCreatedEvent
+            {
+                ReporterEmail = reporter.Email,
+                SectionResponsibleEmail = sectionResponsible.User.Email!,
+                ReportNumber = report.NotificationNumber
+            });
 
             return new CreateReportResponseDto
             {
