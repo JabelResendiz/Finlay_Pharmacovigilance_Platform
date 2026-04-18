@@ -12,10 +12,10 @@ Content-Type:  application/json
   "reporter": {
     "fullName": "Jabel",
     "reporterRelationship": 2,
-    "identityNumber": "03041868163",
+    "identityNumber": "03041868162",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "provinceId": 1,
-    "municipalityId": 1,
+    "municipalityId": 2,
     "phoneNumber": "55664266",
     "email": "jabel@example.com",
     "professionalLicense": "string",
@@ -23,7 +23,7 @@ Content-Type:  application/json
   },
   "vaccinatedSubject": {
     "fullName": "Jabel",
-    "identityNumber": "03041868190",
+    "identityNumber": "03041868191",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
@@ -43,6 +43,14 @@ Content-Type:  application/json
       "batchNumber": "qweqweq",
       "site": 3,
       "doseNumber": 5,
+      "administrationDate": "2026-04-02T18:13:59.418Z",
+      "vaccinationCenter": "string"
+    },
+    {
+      "vaccineId": 2,
+      "batchNumber": "qweqweq",
+      "site": 2,
+      "doseNumber": 19,
       "administrationDate": "2026-04-02T18:13:59.418Z",
       "vaccinationCenter": "string"
     }

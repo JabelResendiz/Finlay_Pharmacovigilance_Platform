@@ -5,5 +5,6 @@ namespace Finlay.PharmaVigilance.Application.IServices;
 
 public interface IVaccineQueryService : IGenericQueryService<Vaccine, GetVaccineDto>
 {
+    Task<PagedResultDto<GetVaccineDto>> GetActivesVaccine(PagedRequestDto paged);
 
 }

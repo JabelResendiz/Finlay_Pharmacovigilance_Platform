@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -33,17 +34,41 @@ public class SectionResponsibleController : ControllerBase
     /// <response code="409">Conflict - user email or username already exists.</response>
     /// <response code="500">Internal server error.</response>
     [HttpPost("register")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RegisterSectionResponsible(RegisterSectionResponsibleDto registerDto)
     {
         if (registerDto == null)
             throw new ArgumentNullException(nameof(registerDto), "Request body cannot be null");
 
         var result = await _sectionResponsibleService.RegisterSectionResponsibleAsync(registerDto);
+
+        return Ok(new
+        {
+            message = result,
+            success = true
+        });
+
+    }
+
+
+
+
+
+    [HttpGet("searchbymunicipality")]
+    //[Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> SearchSectionResponsibleByMunicipality([FromQuery] PagedRequestDto paged, int municipalityId)
+    {
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+        var result = await _sectionResponsibleService.SearchByMunicipality(paged, municipalityId);
 
         return Ok(new
         {

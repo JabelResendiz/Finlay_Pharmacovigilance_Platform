@@ -45,6 +45,10 @@ public interface IGenericRepository<T> where T : GenericEntity
 
     IQueryable<T> GetAllPaged(int skip, int take);
 
+    IQueryable<T> GetAllPagedbyItem(int skip, int take,
+                 Expression<Func<T, bool>> predicate,
+                 params Expression<Func<T, object>>[] includes);
+
     /// <summary>
     /// Asynchronously deletes an entity by its identifier.
     /// </summary>

@@ -4,8 +4,6 @@ namespace Finlay.PharmaVigilance.Domain.Enum;
 public enum UserRole
 {
     MedicalReviewer,
-    Reporter,
-    // VaccinatedSubject,
     SectionResponsible,
     Admin,
 

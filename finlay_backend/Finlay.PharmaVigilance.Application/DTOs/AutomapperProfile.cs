@@ -34,14 +34,19 @@ public class AutomapperProfile : Profile
         // Section Responsible Registration
         CreateMap<RegisterSectionResponsibleDto, SectionResponsible>();
         CreateMap<RegisterSectionResponsibleDto, User>();
+        CreateMap<SectionResponsible, SectionResponsibleResponseDto>()
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
 
         // Catalog Dtos
 
         CreateMap<VaccineDto, Vaccine>();
         CreateMap<Vaccine, GetVaccineDto>();
+        //CreateMap<Vaccine, GetPrivateVaccineDto>();
 
         CreateMap<SymptomDto, Symptom>();
         CreateMap<Symptom, GetSymptomDto>();
+        // CreateMap<Symptom, GetPrivateSymptomsDto>();
 
         // Vaccination-VaccinatedSubject Dtos
         CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
@@ -93,6 +98,18 @@ public class AutomapperProfile : Profile
 
         CreateMap<Contact, ContactDto>();
 
+        // ResponseDto
+
+        CreateMap<VaccinatedSubject, VaccinatedSubjectResponseDto>();
+        CreateMap<Reporter, ReporterResponseDto>();
+        CreateMap<Vaccination, VaccinationResponseDto>()
+            .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
+
+        CreateMap<AdverseEvent, AdverseEventResponseDto>();
+
+        // CreateMap<AefiReport, ReportResponseDto>()
+        //     .ForMember(dest => dest.VaccinatedSubject, opt => opt.MapFrom(src => src.VaccinatedSubject))
+        //     .ForMember(dest => dest.Reporter, opt => opt.MapFrom(src => src.Reporter));
 
 
     }

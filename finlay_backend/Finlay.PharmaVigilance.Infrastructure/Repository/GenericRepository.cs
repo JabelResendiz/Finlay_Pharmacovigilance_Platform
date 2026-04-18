@@ -44,6 +44,26 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
                 .Take(take);
     }
 
+
+    public virtual IQueryable<T> GetAllPagedbyItem(int skip, int take,
+                    Expression<Func<T, bool>> predicate,
+                    params Expression<Func<T, object>>[] includes
+                        )
+    {
+
+        var query = GetAllByItems(predicate);
+
+        if (includes != null)
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+
+        return query.Skip(skip).Take(take);
+    }
+
     public virtual void Update(T element)
     {
         Console.WriteLine(element);

@@ -1,6 +1,7 @@
 
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlay.PharmaVigilance.Api.Controllers.CatalogControllers;
@@ -37,7 +38,7 @@ public class GetCatalogController : ControllerBase
     {
         paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var result = await _vaccineQueryService.GetAllPagedResultAsync(paged);
+        var result = await _vaccineQueryService.GetActivesVaccine(paged);
 
         return Ok(new
         {
@@ -56,7 +57,7 @@ public class GetCatalogController : ControllerBase
     {
         paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var result = await _symptomsQueryService.GetAllPagedResultAsync(paged);
+        var result = await _symptomsQueryService.GetActivesSymptoms(paged);
 
         return Ok(new
         {
@@ -67,6 +68,27 @@ public class GetCatalogController : ControllerBase
     }
 
 
+    [HttpGet("allsymptoms")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetAllSymptoms([FromQuery] PagedRequestDto paged)
+    {
+        if (paged == null)
+            throw new ArgumentNullException(nameof(paged), "Paged cannot be null");
 
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+        var result = await _symptomsQueryService.GetAllPagedResultAsync(paged);
+
+        return Ok(new
+        {
+            message = result,
+            success = true
+        });
+
+    }
 
 }
