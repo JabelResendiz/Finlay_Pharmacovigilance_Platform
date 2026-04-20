@@ -15,7 +15,7 @@ namespace Finlay.PharmaVigilance.Api.Controllers.CatalogControllers;
 public class GetCatalogController : ControllerBase
 {
     private readonly IVaccineQueryService _vaccineQueryService;
-    private readonly ISymptomQueryService _symptomsQueryService;
+    private readonly ISymptomQueryService _symptomQueryService;
 
     /// <summary>
     /// Initializes a new instance of the CatalogController class.
@@ -25,7 +25,7 @@ public class GetCatalogController : ControllerBase
         ISymptomQueryService symptomQueryService)
     {
         _vaccineQueryService = vaccineQueryService;
-        _symptomsQueryService = symptomQueryService;
+        _symptomQueryService = symptomQueryService;
     }
 
 
@@ -57,7 +57,7 @@ public class GetCatalogController : ControllerBase
     {
         paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var result = await _symptomsQueryService.GetActivesSymptoms(paged);
+        var result = await _symptomQueryService.GetActivesSymptoms(paged);
 
         return Ok(new
         {
@@ -81,7 +81,7 @@ public class GetCatalogController : ControllerBase
 
         paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var result = await _symptomsQueryService.GetAllPagedResultAsync(paged);
+        var result = await _symptomQueryService.GetAllPagedResultAsync(paged);
 
         return Ok(new
         {
@@ -90,5 +90,42 @@ public class GetCatalogController : ControllerBase
         });
 
     }
+
+
+    [HttpGet("vaccine")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetVaccineByNameAndStatus(
+        [FromQuery] PagedRequestDto paged,
+        [FromQuery] string? search,
+        [FromQuery] bool? status)
+    {
+        var result = await _vaccineQueryService.GetByFilters(paged, search, status);
+
+        return Ok(result);
+
+    }
+
+    [HttpGet("symptom")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetSymptomByNameAndStatus(
+        [FromQuery] PagedRequestDto paged,
+        [FromQuery] string? search,
+        [FromQuery] bool? status)
+    {
+        var result = await _symptomQueryService.GetByFilters(paged, search, status);
+
+        return Ok(result);
+
+    }
+
+
 
 }

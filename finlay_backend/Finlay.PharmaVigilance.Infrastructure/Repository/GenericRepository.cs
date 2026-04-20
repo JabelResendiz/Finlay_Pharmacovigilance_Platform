@@ -64,6 +64,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
         return query.Skip(skip).Take(take);
     }
 
+
+    public virtual IQueryable<T> GetPaged(IQueryable<T> query, int skip, int take)
+    {
+        return query.Skip(skip).Take(take);
+    }
+
     public virtual void Update(T element)
     {
         Console.WriteLine(element);

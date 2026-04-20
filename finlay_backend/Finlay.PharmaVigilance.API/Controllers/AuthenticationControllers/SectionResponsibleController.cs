@@ -56,10 +56,28 @@ public class SectionResponsibleController : ControllerBase
 
 
 
+    [HttpGet("GetAll")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetSectionResponsible(
+        [FromQuery] PagedRequestDto paged,
+        [FromQuery] string? search)
+    {
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+        var result = await _sectionResponsibleService.GetByFilters(paged, search);
+
+        return Ok(result);
+
+    }
+
 
 
     [HttpGet("searchbymunicipality")]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]

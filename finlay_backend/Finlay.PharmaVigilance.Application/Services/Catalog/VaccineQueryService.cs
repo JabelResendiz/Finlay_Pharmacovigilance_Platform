@@ -1,5 +1,6 @@
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
@@ -11,10 +12,12 @@ namespace Finlay.PharmaVigilance.Application.Services;
 public class VaccineQueryService : GenericQueryService<Vaccine, GetVaccineDto>,
                                          IVaccineQueryService
 {
-    public VaccineQueryService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly IVaccineRepository _vaccineRepository;
+
+    public VaccineQueryService(IUnitOfWork unitOfWork, IMapper mapper, IVaccineRepository vaccineRepository)
         : base(unitOfWork, mapper)
     {
-
+        _vaccineRepository = vaccineRepository;
     }
 
     public async Task<PagedResultDto<GetVaccineDto>> GetActivesVaccine(PagedRequestDto paged)
@@ -44,4 +47,31 @@ public class VaccineQueryService : GenericQueryService<Vaccine, GetVaccineDto>,
         };
     }
 
+    public async Task<PagedResultDto<GetVaccineDto>> GetByFilters(PagedRequestDto paged, string? search, bool? status)
+    {
+
+        var query = _vaccineRepository.GetByFilter(search, status);
+
+        var totalCount = await query.CountAsync();
+
+
+        var items = await _vaccineRepository.GetPaged(query, (paged.PageNumber - 1) * paged.PageSize, paged.PageSize)
+                            .ToListAsync();
+
+        return new PagedResultDto<GetVaccineDto>
+        {
+            Items = items?.Select(_mapper.Map<GetVaccineDto>) ?? Enumerable.Empty<GetVaccineDto>(),
+            TotalCount = totalCount,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalCount
+                       ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                       : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                       ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                       : null
+
+        };
+
+    }
 }
