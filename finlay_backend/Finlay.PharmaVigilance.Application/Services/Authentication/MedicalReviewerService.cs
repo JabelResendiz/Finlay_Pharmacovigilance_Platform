@@ -2,12 +2,14 @@ using AutoMapper;
 using Finlay.PharmaVigilance.Application.Authentication;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
+using Finlay.PharmaVigilance.Application.Interfaces;
 using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
+using Finlay.PharmaVigilance.Domain.Events;
 
 namespace Finlay.PharmaVigilance.Application.Services.Authentication;
 
@@ -22,6 +24,7 @@ public class MedicalReviewerService : IMedicalReviewerService
     private readonly IUserContextService _userContextService;
     private readonly IMedicalReviewerRepository _medical;
 
+    private readonly IEventBus _eventBus;
     /// <summary>
     /// Initializes a new instance of the MedicalReviewerService class.
     /// </summary>
@@ -30,13 +33,15 @@ public class MedicalReviewerService : IMedicalReviewerService
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IUserContextService userContextService,
-        IMedicalReviewerRepository medical)
+        IMedicalReviewerRepository medical,
+        IEventBus eventBus)
     {
         _identityManager = identityManager;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userContextService = userContextService;
         _medical = medical;
+        _eventBus = eventBus;
     }
 
     /// <summary>
@@ -85,6 +90,14 @@ public class MedicalReviewerService : IMedicalReviewerService
         // Add to repository and save
         await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);
         await _unitOfWork.CompleteAsync();
+
+
+
+        await _eventBus.PublishAsync(new MedicalReviewerRegisteredEvent
+        {
+            Email = createdUser.Email!,
+            FullName = createdUser.UserName!
+        });
 
         return "Medical Reviewer successfully registered";
     }

@@ -1,7 +1,7 @@
-namespace Finlay.PharmaVigilance.Application.Interfaces;
+// namespace Finlay.PharmaVigilance.Application.Interfaces;
 
 
-public interface IMessageBus
-{
-    Task PublishAsync<T>(T message);
-}
+// public interface IMessageBus
+// {
+//     Task PublishAsync<T>(T message);
+// }

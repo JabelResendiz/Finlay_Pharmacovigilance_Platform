@@ -45,9 +45,9 @@ public static class DependencyInjection
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
 
-        services.Configure<RabbitMqSettings>(
-            configuration.GetSection("RabbitMQ")
-        );
+        // services.Configure<RabbitMqSettings>(
+        //     configuration.GetSection("RabbitMQ")
+        // );
 
 
         //Identity configuration
@@ -68,11 +68,13 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddSingleton<IEmailService, SmtpEmailService>();
 
-        services.AddScoped<IMessageBus, RabbitMqMessageBus>();
-        services.AddScoped<ReportCreatedConsumer>();
-        services.AddHostedService<RabbitMqListener>();
+        // services.AddScoped<IMessageBus, RabbitMqMessageBus>();
+        // services.AddScoped<ReportCreatedConsumer>();
+        services.AddHostedService<MedicalReviewerConsumer>();
+        services.AddScoped<IEventBus, RabbitMqEventBus>();
+        // services.AddHostedService<RabbitMqListener>();
 
 
 
