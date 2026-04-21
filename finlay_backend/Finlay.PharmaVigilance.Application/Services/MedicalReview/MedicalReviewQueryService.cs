@@ -7,7 +7,7 @@ using Finlay.PharmaVigilance.Domain.Entities;
 namespace Finlay.PharmaVigilance.Application.Services;
 
 
-public class MedicalReviewQueryService : GenericQueryService<MedicalReview, CreateMedicalReviewDto>,
+public class MedicalReviewQueryService : GenericQueryService<MedicalReview, MedicalReviewDto>,
                                          IMedicalReviewQueryService
 {
     public MedicalReviewQueryService(IUnitOfWork unitOfWork, IMapper mapper)

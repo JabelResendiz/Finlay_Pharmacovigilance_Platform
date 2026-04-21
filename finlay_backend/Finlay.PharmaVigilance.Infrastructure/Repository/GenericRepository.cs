@@ -44,9 +44,22 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
 
     public async Task<T?> FirstOrDefaultAsync(
                     Expression<Func<T, bool>> predicate,
-                    CancellationToken cancellationToken = default)
+                    CancellationToken cancellationToken = default,
+                    params Expression<Func<T, object>>[] includes
+                   )
     {
-        return await _entity.FirstOrDefaultAsync(predicate, cancellationToken);
+        IQueryable<T> query = _entity;
+
+        if (includes != null)
+        {
+            Console.WriteLine("Adolfoooo");
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+
+        return await query.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
     public virtual async Task<T> GetByIdAsync<TId>(TId elementId,

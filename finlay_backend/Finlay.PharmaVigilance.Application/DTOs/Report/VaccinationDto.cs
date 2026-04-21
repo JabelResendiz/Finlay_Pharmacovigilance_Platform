@@ -13,7 +13,7 @@ public class VaccinationDto
     public string BatchNumber { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Administration site is required.")]
-    public AdministrationSite Site { get; set; }
+    public AdministrationSite? Site { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Dose number must be greater than 0.")]
     public int DoseNumber { get; set; }

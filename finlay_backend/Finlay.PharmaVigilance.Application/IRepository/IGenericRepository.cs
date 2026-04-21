@@ -70,6 +70,8 @@ public interface IGenericRepository<T> where T : GenericEntity
                          Expression<Func<T, object>>[] includes);
 
     Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate,
-                                CancellationToken cancellationToken = default);
+
+                                CancellationToken cancellationToken = default,
+                                params Expression<Func<T, object>>[] includes);
 }
 

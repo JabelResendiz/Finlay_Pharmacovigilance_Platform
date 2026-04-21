@@ -33,7 +33,7 @@ public class AdverseEventDto
     public DateTime? DeathDate { get; set; }
 
     [Required(ErrorMessage = "Current Status is required.")]
-    public PatientStatus CurrentStatus { get; set; }
+    public PatientStatus? CurrentStatus { get; set; }
 
     [StringLength(300, MinimumLength = 1, ErrorMessage = "Laboratory results must be between 1 and 300 characters.")]
     public string? LaboratoryResults { get; set; }

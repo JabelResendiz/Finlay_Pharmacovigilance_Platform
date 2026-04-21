@@ -15,7 +15,7 @@ public class VaccinatedSubjectDto
     public DateTime? DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "Gender is required.")]
-    public Gender Gender { get; set; }
+    public Gender? Gender { get; set; }
 
     public bool? IsPregnant { get; set; }
 

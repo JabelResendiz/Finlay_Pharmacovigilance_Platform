@@ -3,12 +3,12 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Validates reporter information including age, location hierarchy, and professional requirements.
 /// </summary>
-public class ReporterValidator : IReportValidator
+public class ReporterValidator : IReportValidator<PublicAefiReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -77,6 +77,16 @@ public class ReporterValidator : IReportValidator
 
 
         ValidateIdentityNumberFormat(reporter.IdentityNumber, reporter.DateOfBirth.Value);
+
+        Console.WriteLine($"==========================={reporter.ReporterRelationship}=======================");
+
+        if (!EnumHelper<ReporterRelationship>.IsValid(reporter.ReporterRelationship.ToString()!))
+        {
+            throw new ArgumentException(
+                "Reporter Relationship must be valid",
+                nameof(reporter.ReporterRelationship)
+            );
+        }
     }
 
     /// <summary>

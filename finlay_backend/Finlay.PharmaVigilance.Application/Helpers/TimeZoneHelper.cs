@@ -1,4 +1,4 @@
-namespace Finlay.PharmaVigilance.Application.Services.Report.Helpers;
+namespace Finlay.PharmaVigilance.Application.Helpers;
 
 /// <summary>
 /// Helper class for managing timezones consistently across the application.

@@ -10,6 +10,8 @@ public class MedicalReviewer : GenericEntity
    public Municipality Municipality { get; set; } = null!;
    public string Institution { get; set; } = null!;
 
+   public string IdentityNumber { get; set; } = null!;
+   public DateTime DateOfBirth { get; set; }
    // FK
    public int UserId { get; set; }
    public User User { get; set; } = null!;
@@ -19,6 +21,6 @@ public class MedicalReviewer : GenericEntity
    public int SectionResponsibleId { get; set; }
    public SectionResponsible SectionResponsible { get; set; } = null!;
 
-   public ICollection<MedicalReview> MedicalReviews { get; set; } = new List<MedicalReview>();
+   public ICollection<MedicalReviewAssignment> MedicalReviews { get; set; } = new List<MedicalReviewAssignment>();
 
 }

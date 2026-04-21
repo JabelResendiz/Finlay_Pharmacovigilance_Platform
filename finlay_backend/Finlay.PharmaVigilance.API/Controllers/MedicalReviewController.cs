@@ -24,7 +24,7 @@ public class MedicalReviewController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "MedicalReviewer")]
-    public async Task<IActionResult> CreateMedicalReview([FromBody] CreateMedicalReviewDto medicalReviewDto)
+    public async Task<IActionResult> CreateMedicalReview([FromBody] MedicalReviewDto medicalReviewDto)
     {
         if (medicalReviewDto == null)
             throw new ArgumentNullException(nameof(medicalReviewDto), "Medical Review data is required.");

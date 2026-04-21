@@ -4,7 +4,10 @@ using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Application.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -24,10 +27,26 @@ public class MedicalReviewCommandService : IMedicalReviewCommandService
         _userContextService = userContextService;
     }
 
-    public async Task<CreateMedicalReviewDto> CreateAsync(CreateMedicalReviewDto dto)
+    public async Task<MedicalReviewDto> CreateAsync(MedicalReviewDto dto)
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
+
+        if (!EnumHelper<CausalityLevel>.IsValid(dto.Causality.ToString()!))
+        {
+            throw new ArgumentException(
+                                          "Causality Level must be valid",
+                                          nameof(dto.Causality)
+                                      );
+        }
+
+        if (!EnumHelper<ClinicalSignificance>.IsValid(dto.ClinicalSignificance.ToString()!))
+        {
+            throw new ArgumentException(
+                                          "Clinical Significance must be valid",
+                                          nameof(dto.ClinicalSignificance)
+                                      );
+        }
 
         var userId = _userContextService.GetUserId();
 
@@ -37,16 +56,55 @@ public class MedicalReviewCommandService : IMedicalReviewCommandService
         if (medicalReviewer == null)
             throw new UnauthorizedAccessException("User is not a medical reviewer.");
 
-        var report = await _unitOfWork.GetRepository<AefiReport>()
-                                .GetByIdAsync(dto.AefiReportId);
+        var medicalAssignment = await _unitOfWork.GetRepository<MedicalReviewAssignment>()
+                                .GetByIdAsync(dto.MedicalReviewAssignmentId);
 
-        if (report == null)
-            throw new KeyNotFoundException("Aefi Report not found.");
+        if (medicalAssignment == null)
+            throw new KeyNotFoundException("Medical Review Assignment not found.");
 
+        if (medicalAssignment.MedicalReviewerId != medicalReviewer.Id)
+            throw new UnauthorizedAccessException("This assignment does not belong to the current medical reviewer.");
+
+        var easternNow = TimeZoneHelper.GetEasternNow();
+
+        Console.WriteLine($"============================0Current Eastern Time: {easternNow}===========================");
+        Console.WriteLine($"============================Reviewed At: {dto.ReviewedAt}=============================");
+
+        if (dto.ReviewedAt > easternNow)
+            throw new ArgumentException("Reviewed At date cannot be in the future. It must be less than or equal to the current date (Eastern Time UTC-5).",
+                            nameof(dto.ReviewedAt));
+
+
+        var adverseEventIds = dto.ClinicalMedicalReviews
+            .Select(x => x.AdverseEventId)
+            .ToList();
+
+        var adverseEvents = await _unitOfWork.GetRepository<AdverseEvent>()
+                        .GetAllByItems(ad => ad.AefiReportId == medicalAssignment.AefiReportId
+                                            && adverseEventIds.Contains(ad.Id))
+                        .ToListAsync();
+
+        if (adverseEvents.Count != adverseEventIds.Count)
+        {
+            throw new KeyNotFoundException("Some adverse events were not found or do not belong to the report.");
+        }
+
+        var adverseEventMap = adverseEvents.ToDictionary(x => x.Id);
+
+
+        foreach (var clinical in dto.ClinicalMedicalReviews)
+        {
+            var adverseEvent = adverseEventMap[clinical.AdverseEventId];
+
+            adverseEvent.LaboratoryResults = clinical.LaboratoryResults;
+            adverseEvent.MedDRACode = clinical.MedDRACode;
+            adverseEvent.RetClassification = clinical.RetClassification;
+
+        }
 
         var medicalReview = _mapper.Map<MedicalReview>(dto);
-        medicalReview.MedicalReviewer = medicalReviewer;
-        medicalReview.MedicalReviewerId = medicalReviewer.Id;
+        medicalReview.MedicalReviewAssignment = medicalAssignment;
+        medicalReview.MedicalReviewAssignment.Status = ReviewAssignmentStatus.Completed;
 
         await _unitOfWork.GetRepository<MedicalReview>().CreateAsync(medicalReview);
         await _unitOfWork.CompleteAsync();
@@ -54,7 +112,7 @@ public class MedicalReviewCommandService : IMedicalReviewCommandService
         return dto;
     }
 
-    public async Task<CreateMedicalReviewDto> UpdateAsync(CreateMedicalReviewDto dto)
+    public async Task<MedicalReviewDto> UpdateAsync(MedicalReviewDto dto)
     {
         try
         {

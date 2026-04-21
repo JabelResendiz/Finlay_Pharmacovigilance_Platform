@@ -1,13 +1,14 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Validates vaccination information including vaccine existence, date consistency, and dose validity.
 /// </summary>
-public class VaccinationValidator : IReportValidator
+public class VaccinationValidator : IReportValidator<ReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -23,7 +24,7 @@ public class VaccinationValidator : IReportValidator
     /// - Administration date must be after patient's date of birth and before the report date
     /// - Dose number must be positive
     /// </summary>
-    public async Task ValidateAsync(PublicAefiReportDto reportDto)
+    public async Task ValidateAsync(ReportDto reportDto)
     {
         var vaccineRepository = _unitOfWork.GetRepository<Vaccine>();
 
@@ -52,6 +53,13 @@ public class VaccinationValidator : IReportValidator
                     $"Adverse event date: {minAdverseEventDate:yyyy-MM-dd}",
                     nameof(vaccination.AdministrationDate));
 
+            if (!EnumHelper<AdministrationSite>.IsValid(vaccination.Site.ToString()!))
+            {
+                throw new ArgumentException(
+                    "Administration Site must be valid",
+                    nameof(vaccination.Site)
+                );
+            }
 
         }
     }

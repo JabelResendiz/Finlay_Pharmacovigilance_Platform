@@ -1,8 +1,10 @@
+using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.Services;
 using Finlay.PharmaVigilance.Application.Services.Authentication;
-using Finlay.PharmaVigilance.Application.Services.Report.Validators;
+using Finlay.PharmaVigilance.Application.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,11 +45,12 @@ public static class DependencyInjection
         services.AddScoped<IReportQueryService, ReportQueryService>();
 
         // Report Validators - Chain of Responsibility pattern for comprehensive validation
-        services.AddScoped<IReportValidator, ReportDateValidator>();
-        services.AddScoped<IReportValidator, ReporterValidator>();
-        services.AddScoped<IReportValidator, VaccinatedSubjectValidator>();
-        services.AddScoped<IReportValidator, VaccinationValidator>();
-        services.AddScoped<IReportValidator, AdverseEventValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, ReportDateValidator>();
+        services.AddScoped<IReportValidator<PublicAefiReportDto>, ReporterValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, VaccinatedSubjectValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, VaccinationValidator>();
+        services.AddScoped<IReportValidator<ReportDto>, AdverseEventValidator>();
+        services.AddScoped<IReportValidator<RegisterMedicalReviewerDto>, MedicalReviewerValidator>();
 
         // Notification Number Generator
         services.AddScoped<INotificationNumberGenerator, NotificationNumberGenerator>();
@@ -56,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IMedicalReviewCommandService, MedicalReviewCommandService>();
         services.AddScoped<IMedicalReviewQueryService, MedicalReviewQueryService>();
 
+        services.AddScoped<IMedicalReviewAssignmentCommandService, MedicalReviewAssignmentCommandService>();
 
         return services;
 

@@ -9,7 +9,7 @@ public class SectionResponsible : GenericEntity
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public ICollection<Alert> ReceivedAlerts { get; set; } = new List<Alert>();
-    public ICollection<MedicalReview> ManagedReviews { get; set; } = new List<MedicalReview>();
+    public ICollection<MedicalReviewAssignment> ManagedReviews { get; set; } = new List<MedicalReviewAssignment>();
     public ICollection<MedicalReviewer> MedicalReviewers { get; set; } = new List<MedicalReviewer>();
     public int AdminId { get; set; }
     public Admin Admin { get; set; } = null!;

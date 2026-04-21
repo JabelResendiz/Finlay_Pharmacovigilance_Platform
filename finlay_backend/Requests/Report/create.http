@@ -1,15 +1,18 @@
 @host = http://localhost:5137
 
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZ2l2ZW5fbmFtZSI6IkphYmVsIiwianRpIjoiYzZlMTI4NjAtZmU2Mi00NmIxLThmN2UtYjExNGJhMTMxMjc3IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWVkaWNhbFJldmlld2VyIiwiZXhwIjoxNzc1NjAzMjEzLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.8ysMTOLphkTtN_LyzYeMOh79HjhCwEH3kFBccT9tfSU 
+
+
 # MedicalReviewer
 POST {{host}}/api/Report/createPublic
 Content-Type:  application/json
 
 {
-  "reportDate": "2026-04-03T14:13:59.418Z",
+  "reportDate": "2026-04-04T19:13:59.418Z",
   "reporter": {
     "fullName": "Jabel",
-    "reporterRelationship": 0,
-    "identityNumber": "03041868161",
+    "reporterRelationship": 2,
+    "identityNumber": "03041868163",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "provinceId": 1,
     "municipalityId": 1,
@@ -20,9 +23,9 @@ Content-Type:  application/json
   },
   "vaccinatedSubject": {
     "fullName": "Jabel",
-    "identityNumber": "03041868161",
+    "identityNumber": "03041868190",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
-    "gender": 0,
+    "gender": 1,
     "isPregnant": false,
     "provinceId": 1,
     "municipalityId": 1,
@@ -38,24 +41,8 @@ Content-Type:  application/json
     {
       "vaccineId": 1,
       "batchNumber": "qweqweq",
-      "site": 0,
-      "doseNumber": 2,
-      "administrationDate": "2026-04-02T18:13:59.418Z",
-      "vaccinationCenter": "string"
-    },
-    {
-      "vaccineId": 2,
-      "batchNumber": "qweqweq",
-      "site": 0,
-      "doseNumber": 2,
-      "administrationDate": "2026-04-02T18:13:59.418Z",
-      "vaccinationCenter": "string"
-    },
-    {
-      "vaccineId": 3,
-      "batchNumber": "qweqweq",
-      "site": 0,
-      "doseNumber": 2,
+      "site": 3,
+      "doseNumber": 5,
       "administrationDate": "2026-04-02T18:13:59.418Z",
       "vaccinationCenter": "string"
     }
@@ -64,19 +51,68 @@ Content-Type:  application/json
     {
       "startDate": "2026-04-03T12:13:59.418Z",
       "description": "string",
+      "resultedInDeath": false,
+      "currentStatus": 2,
+      "symptoms": [
+        1,2,3
+      ]
+    },
+    {
+      "startDate": "2026-04-03T12:13:59.418Z",
+      "description": "string",
+      "resultedInDeath": false,
+      "currentStatus": 2,
+      "symptoms": [
+        2,3
+      ]
+    }
+  ]
+}
+
+
+####
+
+POST {{host}}/api/Report/createMedical
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+{
+  "reportDate": "2026-04-06T19:39:17.845Z",
+  "vaccinatedSubject": {
+    "fullName": "Fred",
+    "identityNumber": "03041868163",
+    "dateOfBirth": "2003-04-18T19:39:17.845Z",
+    "gender": 1,
+    "isPregnant": false,
+    "provinceId": 1,
+    "municipalityId": 1
+  },
+  "vaccinations": [
+    {
+      "vaccineId": 1,
+      "batchNumber": "1212",
+      "site": 0,
+      "doseNumber": 2,
+      "administrationDate": "2026-03-07T19:39:17.845Z",
+      "vaccinationCenter": "string"
+    }
+  ],
+  "adverseEvents": [
+    {
+      "startDate": "2026-04-05T19:39:17.845Z",
+      "description": "string",
       "visitedDoctor": true,
       "wentToEmergencyRoom": true,
       "permanentDisability": true,
       "isLifeThreatening": true,
       "resultedInDeath": true,
-      "deathDate": "2026-04-03T12:16:59.418Z",
+      "deathDate": "2026-04-05T19:39:17.845Z",
       "currentStatus": 0,
-      "laboratoryResults": "string",
-      "medDRACode": "string",
-      "retClassification": "string",
       "symptoms": [
         1,2,3
       ]
     }
-  ]
+  ],
+  "causality": 0,
+  "clinicalSignificance": 0
 }

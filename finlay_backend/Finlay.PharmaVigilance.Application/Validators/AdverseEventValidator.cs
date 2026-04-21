@@ -1,13 +1,14 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Validates adverse event information including symptom existence, date consistency, and death-related data.
 /// </summary>
-public class AdverseEventValidator : IReportValidator
+public class AdverseEventValidator : IReportValidator<ReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -24,7 +25,7 @@ public class AdverseEventValidator : IReportValidator
     /// - Event start date must be after vaccination and before report date
     /// - If death occurred, death date must be provided and fall between event date and report date
     /// </summary>
-    public async Task ValidateAsync(PublicAefiReportDto reportDto)
+    public async Task ValidateAsync(ReportDto reportDto)
     {
         if (reportDto?.AdverseEvents == null || !reportDto.AdverseEvents.Any())
             throw new ArgumentException(
@@ -46,6 +47,14 @@ public class AdverseEventValidator : IReportValidator
                 throw new ArgumentException(
                     "Each adverse event must have at least one symptom.",
                     nameof(adverseEvent.Symptoms));
+
+            if (!EnumHelper<PatientStatus>.IsValid(adverseEvent.CurrentStatus.ToString()!))
+            {
+                throw new ArgumentException(
+                                "Patient Status must be valid",
+                                nameof(adverseEvent.CurrentStatus)
+                            );
+            }
 
             // Validate each symptom exists in database
             foreach (var symptomId in adverseEvent.Symptoms)
@@ -94,6 +103,15 @@ public class AdverseEventValidator : IReportValidator
                         $"Death date: {deathDate:yyyy-MM-dd}, " +
                         $"Report date: {reportDto.ReportDate:yyyy-MM-dd}",
                         nameof(adverseEvent.DeathDate));
+            }
+
+            else
+            {
+                if (adverseEvent.DeathDate.HasValue)
+                    throw new ArgumentException(
+                        "Death date dont must be provided when 'Resulted In Death' is marked as false.",
+                        nameof(adverseEvent.DeathDate));
+
             }
         }
     }

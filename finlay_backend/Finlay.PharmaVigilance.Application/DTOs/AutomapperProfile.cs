@@ -42,6 +42,8 @@ public class AutomapperProfile : Profile
 
         CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
         CreateMap<ReporterDto, Reporter>();
+        // CreateMap<Reporter, ReporterDto>();
+        // CreateMap<MedicalReportDto, PublicAefiReportDto>();
 
         CreateMap<AdverseEventDto, AdverseEvent>()
             .ForMember(dest => dest.AdverseEventSymptoms,
@@ -73,7 +75,18 @@ public class AutomapperProfile : Profile
 
         // Medical Review
 
-        CreateMap<CreateMedicalReviewDto, MedicalReview>();
+        CreateMap<MedicalReviewDto, MedicalReview>();
+
+        CreateMap<MedicalReviewAssignmentDTO,
+                    MedicalReviewAssignment>();
+
+        CreateMap<MedicalReviewer, Reporter>()
+                        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.UserName))
+                        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+
+
+
 
 
     }
