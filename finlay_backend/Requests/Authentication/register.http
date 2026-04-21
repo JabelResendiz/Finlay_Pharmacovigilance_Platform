@@ -1,20 +1,20 @@
 @host = http://localhost:5137
 @token_Admin=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImE5NGNhMTkxLTUyNjItNGE0Mi04ODY2LWUzZTI4ODBkMWY3MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NTk0MDg2LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.VYcCDdDIktbOhviixk7RIQ8H8MAbFfasP5IJzQAGA_M
 
-@token_Jefe=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZ2l2ZW5fbmFtZSI6IlBlZHJvIiwianRpIjoiMGQyNDg4ZWYtZmUxNC00MTEwLWE2YmMtMGY3MGUyMTZiM2JjIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiU2VjdGlvblJlc3BvbnNpYmxlIiwiZXhwIjoxNzc1NTk0MTI3LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.GPHDwdT6wv3sgjmImfZslUCq5P_7lM7Sf9jPQtdv1g8
+@token_Jefe=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNCIsImdpdmVuX25hbWUiOiJDYXJsYSIsImp0aSI6ImIwNTYwNThmLTdlNjMtNGJjZi1hMzgyLTQ0MmY2OTRlZjk5NyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlY3Rpb25SZXNwb25zaWJsZSIsImV4cCI6MTc3NjY2NDg3MCwiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.tcShEFXePDlV5bxorviv2a31VQnTtle3VUgN_xnva1Y
 
 POST {{host}}/api/MedicalReviewer/register
 Content-Type:  application/json
 Authorization: Bearer {{token_Jefe}}
 
 {
-  "userName": "Jabel",
-  "email": "jabel@example.com",
+  "userName": "Retry",
+  "email": "jabelresendiz00@gmail.com",
   "password": "Password_123!",
   "phoneNumber": "55664266",
   "institution": "Hospital Nacional",
   "professionalLicense": "334324eref",
-  "identityNumber": "01001010A?r",
+  "identityNumber": "retry787878",
   "dateOfBirth": "2006-04-07T19:35:54.456Z",
   "specialty": "Medicina General"
 }
