@@ -70,11 +70,11 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddSingleton<IEmailService, SmtpEmailService>();
 
-        // services.AddScoped<IMessageBus, RabbitMqMessageBus>();
-        // services.AddScoped<ReportCreatedConsumer>();
+
         services.AddHostedService<MedicalReviewerConsumer>();
+        services.AddHostedService<EmailToReporterConsumer>();
+        services.AddHostedService<EmailToSectionResponsibleConsumer>();
         services.AddScoped<IEventBus, RabbitMqEventBus>();
-        // services.AddHostedService<RabbitMqListener>();
 
 
 

@@ -8,11 +8,11 @@ using System.Text.Json;
 
 namespace Finlay.PharmaVigilance.Infrastructure.Consumers;
 
-public class MedicalReviewerConsumer : BackgroundService
+public class EmailToSectionResponsibleConsumer : BackgroundService
 {
     private readonly IEmailService _emailService;
 
-    public MedicalReviewerConsumer(IEmailService emailService)
+    public EmailToSectionResponsibleConsumer(IEmailService emailService)
     {
         _emailService = emailService;
     }
@@ -29,7 +29,7 @@ public class MedicalReviewerConsumer : BackgroundService
         var connection = await factory.CreateConnectionAsync();
         var channel = await connection.CreateChannelAsync();
 
-        var queueName = "MedicalReviewerRegisteredEvent";
+        var queueName = "EmailToSectionResponsibleEvent";
 
         await channel.QueueDeclareAsync(queueName, true, false, false);
 
@@ -40,7 +40,7 @@ public class MedicalReviewerConsumer : BackgroundService
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
 
-            var data = JsonSerializer.Deserialize<MedicalReviewerRegisteredEvent>(message);
+            var data = JsonSerializer.Deserialize<EmailToSectionResponsibleEvent>(message);
 
             int retryCount = 0;
 
@@ -53,9 +53,9 @@ public class MedicalReviewerConsumer : BackgroundService
             try
             {
                 await _emailService.SendEmailAsync(
-                    data!.Email,
-                    "Welcome",
-                    $"Hola {data.Email}, bienvenido"
+                    data!.SectionResponsibleEmail,
+                    "Nuevo Reporte",
+                    $"Se registró el reporte {data.ReportNumber}."
                 );
 
                 await channel.BasicAckAsync(ea.DeliveryTag, false);
@@ -89,14 +89,13 @@ public class MedicalReviewerConsumer : BackgroundService
                 );
 
                 await channel.BasicAckAsync(ea.DeliveryTag, false);
-                // await channel.BasicNackAsync(ea.DeliveryTag, false, true);
+
             }
-            // Console.WriteLine($"📧 Enviar email a: {data!.Email}");
+
         };
 
         await channel.BasicConsumeAsync(queueName, false, consumer);
 
-        // 👇 IMPORTANTE: mantener vivo el servicio
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
