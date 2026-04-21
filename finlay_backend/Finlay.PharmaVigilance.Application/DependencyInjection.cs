@@ -25,8 +25,6 @@ public static class DependencyInjection
 
         // Email Service
         services.AddScoped<IEmailAppService, EmailAppService>();
-        services.AddScoped<IContactCommandService, ContactCommandService>();
-        services.AddScoped<IContactQueryService, ContactQueryService>();
 
         // Catalog Service
         services.AddScoped<ICatalogCommandService, CatalogCommandService>();

@@ -1,6 +1,6 @@
-using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Domain.Entities;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -16,17 +16,42 @@ public class EmailAppService : IEmailAppService
         _emailService = emailService;
     }
 
-    public async Task SendEmailToContactAsync(SendEmailDto dto)
+    public async Task SendEmailToSectionResponsibleAsync(SectionResponsible sectionResponsible)
     {
-        var contact = await _unitOfWork.ContactRepository.GetByIdAsync(dto.ContactId);
 
-        if (contact == null)
-            throw new KeyNotFoundException($"Contacto con ID {dto.ContactId} no encontrado");
+        var user = await _unitOfWork.UserRepository
+                            .GetByIdAsync(sectionResponsible.UserId)
+                            ?? throw new ArgumentException($"User with ID {sectionResponsible.UserId} dont founded");
 
-        if (!contact.IsActive)
-            throw new InvalidOperationException("El contacto está inactivo");
+        var email = user.Email ?? throw new ArgumentException("Null Email");
 
-        await _emailService.SendEmailAsync(contact.Email, dto.Subject, dto.Message);
+        await _emailService.SendEmailAsync(email,
+            "Nueva Alerta de Reporte Creado",
+            "Tiene nueva alerta de reporte creado en el sistema de autorreporte del Instituo Finlay.Acceda al portal de https://..../..../ para poder asignar el reporte");
+
+    }
+
+    public async Task SendEmailToReporterAsync(Reporter reporter)
+    {
+        var email = reporter.Email ?? throw new ArgumentException("Null Email");
+
+        await _emailService.SendEmailAsync(email,
+            "Nueva Alerta de Reporte Creado",
+            "Tiene nueva alerta de reporte creado en el sistema de autorreporte del Instituo Finlay.Acceda al portal de https://..../..../ para poder asignar el reporte");
+
+    }
+
+    public async Task SendEmailToMedicalReviewerAsync(MedicalReviewer medicalReviewer)
+    {
+        var user = await _unitOfWork.UserRepository
+                            .GetByIdAsync(medicalReviewer.UserId)
+                            ?? throw new ArgumentException($"User with ID {medicalReviewer.UserId} dont founded");
+
+        var email = user.Email ?? throw new ArgumentException("Null Email");
+
+        await _emailService.SendEmailAsync(email,
+            "Nueva Alerta de Reporte Creado",
+            "Tiene nueva alerta de reporte creado en el sistema de autorreporte del Instituo Finlay.Acceda al portal de https://..../..../ para poder asignar el reporte");
 
     }
 }

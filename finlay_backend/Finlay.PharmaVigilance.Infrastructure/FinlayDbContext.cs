@@ -57,7 +57,6 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
         public DbSet<AdverseEventSymptom> AdverseEventSymptoms { get; set; }
         public DbSet<AefiReport> AefiReport { get; set; }
         public DbSet<Alert> Alerts { get; set; }
-        public DbSet<Contact> Contacts { get; set; }
         public DbSet<MedicalReview> MedicalReviews { get; set; }
         public DbSet<MedicalReviewer> MedicalReviewers { get; set; }
         public DbSet<Municipality> Municipalities { get; set; }

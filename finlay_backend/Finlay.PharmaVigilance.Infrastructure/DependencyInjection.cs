@@ -19,6 +19,9 @@ using System.Text.Json;
 using Finlay.PharmaVigilance.Application.Repository;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Infrastructure.Email;
+using Finlay.PharmaVigilance.Infrastructure.Messaging;
+using Finlay.PharmaVigilance.Application.Interfaces;
+using Finlay.PharmaVigilance.Infrastructure.Consumers;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -42,6 +45,11 @@ public static class DependencyInjection
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
 
+        // services.Configure<RabbitMqSettings>(
+        //     configuration.GetSection("RabbitMQ")
+        // );
+
+
         //Identity configuration
         services.AddIdentity<User, Role>(options =>
                 {
@@ -60,8 +68,16 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IContactRepository, ContactRepository>();
-        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddSingleton<IEmailService, SmtpEmailService>();
+
+
+        services.AddHostedService<MedicalReviewerConsumer>();
+        services.AddHostedService<EmailToReporterConsumer>();
+        services.AddHostedService<EmailToSectionResponsibleConsumer>();
+        services.AddScoped<IEventBus, RabbitMqEventBus>();
+
+
+
         services.AddScoped<IIdentityManager, IdentityManager>();
         services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();
         services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();

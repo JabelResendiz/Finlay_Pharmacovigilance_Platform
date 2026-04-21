@@ -62,16 +62,16 @@ public class AutomapperProfile : Profile
         CreateMap<MedicalReportDto, AefiReport>();
 
         // Email
-        CreateMap<CreateContactDto, Contact>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Trim().ToLowerInvariant()))
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Trim()))
-            .ForMember(dest => dest.Phone, opt => opt.MapFrom(src =>
-                    src.Phone != null ? Regex.Replace(src.Phone.Trim(), "[^0-9+]", "") : null))
-            .ForMember(dest => dest.Department, opt => opt.MapFrom(src =>
-                    src.Department != null ? src.Department.Trim() : null));
+        // CreateMap<CreateContactDto, Contact>()
+        //     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Trim().ToLowerInvariant()))
+        //     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Trim()))
+        //     .ForMember(dest => dest.Phone, opt => opt.MapFrom(src =>
+        //             src.Phone != null ? Regex.Replace(src.Phone.Trim(), "[^0-9+]", "") : null))
+        //     .ForMember(dest => dest.Department, opt => opt.MapFrom(src =>
+        //             src.Department != null ? src.Department.Trim() : null));
 
 
-        CreateMap<Contact, ContactDto>();
+        // CreateMap<Contact, ContactDto>();
 
         // Medical Review
 

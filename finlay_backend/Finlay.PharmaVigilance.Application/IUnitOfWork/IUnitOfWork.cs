@@ -15,11 +15,6 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     IUserRepository UserRepository { get; }
 
-    /// <summary>
-    /// Gets the repository for contact-related operations.
-    /// </summary>
-    IContactRepository ContactRepository { get; }
-
     //IDepartmentRepository DepartmentRepository {get;}
     /// <summary>
     /// Gets a generic repository for managing entities of the specified type.
