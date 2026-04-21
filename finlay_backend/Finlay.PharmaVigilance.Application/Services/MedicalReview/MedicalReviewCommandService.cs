@@ -4,7 +4,7 @@ using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
-using Finlay.PharmaVigilance.Application.Services.Report.Helpers;
+using Finlay.PharmaVigilance.Application.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 using Microsoft.EntityFrameworkCore;

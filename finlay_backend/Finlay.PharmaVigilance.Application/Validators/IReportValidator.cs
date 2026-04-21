@@ -1,6 +1,6 @@
 using Finlay.PharmaVigilance.Application.DTO;
 
-namespace Finlay.PharmaVigilance.Application.Services.Report.Validators;
+namespace Finlay.PharmaVigilance.Application.Validators;
 
 /// <summary>
 /// Interface for validating AEFI reports with business rule enforcement.
