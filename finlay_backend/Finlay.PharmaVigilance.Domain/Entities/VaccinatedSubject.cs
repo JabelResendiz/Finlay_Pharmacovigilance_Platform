@@ -2,7 +2,7 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class VaccinatedSubject : GenericEntity
+public class VaccinatedSubject : GuidEntity
 {
     public string FullName { get; set; } = null!;
     public string IdentityNumber { get; set; } = null!;

@@ -1,13 +1,13 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZ2l2ZW5fbmFtZSI6IlBlZHJvIiwianRpIjoiNDlkZmVjY2QtZGI2Yi00OTY4LWE0ZDMtNzZjNDE1N2MxYjhjIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiU2VjdGlvblJlc3BvbnNpYmxlIiwiZXhwIjoxNzc1NDQyNzU2LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.tgn-OjklR1IqfP8FTaCbnbn54_8NRfU9E-ZIym5UznA
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZ2l2ZW5fbmFtZSI6Ikp1bGlvIiwianRpIjoiNjY3OGI4NWYtZmY4Zi00ZTBlLWJhMzAtYWEwNGVmMmRlM2Q1IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiU2VjdGlvblJlc3BvbnNpYmxlIiwiZXhwIjoxNzc1NjA5MTQwLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.0OFG3kNqhoOUBs-9GJb-J1QDWWcUuBHhSOlBAoLb1as
 
 POST {{host}}/api/MedicalReviewAssignment/create
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "medicalReviewerId": 1,
-  "aefiReportId": 16,
+  "medicalReviewerId": "08de94ff-ec83-445b-8450-2729d87e26f2",
+  "aefiReportId": "08de9500-acac-43b9-8c0c-52efd41e1dc8",
   "assignedAt": "2026-04-05T22:10:30.680Z"
 }
 

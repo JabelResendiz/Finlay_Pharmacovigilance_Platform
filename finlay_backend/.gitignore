@@ -33,3 +33,5 @@ Migrations/
 .env
 
 *.json
+
+Requests/

@@ -1,11 +1,11 @@
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class AdverseEventSymptom : GenericEntity
+public class AdverseEventSymptom : GuidEntity
 {
-    public int AdverseEventId { get; set; }
+    public Guid AdverseEventId { get; set; }
     public AdverseEvent AdverseEvent { get; set; } = null!;
-    public int SymptomId { get; set; }
+    public Guid SymptomId { get; set; }
     public Symptom Symptom { get; set; } = null!;
 
 }

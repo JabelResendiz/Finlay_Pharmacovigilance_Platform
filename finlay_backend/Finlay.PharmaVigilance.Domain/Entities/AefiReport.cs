@@ -3,7 +3,7 @@ using Finlay.PharmaVigilance.Domain.Enum;
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
 
-public class AefiReport : GenericEntity
+public class AefiReport : GuidEntity
 {
     public DateTime ReportDate { get; set; }
     public ReportStatus Status { get; set; }
@@ -11,8 +11,8 @@ public class AefiReport : GenericEntity
     public bool isMedicalReport { get; set; }
 
 
-    public int ReporterId { get; set; }
-    public int VaccinatedSubjectId { get; set; }
+    public Guid ReporterId { get; set; }
+    public Guid VaccinatedSubjectId { get; set; }
 
     public Reporter Reporter { get; set; } = null!;
 

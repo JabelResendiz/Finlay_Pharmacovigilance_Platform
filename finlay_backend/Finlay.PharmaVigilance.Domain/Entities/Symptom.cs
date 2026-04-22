@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Symptom : GenericEntity
+public class Symptom : GuidEntity
 {
     private string _name = null!;
 

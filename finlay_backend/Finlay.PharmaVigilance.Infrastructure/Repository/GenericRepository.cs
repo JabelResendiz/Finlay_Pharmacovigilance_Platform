@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finlay.PharmaVigilance.Infrastructure.Repository;
 
 // "Repository Pattern"
-public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntity
+public class GenericRepository<T> : IGenericRepository<T> where T : BasicEntity
 {
     protected readonly DbSet<T> _entity; // Represents the database set for the entity type T.
     private FinlayDbContext _context; // Holds the database context for interacting with the database.
@@ -84,7 +84,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : GenericEntit
         return result;
     }
 
-    public virtual async Task DeleteByIdAsync(int elementId, CancellationToken cancellationToken = default)
+    public virtual async Task DeleteByIdAsync<TId>(TId elementId, CancellationToken cancellationToken = default)
     {
         Console.WriteLine(elementId);
         // Retrieve the entity by its ID.

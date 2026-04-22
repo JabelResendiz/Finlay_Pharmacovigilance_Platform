@@ -6,7 +6,7 @@ namespace Finlay.PharmaVigilance.Application.DTO;
 public class VaccinationDto
 {
     [Required(ErrorMessage = "Vaccine information is required.")]
-    public int VaccineId { get; set; }
+    public Guid VaccineId { get; set; }
 
     [Required(ErrorMessage = "Batch number is required.")]
     [StringLength(50, MinimumLength = 1, ErrorMessage = "Batch number must be between 1 and 50 characters.")]
@@ -15,7 +15,7 @@ public class VaccinationDto
     [Required(ErrorMessage = "Administration site is required.")]
     public AdministrationSite? Site { get; set; }
 
-    [Range(1, int.MaxValue, ErrorMessage = "Dose number must be greater than 0.")]
+    [Range(1, 50, ErrorMessage = "Dose number must be greater than 0.")]
     public int DoseNumber { get; set; }
 
     [Required(ErrorMessage = "Administration date is required.")]

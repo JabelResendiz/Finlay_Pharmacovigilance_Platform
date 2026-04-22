@@ -1,6 +1,6 @@
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class Alert : GenericEntity
+public class Alert : GuidEntity
 {
     public string Description { get; set; } = null!;
     public DateTime? ReadAt { get; set; }
@@ -9,8 +9,8 @@ public class Alert : GenericEntity
 
 
     //FK
-    public int SectionResponsibleId { get; set; }
+    public Guid SectionResponsibleId { get; set; }
     public SectionResponsible SectionResponsible { get; set; } = null!;
-    public int AefiReportId { get; set; }
+    public Guid AefiReportId { get; set; }
     public AefiReport AefiReport { get; set; } = null!;
 }

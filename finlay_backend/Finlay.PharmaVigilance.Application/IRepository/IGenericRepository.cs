@@ -9,7 +9,7 @@ namespace Finlay.PharmaVigilance.Application.IRepository;
 /// Provides methods for creating, updating, retrieving, and deleting entities.
 /// </summary>
 /// <typeparam name="T">The type of the entity managed by the repository, which must inherit from <see cref="GenericEntity"/>.</typeparam>
-public interface IGenericRepository<T> where T : GenericEntity
+public interface IGenericRepository<T> where T : BasicEntity
 {
     /// <summary>
     /// Asynchronously creates a new entity in the repository.
@@ -49,7 +49,7 @@ public interface IGenericRepository<T> where T : GenericEntity
     /// <param name="elementId">The identifier of the entity to delete.</param>
     /// <param name="cancellationToken">A token to cancel the operation, if needed.</param>
     /// <returns>A Task representing the asynchronous delete operation.</returns>
-    Task DeleteByIdAsync(int elementId, CancellationToken cancellationToken = default);
+    Task DeleteByIdAsync<TId>(TId elementId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Synchronously retrieves an entity by its identifier.

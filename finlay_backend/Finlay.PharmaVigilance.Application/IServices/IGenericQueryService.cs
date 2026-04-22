@@ -10,9 +10,9 @@ namespace Finlay.PharmaVigilance.Application.IServices;
 /// Provides methods for creating, updating, listing, retrieving, and deleting entities.
 /// </summary>
 /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) used by the service.</typeparam>
-public interface IGenericQueryService<TEntity,TDto> where TEntity : GenericEntity
+public interface IGenericQueryService<TEntity, TDto> where TEntity : BasicEntity
 {
-    Expression<Func<TEntity,object>>[] GetIncludes();
+    Expression<Func<TEntity, object>>[] GetIncludes();
 
     /// <summary>
     /// Retrieves a list of all entities.
@@ -25,8 +25,8 @@ public interface IGenericQueryService<TEntity,TDto> where TEntity : GenericEntit
     /// </summary>
     /// <param name="dto">The identifier of the entity to retrieve.</param>
     /// <returns>A Task representing the asynchronous operation, returning the DTO of the retrieved entity.</returns>
-    Task<TDto> GetByIdAsync(int dto);
-    
+    Task<TDto> GetByIdAsync<TId>(TId dto);
+
     /// <summary>
     /// Asynchronously retrieves a paginated list of entities .
     /// </summary>

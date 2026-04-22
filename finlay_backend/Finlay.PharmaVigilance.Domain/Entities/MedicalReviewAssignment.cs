@@ -2,11 +2,11 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Domain.Entities;
 
-public class MedicalReviewAssignment : GenericEntity
+public class MedicalReviewAssignment : GuidEntity
 {
-    public int SectionResponsibleId { get; set; }
-    public int MedicalReviewerId { get; set; }
-    public int AefiReportId { get; set; }
+    public Guid SectionResponsibleId { get; set; }
+    public Guid MedicalReviewerId { get; set; }
+    public Guid AefiReportId { get; set; }
     public DateTime AssignedAt { get; set; }
     public ReviewAssignmentStatus Status { get; set; }
     public string? RejectionReason { get; set; }

@@ -25,6 +25,6 @@ public interface IGenericCommandService<TDto, TDtoOut>
     /// </summary>
     /// <param name="dto">The identifier of the entity to delete.</param>
     /// <returns>A Task representing the asynchronous delete operation.</returns>
-    Task DeleteAsync(int dto);
+    Task DeleteAsync<TId>(TId dto);
 
 }
