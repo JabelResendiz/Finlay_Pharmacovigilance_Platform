@@ -13,8 +13,8 @@ Content-Type:  application/json
     "reporterRelationship": 2,
     "identityNumber": "03041868164",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
-    "provinceId": 1,
-    "municipalityId": 2,
+    "provinceId": 2,
+    "municipalityId": 4,
     "phoneNumber": "55664266",
     "email": "12aidenpearces@gmail.com",
     "professionalLicense": "string",
@@ -26,8 +26,8 @@ Content-Type:  application/json
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
-    "provinceId": 1,
-    "municipalityId": 2,
+    "provinceId": 2,
+    "municipalityId": 4,
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
@@ -38,7 +38,7 @@ Content-Type:  application/json
   },
   "vaccinations": [
     {
-      "vaccineId": "08de9500-1a6a-45fe-8f1b-73b439462b79",
+      "vaccineId": "08dea0ba-a214-4386-84f2-ad3e0ad2ab07",
       "batchNumber": "qweqweq",
       "site": 3,
       "doseNumber": 5,
@@ -53,7 +53,7 @@ Content-Type:  application/json
       "resultedInDeath": false,
       "currentStatus": 2,
       "symptoms": [
-        "08de9500-0beb-4683-8fc7-e362aca745d2"
+        "08dea0ba-8b59-401b-883d-3ad3577f616f"
       ]
     }
   ]

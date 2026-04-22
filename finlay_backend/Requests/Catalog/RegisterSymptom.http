@@ -1,5 +1,5 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6IjRiZmEwMzJhLTJkZWUtNDM2NC1hZTM4LTJiZjA1ZjYzZjVjZSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc1NjA5MDQ1LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.OsTUJvW7YgSu6W8DRfBvMw5PQ-pje2GOOmF4CpTjJdI
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6IjBhNjRjMzhmLTQzZDctNDExMS1iMTkzLWNkY2U1MGUzNzQ5OSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc2ODk4MTk2LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.xwGoR57_Tg7804kyCY1aQd0dwaS6Oq0-Dw4s6NSCWMs
 
 
 POST {{host}}/api/Catalog/register/symptom
@@ -7,7 +7,7 @@ Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "fiebre",
+  "name": "Catarro",
   "standardCode": "12121223",
   "codingSystem": "12312312",
   "category": "General",

@@ -53,6 +53,16 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
         if (medicalReviewer == null)
             throw new KeyNotFoundException("Medical Reviewer not found.");
 
+        var alert = await _unitOfWork.GetRepository<Alert>()
+                                .FirstOrDefaultAsync(a => a.AefiReportId == report.Id);
+
+        if (alert == null)
+            throw new KeyNotFoundException("Alert not found.");
+
+        if (alert.SectionResponsibleId != sectionResponsible.Id)
+            throw new UnauthorizedAccessException("Section Responsible does not have permission to assign this report.");
+
+
         if (medicalReviewer.MunicipalityId != sectionResponsible.MunicipalityId)
             throw new InvalidOperationException(
                 "Medical Reviewer must be from the same municipality as the Section Responsible.");
