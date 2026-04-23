@@ -20,4 +20,6 @@ public interface IMedicalReviewerService
 
     Task<IEnumerable<GetMedicalReviewerDto>> ListByProvinceAsync(CancellationToken cancellationToken = default);
 
+    Task<PagedResultDto<GetMedicalReviewerDto>> GetMedicalReviewerForCurrentUserAsync(PagedRequestDto paged);
+
 }

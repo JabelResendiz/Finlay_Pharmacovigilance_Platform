@@ -69,4 +69,26 @@ public class MedicalReviewerController : ControllerBase
 
     }
 
+
+    [HttpGet("by-current-user-municipality")]
+    [Authorize(Roles = "SectionResponsible")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetMedicalReviewerByCurrentUserMunicipality(
+        [FromQuery] PagedRequestDto paged
+    )
+    {
+        if (paged == null)
+            throw new ArgumentNullException(nameof(paged), "Query parameters cannot be null");
+
+        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+
+        var users = await _medicalReviewerService.GetMedicalReviewerForCurrentUserAsync(paged);
+        return Ok(users);
+
+    }
+
 }

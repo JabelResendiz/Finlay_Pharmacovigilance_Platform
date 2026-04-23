@@ -1,5 +1,4 @@
 
-using System.Text.RegularExpressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Domain.Entities;
@@ -26,6 +25,7 @@ public class AutomapperProfile : Profile
         // Medical Reviewer Registration
         CreateMap<RegisterMedicalReviewerDto, MedicalReviewer>();
         CreateMap<MedicalReviewer, GetMedicalReviewerDto>()
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.UserName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
 

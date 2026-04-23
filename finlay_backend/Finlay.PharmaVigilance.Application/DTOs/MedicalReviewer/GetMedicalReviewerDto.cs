@@ -7,7 +7,7 @@ public class GetMedicalReviewerDto
     public string Email { get; set; } = null!;
     public int ProvinceId { get; set; }
     public int MunicipalityId { get; set; }
-    public string HealthArea { get; set; } = null!;
+    public string Institution { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
 
 }

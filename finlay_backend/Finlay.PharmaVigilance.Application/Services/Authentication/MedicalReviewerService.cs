@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Finlay.PharmaVigilance.Application.Authentication;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
@@ -11,6 +12,7 @@ using Finlay.PharmaVigilance.Application.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 using Finlay.PharmaVigilance.Domain.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Application.Services.Authentication;
 
@@ -161,6 +163,47 @@ public class MedicalReviewerService : IMedicalReviewerService
         var medicalList = await _medical.GetByProvinceAsync(provinceId);
 
         return _mapper.Map<IEnumerable<GetMedicalReviewerDto>>(medicalList);
+    }
+
+
+    public async Task<PagedResultDto<GetMedicalReviewerDto>> GetMedicalReviewerForCurrentUserAsync(PagedRequestDto paged)
+    {
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException("User is not a section responsible.");
+
+        var provinceId = sectionResponsible.ProvinceId;
+        var municipalityId = sectionResponsible.MunicipalityId;
+
+        var query = _medical.GetAllByItems(
+            mr => mr.ProvinceId == provinceId && mr.MunicipalityId == municipalityId);
+
+
+        var totalItems = await query.CountAsync();
+
+        var items = await _medical.GetPaged(query, (paged.PageNumber - 1) * paged.PageSize, paged.PageSize)
+                        .ProjectTo<GetMedicalReviewerDto>(_mapper.ConfigurationProvider)
+                        .ToListAsync();
+
+
+        return new PagedResultDto<GetMedicalReviewerDto>
+        {
+            Items = items,
+            TotalCount = totalItems,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalItems
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
+
+        };
     }
 
 
