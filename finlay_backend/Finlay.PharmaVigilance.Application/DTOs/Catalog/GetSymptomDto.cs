@@ -2,7 +2,7 @@ namespace Finlay.PharmaVigilance.Application.DTO;
 
 public class GetSymptomDto
 {
-    public required int Id { get; set; }
+    public required Guid Id { get; set; }
     public required string Name { get; set; }
 }
 

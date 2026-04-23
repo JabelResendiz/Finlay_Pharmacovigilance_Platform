@@ -11,10 +11,10 @@ Content-Type:  application/json
   "reporter": {
     "fullName": "Jabel",
     "reporterRelationship": 2,
-    "identityNumber": "03041868164",
+    "identityNumber": "03041868161",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
-    "provinceId": 2,
-    "municipalityId": 4,
+    "provinceId": 1,
+    "municipalityId": 2,
     "phoneNumber": "55664266",
     "email": "12aidenpearces@gmail.com",
     "professionalLicense": "string",
@@ -22,12 +22,12 @@ Content-Type:  application/json
   },
   "vaccinatedSubject": {
     "fullName": "Jabel",
-    "identityNumber": "03041868197",
+    "identityNumber": "03041868191",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
-    "provinceId": 2,
-    "municipalityId": 4,
+    "provinceId": 1,
+    "municipalityId": 2,
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
@@ -38,18 +38,10 @@ Content-Type:  application/json
   },
   "vaccinations": [
     {
-      "vaccineId": "08dea0ba-a214-4386-84f2-ad3e0ad2ab07",
+      "vaccineId": "08dea0df-93de-4c04-8f03-6d24751c22df",
       "batchNumber": "qweqweq",
       "site": 3,
       "doseNumber": 5,
-      "administrationDate": "2026-04-02T18:13:59.418Z",
-      "vaccinationCenter": "string"
-    },
-    {
-      "vaccineId": 2,
-      "batchNumber": "qweqweq",
-      "site": 2,
-      "doseNumber": 19,
       "administrationDate": "2026-04-02T18:13:59.418Z",
       "vaccinationCenter": "string"
     }
@@ -61,7 +53,7 @@ Content-Type:  application/json
       "resultedInDeath": false,
       "currentStatus": 2,
       "symptoms": [
-        "08dea0ba-8b59-401b-883d-3ad3577f616f"
+        "08dea0de-29fa-4ca4-8afc-af4cafc58a4c"
       ]
     }
   ]
