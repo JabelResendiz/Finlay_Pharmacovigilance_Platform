@@ -43,6 +43,14 @@ public interface IGenericRepository<T> where T : BasicEntity
     /// <returns>An <see cref="IQueryable{T}"/> representing all entities in the repository.</returns>
     IQueryable<T> GetAll();
 
+    IQueryable<T> GetAllPaged(int skip, int take);
+
+    IQueryable<T> GetAllPagedbyItem(int skip, int take,
+                 Expression<Func<T, bool>> predicate,
+                 params Expression<Func<T, object>>[] includes);
+
+    IQueryable<T> GetPaged(IQueryable<T> query, int skip, int take);
+
     /// <summary>
     /// Asynchronously deletes an entity by its identifier.
     /// </summary>
@@ -73,5 +81,7 @@ public interface IGenericRepository<T> where T : BasicEntity
 
                                 CancellationToken cancellationToken = default,
                                 params Expression<Func<T, object>>[] includes);
+
+
 }
 

@@ -28,6 +28,8 @@ public static class DependencyInjection
 
         // Catalog Service
         services.AddScoped<ICatalogCommandService, CatalogCommandService>();
+        services.AddScoped<IVaccineQueryService, VaccineQueryService>();
+        services.AddScoped<ISymptomQueryService, SymptomQueryService>();
 
         // Registers services related to Entities
         services.AddScoped<IIdentityService, IdentityService>();

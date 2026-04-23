@@ -17,3 +17,12 @@ public class RegisterSectionResponsibleDto : RegisterUserDto
     public int MunicipalityId { get; set; }
 
 }
+
+
+public class SectionResponsibleResponseDto
+{
+    public required string UserName { get; set; }
+    public required string PhoneNumber { get; set; }
+    public required int ProvinceId { get; set; }
+    public required int MunicipalityId { get; set; }
+}

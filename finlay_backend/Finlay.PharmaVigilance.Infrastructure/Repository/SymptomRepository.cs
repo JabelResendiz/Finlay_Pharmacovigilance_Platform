@@ -1,17 +1,16 @@
 
 
-using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Infrastructure.Repository;
 
-public class VaccineRepository : GenericRepository<Vaccine>, IVaccineRepository
+public class SymptomRepository : GenericRepository<Symptom>, ISymptomRepository
 {
-    public VaccineRepository(FinlayDbContext context) : base(context) { }
+    public SymptomRepository(FinlayDbContext context) : base(context) { }
 
-    public IQueryable<Vaccine> GetByFilter(string? search, bool? status)
+
+    public IQueryable<Symptom> GetByFilter(string? search, bool? status)
     {
         var query = _entity.AsQueryable();
 
@@ -28,5 +27,4 @@ public class VaccineRepository : GenericRepository<Vaccine>, IVaccineRepository
         return query;
 
     }
-
 }

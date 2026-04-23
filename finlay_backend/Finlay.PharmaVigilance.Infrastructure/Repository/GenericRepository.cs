@@ -35,6 +35,41 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BasicEntity
         return _entity; // Return the entire DbSet as an IQueryable.
     }
 
+    public virtual IQueryable<T> GetAllPaged(int skip, int take)
+    {
+        var query = GetAll();
+
+        return query
+                .Skip(skip)
+                .Take(take);
+    }
+
+
+    public virtual IQueryable<T> GetAllPagedbyItem(int skip, int take,
+                    Expression<Func<T, bool>> predicate,
+                    params Expression<Func<T, object>>[] includes
+                        )
+    {
+
+        var query = GetAllByItems(predicate);
+
+        if (includes != null)
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+
+        return query.Skip(skip).Take(take);
+    }
+
+
+    public virtual IQueryable<T> GetPaged(IQueryable<T> query, int skip, int take)
+    {
+        return query.Skip(skip).Take(take);
+    }
+
     public virtual void Update(T element)
     {
         Console.WriteLine(element);

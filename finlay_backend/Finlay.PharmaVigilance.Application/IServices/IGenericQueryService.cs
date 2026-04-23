@@ -1,6 +1,6 @@
 
 using System.Linq.Expressions;
-//using Finlay.PharmaVigilance.Application.DTO.Paged;
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Domain.Entities;
 
 namespace Finlay.PharmaVigilance.Application.IServices;
@@ -34,5 +34,5 @@ public interface IGenericQueryService<TEntity, TDto> where TEntity : BasicEntity
     /// <returns>A Task representing the asynchronous operation, returning a paginated result as <see cref="PagedResultDto{TDto}"/>.</returns>
     // Task<PagedResultDto<TDto>> GetPagedResultByQueryAsync(PagedRequestDto paged, IQueryable<TEntity> query);
 
-    // Task<PagedResultDto<TDto>> GetAllPagedResultAsync (PagedRequestDto paged);
+    Task<PagedResultDto<TDto>> GetAllPagedResultAsync(PagedRequestDto paged);
 }

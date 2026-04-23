@@ -107,7 +107,7 @@ public class UserController : ControllerBase
     /// <response code="403">Forbidden - requires administrator role.</response>
     /// <response code="404">User not found.</response>
     [HttpDelete("{userId:int}")]
-    //[Authorize(Roles = "Supervisor")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

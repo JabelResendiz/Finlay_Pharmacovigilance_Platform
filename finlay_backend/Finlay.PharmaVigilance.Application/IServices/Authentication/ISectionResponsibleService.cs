@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 
 namespace Finlay.PharmaVigilance.Application.IServices.Authentication;
@@ -14,4 +15,9 @@ public interface ISectionResponsibleService
     /// <param name="registerDto">The DTO containing registration and profile details.</param>
     /// <returns>A task representing the asynchronous operation, returning a response message.</returns>
     Task<string> RegisterSectionResponsibleAsync(RegisterSectionResponsibleDto registerDto);
+
+
+    Task<PagedResultDto<SectionResponsibleResponseDto>> SearchByMunicipality(PagedRequestDto paged, int municipalityId);
+
+    Task<PagedResultDto<SectionResponsibleResponseDto>> GetByFilters(PagedRequestDto paged, string? search);
 }

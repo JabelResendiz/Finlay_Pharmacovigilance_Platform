@@ -44,6 +44,14 @@ Content-Type:  application/json
       "doseNumber": 5,
       "administrationDate": "2026-04-02T18:13:59.418Z",
       "vaccinationCenter": "string"
+    },
+    {
+      "vaccineId": 2,
+      "batchNumber": "qweqweq",
+      "site": 2,
+      "doseNumber": 19,
+      "administrationDate": "2026-04-02T18:13:59.418Z",
+      "vaccinationCenter": "string"
     }
   ],
   "adverseEvents": [

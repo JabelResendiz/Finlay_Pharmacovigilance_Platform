@@ -1,11 +1,13 @@
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.Authentication;
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Application.Services.Authentication;
 
@@ -85,5 +87,73 @@ public class SectionResponsibleService : ISectionResponsibleService
         await _unitOfWork.CompleteAsync();
 
         return "Section Responsible successfully registered";
+    }
+
+    public async Task<PagedResultDto<SectionResponsibleResponseDto>> SearchByMunicipality(PagedRequestDto paged, int municipalityId)
+    {
+        Console.WriteLine("898989");
+
+        var query = _unitOfWork.GetRepository<SectionResponsible>()
+                                        .GetAllByItems(src => src.MunicipalityId == municipalityId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await _unitOfWork.GetRepository<SectionResponsible>()
+                        .GetAllPagedbyItem((paged.PageNumber - 1) * paged.PageSize,
+                                            paged.PageSize,
+                                            src => src.MunicipalityId == municipalityId,
+                                            sr => sr.User)
+                        .ToListAsync();
+
+        return new PagedResultDto<SectionResponsibleResponseDto>
+        {
+            Items = items?.Select(_mapper.Map<SectionResponsibleResponseDto>) ?? Enumerable.Empty<SectionResponsibleResponseDto>(),
+            TotalCount = totalCount,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalCount
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
+        };
+    }
+
+
+    public async Task<PagedResultDto<SectionResponsibleResponseDto>> GetByFilters(PagedRequestDto paged, string? search)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+            Console.WriteLine("Search term: " + search);
+        else
+            Console.WriteLine("No search term provided.");
+
+        var query = _unitOfWork.GetRepository<SectionResponsible>()
+                                        .GetAllByItems(src => string.IsNullOrEmpty(search) ||
+                                                              src.User.UserName!.Contains(search));
+
+        var totalCount = await query.CountAsync();
+
+        var items = await _unitOfWork.GetRepository<SectionResponsible>()
+                        .GetAllPagedbyItem((paged.PageNumber - 1) * paged.PageSize,
+                                            paged.PageSize,
+                                            src => string.IsNullOrEmpty(search) ||
+                                                   src.User.UserName!.Contains(search),
+                                            sr => sr.User)
+                        .ToListAsync();
+
+        return new PagedResultDto<SectionResponsibleResponseDto>
+        {
+            Items = items?.Select(_mapper.Map<SectionResponsibleResponseDto>) ?? Enumerable.Empty<SectionResponsibleResponseDto>(),
+            TotalCount = totalCount,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalCount
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
+        };
     }
 }

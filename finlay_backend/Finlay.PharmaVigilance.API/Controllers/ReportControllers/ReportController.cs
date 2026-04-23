@@ -1,5 +1,6 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,5 +60,47 @@ public class ReportController : ControllerBase
         });
     }
 
+
+
+    [HttpGet("get-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetReportByNotificationNumber(string notificationNumber)
+    {
+        if (notificationNumber == null)
+            throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
+
+        var result = await _reportQueryService.GetReportByNotificationNumber(notificationNumber);
+
+        return StatusCode(StatusCodes.Status202Accepted, new
+        {
+            message = "Report successfully search",
+            data = result
+        });
+    }
+
+
+
+    [HttpGet("get-report-assigment")]
+    [Authorize(Roles = "MedicalReviewer")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetReportAssigment()
+    {
+        // if (notificationNumber == null)
+        //     throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
+
+        var result = await _reportQueryService.GetReportAssigment();
+
+        return StatusCode(StatusCodes.Status202Accepted, new
+        {
+            message = "Report successfully search",
+            data = result
+        });
+    }
 
 }

@@ -34,17 +34,29 @@ public class AutomapperProfile : Profile
         // Section Responsible Registration
         CreateMap<RegisterSectionResponsibleDto, SectionResponsible>();
         CreateMap<RegisterSectionResponsibleDto, User>();
+        CreateMap<SectionResponsible, SectionResponsibleResponseDto>()
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
 
-        // Report Mappings
+        // Catalog Dtos
 
         CreateMap<VaccineDto, Vaccine>();
+        CreateMap<Vaccine, GetVaccineDto>();
+        //CreateMap<Vaccine, GetPrivateVaccineDto>();
+
+        CreateMap<SymptomDto, Symptom>();
+        CreateMap<Symptom, GetSymptomDto>();
+        // CreateMap<Symptom, GetPrivateSymptomsDto>();
+
+        // Vaccination-VaccinatedSubject Dtos
+        CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
         CreateMap<VaccinationDto, Vaccination>();
 
-        CreateMap<VaccinatedSubjectDto, VaccinatedSubject>();
-        CreateMap<ReporterDto, Reporter>();
-        // CreateMap<Reporter, ReporterDto>();
-        // CreateMap<MedicalReportDto, PublicAefiReportDto>();
 
+
+
+
+        // AdverseEvent - AefiReport - Reporter
         CreateMap<AdverseEventDto, AdverseEvent>()
             .ForMember(dest => dest.AdverseEventSymptoms,
                 opt => opt.MapFrom(src =>
@@ -55,7 +67,7 @@ public class AutomapperProfile : Profile
                 )
             );
 
-        CreateMap<SymptomDto, Symptom>();
+        CreateMap<ReporterDto, Reporter>();
 
 
         CreateMap<PublicAefiReportDto, AefiReport>();
@@ -69,17 +81,6 @@ public class AutomapperProfile : Profile
         //             src.Phone != null ? Regex.Replace(src.Phone.Trim(), "[^0-9+]", "") : null))
         //     .ForMember(dest => dest.Department, opt => opt.MapFrom(src =>
         //             src.Department != null ? src.Department.Trim() : null));
-
-
-        // CreateMap<Contact, ContactDto>();
-
-        // Medical Review
-
-        CreateMap<MedicalReviewDto, MedicalReview>();
-
-        CreateMap<MedicalReviewAssignmentDTO,
-                    MedicalReviewAssignment>();
-
         CreateMap<MedicalReviewer, Reporter>()
                         .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.UserName))
                         .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
@@ -87,6 +88,36 @@ public class AutomapperProfile : Profile
 
 
 
+        // medicalAssignment - Medical Reviews Dtos
+
+        CreateMap<MedicalReviewDto, MedicalReview>();
+        CreateMap<MedicalReviewAssignmentDTO,
+                 MedicalReviewAssignment>();
+
+        // Contact Dtos
+        // CreateMap<CreateContactDto, Contact>()
+        //     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email.Trim().ToLowerInvariant()))
+        //     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Trim()))
+        //     .ForMember(dest => dest.Phone, opt => opt.MapFrom(src =>
+        //             src.Phone != null ? Regex.Replace(src.Phone.Trim(), "[^0-9+]", "") : null))
+        //     .ForMember(dest => dest.Department, opt => opt.MapFrom(src =>
+        //             src.Department != null ? src.Department.Trim() : null));
+
+
+        // CreateMap<Contact, ContactDto>();
+
+        // ResponseDto
+
+        CreateMap<VaccinatedSubject, VaccinatedSubjectResponseDto>();
+        CreateMap<Reporter, ReporterResponseDto>();
+        CreateMap<Vaccination, VaccinationResponseDto>()
+            .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
+
+        CreateMap<AdverseEvent, AdverseEventResponseDto>();
+
+        // CreateMap<AefiReport, ReportResponseDto>()
+        //     .ForMember(dest => dest.VaccinatedSubject, opt => opt.MapFrom(src => src.VaccinatedSubject))
+        //     .ForMember(dest => dest.Reporter, opt => opt.MapFrom(src => src.Reporter));
 
 
     }

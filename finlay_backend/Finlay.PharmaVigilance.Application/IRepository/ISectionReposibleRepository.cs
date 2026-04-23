@@ -7,5 +7,5 @@ namespace Finlay.PharmaVigilance.Application.IRepository;
 /// </summary>
 public interface ISectionResponsibleRepository : IGenericRepository<SectionResponsible>
 {
-    
+
 }

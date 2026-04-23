@@ -91,4 +91,61 @@ public class CatalogCommandService : ICatalogCommandService
         }
     }
 
+    public async Task<string> DeactivateVaccine(int vaccineId)
+    {
+        var vaccine = await _unitOfWork.GetRepository<Vaccine>()
+                        .GetByIdAsync(vaccineId);
+
+        if (vaccine == null)
+            throw new InvalidOperationException("This vaccine not exists");
+
+        vaccine.IsActive = false;
+
+        await _unitOfWork.CompleteAsync();
+
+        return "Vaccine is now inactive";
+    }
+    public async Task<string> DeactivateSymptom(int symptomId)
+    {
+        var symptom = await _unitOfWork.GetRepository<Symptom>()
+                        .GetByIdAsync(symptomId);
+
+        if (symptom == null)
+            throw new InvalidOperationException("This symptom not exists");
+
+        symptom.IsActive = false;
+
+        await _unitOfWork.CompleteAsync();
+
+        return "Symptom is now inactive";
+    }
+
+    public async Task<string> ActivateVaccine(int vaccineId)
+    {
+        var vaccine = await _unitOfWork.GetRepository<Vaccine>()
+                                .GetByIdAsync(vaccineId);
+
+        if (vaccine == null)
+            throw new InvalidOperationException("This vaccine not exists");
+
+        vaccine.IsActive = true;
+
+        await _unitOfWork.CompleteAsync();
+
+        return "Vaccine is now active";
+    }
+    public async Task<string> ActivateSymptom(int symptomId)
+    {
+        var symptom = await _unitOfWork.GetRepository<Symptom>()
+                                .GetByIdAsync(symptomId);
+
+        if (symptom == null)
+            throw new InvalidOperationException("This symptom not exists");
+
+        symptom.IsActive = true;
+
+        await _unitOfWork.CompleteAsync();
+
+        return "Symptom is now active";
+    }
 }

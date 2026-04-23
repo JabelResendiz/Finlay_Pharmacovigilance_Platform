@@ -1,0 +1,10 @@
+@host = http://localhost:5137
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsImdpdmVuX25hbWUiOiJDYXJsb3MiLCJqdGkiOiIzNjZhZTg1MS1iZTg2LTQxMjUtYjVhNC0xYWE5OTgxOGViMGIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc3NjY0Mjc0MywiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.J-k0wc5AidZTTrGIgASiDGzE1TwU_JXenab-oNPcW8Q
+
+GET {{host}}/api/SectionResponsible/GetAll?pageNumber=1&pageSize=10&search=
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+
