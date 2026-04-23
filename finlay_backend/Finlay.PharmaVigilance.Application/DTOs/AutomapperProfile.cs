@@ -113,12 +113,18 @@ public class AutomapperProfile : Profile
         CreateMap<Vaccination, VaccinationResponseDto>()
             .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
 
-        CreateMap<AdverseEvent, AdverseEventResponseDto>();
+        CreateMap<AdverseEvent, AdverseEventDetailDto>();
 
         // CreateMap<AefiReport, ReportResponseDto>()
         //     .ForMember(dest => dest.VaccinatedSubject, opt => opt.MapFrom(src => src.VaccinatedSubject))
         //     .ForMember(dest => dest.Reporter, opt => opt.MapFrom(src => src.Reporter));
 
+        // ReportResponseSimpleDto
+        CreateMap<AefiReport, ReportSummaryDto>();
+        CreateMap<AdverseEvent, AdverseEventSummaryDto>();
+        CreateMap<Vaccination, VaccinationSummaryDto>()
+                .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
+        CreateMap<AdverseEvent, AdverseEventSummaryDto>();
 
     }
 }

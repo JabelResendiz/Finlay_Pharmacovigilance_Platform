@@ -103,4 +103,27 @@ public class ReportController : ControllerBase
         });
     }
 
+
+
+
+
+    [HttpGet("assigned")]
+    [Authorize(Roles = "SectionResponsible")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetReportsbySectionResponsible(
+        [FromQuery] PagedRequestDto pagedRequestDto
+    )
+    {
+        if (pagedRequestDto == null)
+            throw new ArgumentNullException(nameof(pagedRequestDto), "pagedRequestDto is required.");
+
+        var result = await _reportQueryService.GetReportsBySectionResponsible(pagedRequestDto);
+
+
+        return Ok(result);
+    }
+
 }

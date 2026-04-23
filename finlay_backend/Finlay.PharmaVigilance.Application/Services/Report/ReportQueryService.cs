@@ -1,11 +1,13 @@
-using System.IO.Pipes;
+
 using System.Linq.Expressions;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finlay.PharmaVigilance.Application.Services;
@@ -33,7 +35,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
 
 
-    public async Task<ReportResponseDto> GetReportByNotificationNumber(string notificationNumber)
+    public async Task<ReportDetailDto> GetReportByNotificationNumber(string notificationNumber)
     {
         var includes = GetIncludes();
 
@@ -94,7 +96,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
         // var listadverseEvents = adverseEvents?.Select(_mapper.Map<AdverseEventResponseDto>) ?? Enumerable.Empty<AdverseEventResponseDto>();
 
-        List<AdverseEventResponseDto> adverseEventsList = new List<AdverseEventResponseDto>();
+        List<AdverseEventDetailDto> adverseEventsList = new List<AdverseEventDetailDto>();
 
         for (int i = 0; i < adverseEvents!.Count(); i++)
         {
@@ -118,13 +120,13 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
             Console.WriteLine("090909090909");
 
-            adverseEventsList.Add(_mapper.Map<AdverseEventResponseDto>(adverseEvents[i]));
+            adverseEventsList.Add(_mapper.Map<AdverseEventDetailDto>(adverseEvents[i]));
             adverseEventsList[i].Symptoms = symptoms?.Select(_mapper.Map<GetSymptomDto>) ?? Enumerable.Empty<GetSymptomDto>();
 
 
         }
 
-        return new ReportResponseDto
+        return new ReportDetailDto
         {
             ReportDate = report.ReportDate,
             VaccinatedSubject = _mapper.Map<VaccinatedSubjectResponseDto>(vaccinatedSubject),
@@ -137,7 +139,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
     }
 
 
-    public async Task<IEnumerable<ReportResponseDto>> GetReportAssigment()
+    public async Task<IEnumerable<ReportDetailDto>> GetReportAssigment()
     {
         var userId = _userContextService.GetUserId();
 
@@ -153,7 +155,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
                                                 mra.Status == Domain.Enum.ReviewAssignmentStatus.Pending)
                                             .ToListAsync();
 
-        List<ReportResponseDto> reportResponses = new List<ReportResponseDto>();
+        List<ReportDetailDto> reportResponses = new List<ReportDetailDto>();
 
         foreach (var medicalReviewAssigment in medicalreviewassignments)
         {
@@ -217,7 +219,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
             // var listadverseEvents = adverseEvents?.Select(_mapper.Map<AdverseEventResponseDto>) ?? Enumerable.Empty<AdverseEventResponseDto>();
 
-            List<AdverseEventResponseDto> adverseEventsList = new List<AdverseEventResponseDto>();
+            List<AdverseEventDetailDto> adverseEventsList = new List<AdverseEventDetailDto>();
 
             for (int i = 0; i < adverseEvents!.Count(); i++)
             {
@@ -241,13 +243,13 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
                 Console.WriteLine("090909090909");
 
-                adverseEventsList.Add(_mapper.Map<AdverseEventResponseDto>(adverseEvents[i]));
+                adverseEventsList.Add(_mapper.Map<AdverseEventDetailDto>(adverseEvents[i]));
                 adverseEventsList[i].Symptoms = symptoms?.Select(_mapper.Map<GetSymptomDto>) ?? Enumerable.Empty<GetSymptomDto>();
 
 
             }
 
-            reportResponses.Add(new ReportResponseDto
+            reportResponses.Add(new ReportDetailDto
             {
                 ReportDate = report.ReportDate,
                 VaccinatedSubject = _mapper.Map<VaccinatedSubjectResponseDto>(vaccinatedSubject),
@@ -262,5 +264,51 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
         return reportResponses;
 
     }
+
+    public async Task<PagedResultDto<ReportSummaryDto>> GetReportsBySectionResponsible(PagedRequestDto paged)
+    {
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException("User is not a section responsible");
+
+        var reportIds = _unitOfWork.GetRepository<Alert>()
+                            .GetAllByItems(a => a.SectionResponsibleId == sectionResponsible.Id &&
+                                a.AefiReport.Status == ReportStatus.Submitted)
+                            .Select(a => a.AefiReportId)
+                            .Distinct();
+
+        var reportsQuery = _unitOfWork.GetRepository<AefiReport>()
+                                .GetAllByItems(r => reportIds.Contains(r.Id))
+                                .OrderByDescending(r => r.ReportDate);
+
+
+        var totalItems = await reportsQuery.CountAsync();
+
+        var items = await _unitOfWork.GetRepository<AefiReport>()
+                        .GetPaged(reportsQuery, (paged.PageNumber - 1) * paged.PageSize, paged.PageSize)
+                        .ProjectTo<ReportSummaryDto>(_mapper.ConfigurationProvider)
+                        .ToListAsync();
+
+        return new PagedResultDto<ReportSummaryDto>
+        {
+            Items = items,
+            TotalCount = totalItems,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalItems
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
+
+        };
+
+    }
+
 
 }

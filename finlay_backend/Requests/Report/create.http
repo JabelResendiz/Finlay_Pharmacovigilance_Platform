@@ -26,8 +26,8 @@ Content-Type:  application/json
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
-    "provinceId": 1,
-    "municipalityId": 2,
+    "provinceId": 2,
+    "municipalityId": 4,
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
@@ -50,6 +50,10 @@ Content-Type:  application/json
     {
       "startDate": "2026-04-03T12:13:59.418Z",
       "description": "string",
+      "visitedDoctor": true,
+      "wentToEmergencyRoom": true,
+      "permanentDisability": true,
+      "isLifeThreatening": false,
       "resultedInDeath": false,
       "currentStatus": 2,
       "symptoms": [

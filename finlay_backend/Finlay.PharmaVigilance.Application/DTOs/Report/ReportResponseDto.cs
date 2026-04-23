@@ -2,13 +2,13 @@ using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Application.DTO;
 
-public class ReportResponseDto
+public class ReportDetailDto
 {
     public required DateTime ReportDate { get; set; }
     public required VaccinatedSubjectResponseDto VaccinatedSubject { get; set; }
     public required ReporterResponseDto Reporter { get; set; }
     public required IEnumerable<VaccinationResponseDto> Vaccinations { get; set; }
-    public required IEnumerable<AdverseEventResponseDto> AdverseEvents { get; set; }
+    public required IEnumerable<AdverseEventDetailDto> AdverseEvents { get; set; }
 }
 
 public class VaccinatedSubjectResponseDto
@@ -33,7 +33,7 @@ public class VaccinationResponseDto
     public string? VaccinationCenter { get; set; }
 }
 
-public class AdverseEventResponseDto
+public class AdverseEventDetailDto
 {
     public required DateTime StartDate { get; set; }
     public required bool VisitedDoctor { get; set; }
