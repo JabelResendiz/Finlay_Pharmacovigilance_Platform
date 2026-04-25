@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices;
@@ -46,6 +47,16 @@ public class VaccineQueryService : GenericQueryService<Vaccine, GetVaccineDto>,
 
         };
     }
+
+
+    public async Task<IEnumerable<GetVaccineDto>> GetActiveVaccinesLookup()
+    {
+        return await _vaccineRepository
+                    .GetAllByItems(v => v.IsActive)
+                    .ProjectTo<GetVaccineDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+    }
+
 
     public async Task<PagedResultDto<GetVaccineDto>> GetByFilters(PagedRequestDto paged, string? search, bool? status)
     {

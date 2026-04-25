@@ -21,3 +21,11 @@ Authorization: Bearer {{token}}
 POST {{host}}/api/Catalog/activate/symptom/1
 Content-Type:  application/json
 Authorization: Bearer {{token}}
+
+
+
+####
+
+
+GET http://localhost:5137/api/GetCatalog/vaccines/actives
+Content-Type:  application/json

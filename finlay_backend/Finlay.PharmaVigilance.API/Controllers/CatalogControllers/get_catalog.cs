@@ -29,67 +29,55 @@ public class GetCatalogController : ControllerBase
     }
 
 
-    [HttpGet("vaccines")]
+    [HttpGet("vaccines/actives")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> GetVaccines([FromQuery] PagedRequestDto paged)
+    public async Task<ActionResult> GetActiveVaccines()
     {
-        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+        var result = await _vaccineQueryService.GetActiveVaccinesLookup();
 
-        var result = await _vaccineQueryService.GetActivesVaccine(paged);
-
-        return Ok(new
-        {
-            message = result,
-            success = true
-        });
+        return Ok(result);
 
     }
 
-    [HttpGet("symptoms")]
+    [HttpGet("symptoms/actives")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> GetSymptoms([FromQuery] PagedRequestDto paged)
+    public async Task<ActionResult> GetActiveSymptoms()
     {
-        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+        var result = await _symptomQueryService.GetActiveSymptomsLookup();
 
-        var result = await _symptomQueryService.GetActivesSymptoms(paged);
-
-        return Ok(new
-        {
-            message = result,
-            success = true
-        });
+        return Ok(result);
 
     }
 
 
-    [HttpGet("allsymptoms")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> GetAllSymptoms([FromQuery] PagedRequestDto paged)
-    {
-        if (paged == null)
-            throw new ArgumentNullException(nameof(paged), "Paged cannot be null");
+    // [HttpGet("allsymptoms")]
+    // [Authorize(Roles = "Admin")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // [ProducesResponseType(StatusCodes.Status409Conflict)]
+    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    // public async Task<ActionResult> GetAllSymptoms([FromQuery] PagedRequestDto paged)
+    // {
+    //     if (paged == null)
+    //         throw new ArgumentNullException(nameof(paged), "Paged cannot be null");
 
-        paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+    //     paged.BaseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var result = await _symptomQueryService.GetAllPagedResultAsync(paged);
+    //     var result = await _symptomQueryService.GetAllPagedResultAsync(paged);
 
-        return Ok(new
-        {
-            message = result,
-            success = true
-        });
+    //     return Ok(new
+    //     {
+    //         message = result,
+    //         success = true
+    //     });
 
-    }
+    // }
 
 
     [HttpGet("vaccine")]

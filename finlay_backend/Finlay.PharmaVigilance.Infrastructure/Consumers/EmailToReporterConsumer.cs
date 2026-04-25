@@ -60,10 +60,28 @@ public class EmailToReporterConsumer : BackgroundService
 
                 await channel.BasicAckAsync(ea.DeliveryTag, false);
             }
-            catch
+            catch (Exception ex)
             {
+                if (ex.Message.Contains("Invalid domain") ||
+                    ex.Message.Contains("Invalid address") ||
+                    ex is FormatException)
+                {
+                    Console.WriteLine($"❌ Email inválido: {data!.ReporterEmail}");
+
+                    // ACK y descartar
+                    await channel.BasicAckAsync(ea.DeliveryTag, false);
+                    return;
+                }
 
                 retryCount++;
+
+                if (retryCount > 10)
+                {
+                    Console.WriteLine("❌ Máximo de reintentos alcanzado");
+
+                    await channel.BasicAckAsync(ea.DeliveryTag, false);
+                    return;
+                }
 
                 var delay = Math.Pow(2, retryCount);
                 var delayMs = (int)(delay * 1000);

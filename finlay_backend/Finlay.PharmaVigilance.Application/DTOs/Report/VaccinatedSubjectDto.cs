@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Finlay.PharmaVigilance.Application.Validators.Attribute;
 using Finlay.PharmaVigilance.Domain.Enum;
 
 public class VaccinatedSubjectDto
@@ -35,6 +36,7 @@ public class VaccinatedSubjectDto
     public string? PhoneNumber { get; set; }
 
     [EmailAddress(ErrorMessage = "Email format is not valid.")]
+    [EmailValidation]
     public string? Email { get; set; }
 
     [StringLength(250, ErrorMessage = "Current Medications cannot exceed 250 characters")]

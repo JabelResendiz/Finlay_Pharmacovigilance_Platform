@@ -7,6 +7,8 @@ public interface IVaccineQueryService : IGenericQueryService<Vaccine, GetVaccine
 {
     Task<PagedResultDto<GetVaccineDto>> GetActivesVaccine(PagedRequestDto paged);
 
+    Task<IEnumerable<GetVaccineDto>> GetActiveVaccinesLookup();
+
     Task<PagedResultDto<GetVaccineDto>> GetByFilters(PagedRequestDto paged, string? search, bool? status);
 
 }

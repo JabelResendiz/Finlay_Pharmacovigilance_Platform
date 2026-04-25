@@ -6,6 +6,8 @@ namespace Finlay.PharmaVigilance.Application.IServices;
 public interface ISymptomQueryService : IGenericQueryService<Symptom, GetSymptomDto>
 {
     Task<PagedResultDto<GetSymptomDto>> GetActivesSymptoms(PagedRequestDto paged);
+
+    Task<IEnumerable<GetSymptomDto>> GetActiveSymptomsLookup();
     Task<PagedResultDto<GetSymptomDto>> GetByFilters(PagedRequestDto paged, string? search, bool? status);
 
 }

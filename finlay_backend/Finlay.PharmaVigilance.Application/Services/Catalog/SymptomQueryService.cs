@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices;
@@ -48,6 +49,14 @@ public class SymptomQueryService : GenericQueryService<Symptom, GetSymptomDto>,
         };
     }
 
+
+    public async Task<IEnumerable<GetSymptomDto>> GetActiveSymptomsLookup()
+    {
+        return await _symptomRepository
+                    .GetAllByItems(v => v.IsActive)
+                    .ProjectTo<GetSymptomDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+    }
 
     public async Task<PagedResultDto<GetSymptomDto>> GetByFilters(PagedRequestDto paged, string? search, bool? status)
     {

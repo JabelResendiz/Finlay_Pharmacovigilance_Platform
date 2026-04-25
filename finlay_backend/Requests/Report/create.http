@@ -10,19 +10,17 @@ Content-Type:  application/json
   "reportDate": "2026-04-04T19:13:59.418Z",
   "reporter": {
     "fullName": "Jabel",
-    "reporterRelationship": 2,
-    "identityNumber": "03041868161",
+    "reporterRelationship": "Self",
+    "identityNumber": "03041868002",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "provinceId": 1,
     "municipalityId": 2,
     "phoneNumber": "55664266",
-    "email": "12aidenpearces@gmail.com",
-    "professionalLicense": "string",
-    "institution": "string"
+    "email": "12aidenpearces@gmail.com"
   },
   "vaccinatedSubject": {
     "fullName": "Jabel",
-    "identityNumber": "03041868191",
+    "identityNumber": "03041868002",
     "dateOfBirth": "2003-04-18T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
@@ -40,7 +38,7 @@ Content-Type:  application/json
     {
       "vaccineId": "08dea0df-93de-4c04-8f03-6d24751c22df",
       "batchNumber": "qweqweq",
-      "site": 3,
+      "site": "leftarm",
       "doseNumber": 5,
       "administrationDate": "2026-04-02T18:13:59.418Z",
       "vaccinationCenter": "string"
@@ -55,7 +53,7 @@ Content-Type:  application/json
       "permanentDisability": true,
       "isLifeThreatening": false,
       "resultedInDeath": false,
-      "currentStatus": 2,
+      "currentStatus": "Recovered",
       "symptoms": [
         "08dea0de-29fa-4ca4-8afc-af4cafc58a4c"
       ]

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Finlay.PharmaVigilance.Application.Validators.Attribute;
 using Finlay.PharmaVigilance.Domain.Enum;
 
 namespace Finlay.PharmaVigilance.Application.DTO;
@@ -31,6 +32,8 @@ public class ReporterDto
 
     [Required(ErrorMessage = "Email is required.")]
     [StringLength(100, MinimumLength = 1, ErrorMessage = "Email must be between 1 and 50 characters.")]
+    [EmailAddress(ErrorMessage = "Invalid email format.")]
+    [EmailValidation]
     public string Email { get; set; } = string.Empty;
 
     [StringLength(30, MinimumLength = 1, ErrorMessage = "Email must be between 1 and 50 characters.")]

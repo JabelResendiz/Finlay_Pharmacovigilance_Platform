@@ -1,4 +1,3 @@
-using Finlay.PharmaVigilance.Application.DTO;
 
 namespace Finlay.PharmaVigilance.Application.Validators;
 
