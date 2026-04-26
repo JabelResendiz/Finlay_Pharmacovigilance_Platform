@@ -6,6 +6,7 @@ using Finlay.PharmaVigilance.Application;
 using Finlay.PharmaVigilance.Infrastructure;
 using Finlay.PharmaVigilance.Api.Middleware;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,15 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 
+// 🔥 CONFIGURACIÓN SERILOG AQUÍ
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+
 var app = builder.Build();
 
 
@@ -62,7 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 //app.UseCors("LocalhostPolicy");
-        
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
