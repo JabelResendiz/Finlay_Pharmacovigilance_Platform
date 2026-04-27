@@ -4,6 +4,7 @@ using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -11,12 +12,14 @@ public class CatalogCommandService : ICatalogCommandService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ILogger<CatalogCommandService> _logger;
 
 
-    public CatalogCommandService(IUnitOfWork unitOfWork, IMapper mapper)
+    public CatalogCommandService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CatalogCommandService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<string> CreateVaccineAsync(VaccineDto vaccineDto)
@@ -40,6 +43,8 @@ public class CatalogCommandService : ICatalogCommandService
 
             await _unitOfWork.GetRepository<Vaccine>().CreateAsync(vaccine);
             await _unitOfWork.CompleteAsync();
+
+            _logger.LogInformation("Vaccine successfully created");
 
             return "Vaccine successfully created";
         }
@@ -71,6 +76,13 @@ public class CatalogCommandService : ICatalogCommandService
 
             await _unitOfWork.GetRepository<Symptom>().CreateAsync(symptom);
             await _unitOfWork.CompleteAsync();
+
+            _logger.LogInformation(
+                "Symptom created: {Name}, Category: {Category}, Code: {Code}",
+                symptomDto.Name,
+                symptomDto.Category,
+                symptomDto.StandardCode
+            );
 
             return "Symptom successfully created";
         }
