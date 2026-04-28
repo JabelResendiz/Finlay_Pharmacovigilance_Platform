@@ -9,6 +9,7 @@ using Finlay.PharmaVigilance.Application.Validators;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
 using Finlay.PharmaVigilance.Domain.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -29,6 +30,7 @@ public class ReportCommandService : IReportCommandService
     private readonly IEnumerable<IReportValidator<PublicAefiReportDto>> _publicValidators;
     private readonly IUserContextService _userContextService;
     private readonly IEventBus _eventBus;
+    private readonly ILogger<ReportCommandService> _logger;
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
                             { e => e.User! };
@@ -40,7 +42,8 @@ public class ReportCommandService : IReportCommandService
         IEnumerable<IReportValidator<ReportDto>> validators,
         IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
         IUserContextService userContextService,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        ILogger<ReportCommandService> logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -50,6 +53,7 @@ public class ReportCommandService : IReportCommandService
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
         //_emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;

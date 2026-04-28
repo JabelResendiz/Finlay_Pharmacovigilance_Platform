@@ -53,6 +53,7 @@ Content-Type:  application/json
       "permanentDisability": true,
       "isLifeThreatening": false,
       "resultedInDeath": false,
+      "deathDate": null,
       "currentStatus": "Recovered",
       "symptoms": [
         "08dea0de-29fa-4ca4-8afc-af4cafc58a4c"
