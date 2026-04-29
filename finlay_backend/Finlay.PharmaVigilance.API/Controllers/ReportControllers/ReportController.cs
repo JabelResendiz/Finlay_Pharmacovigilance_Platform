@@ -89,12 +89,14 @@ public class ReportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetReportAssigment()
+    public async Task<IActionResult> GetReportAssigment(
+        [FromQuery] PagedRequestDto pagedRequestDto
+    )
     {
-        // if (notificationNumber == null)
-        //     throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
+        if (pagedRequestDto == null)
+            throw new ArgumentNullException(nameof(pagedRequestDto), "pagedRequestDto is required.");
 
-        var result = await _reportQueryService.GetReportAssigment();
+        var result = await _reportQueryService.GetReportAssigment(pagedRequestDto);
 
         return StatusCode(StatusCodes.Status202Accepted, new
         {

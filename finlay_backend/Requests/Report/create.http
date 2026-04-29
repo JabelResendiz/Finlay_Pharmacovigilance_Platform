@@ -36,7 +36,7 @@ Content-Type:  application/json
   },
   "vaccinations": [
     {
-      "vaccineId": "08dea0df-93de-4c04-8f03-6d24751c22df",
+      "vaccineId": "08dea54c-1466-426e-843c-be3f2cd6114a",
       "batchNumber": "qweqweq",
       "site": "leftarm",
       "doseNumber": 5,
@@ -56,7 +56,7 @@ Content-Type:  application/json
       "deathDate": null,
       "currentStatus": "Recovered",
       "symptoms": [
-        "08dea0de-29fa-4ca4-8afc-af4cafc58a4c"
+        "08dea54c-144c-497d-8cc6-e4d7cda646a0"
       ]
     }
   ]
