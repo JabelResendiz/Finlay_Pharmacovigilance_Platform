@@ -10,7 +10,6 @@
   - [ ] Provincias del paciente
   - [ ] Severidad
   - [ ] Vacuna
-  - [ ] Por numero de notificación
 - [ ] Exportar a PDF reportes enteros
 - [ ] Exportar a PDF filtros específicos
 - [ ] Dashboards de :
