@@ -38,7 +38,16 @@ public class MedicalReviewAssignmentController : ControllerBase
     }
 
 
+    [HttpDelete("delete")]
+    public async Task<IActionResult> DeleteAssigment([FromQuery] Guid assignmentId)
+    {
+        await _medicalReviewAssignmentCommandService.DeleteAsync(assignmentId);
 
+        return Ok(new
+        {
+            message = "the assignment successfully deleted"
+        });
+    }
 
 
 }
