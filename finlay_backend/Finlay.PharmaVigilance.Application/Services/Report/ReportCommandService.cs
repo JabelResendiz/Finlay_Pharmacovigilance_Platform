@@ -150,17 +150,17 @@ public class ReportCommandService : IReportCommandService
 
             Console.WriteLine($"📧 Queremos enviar email a: {reporter.Email} y {sectionResponsibleUser.Email}");
 
-            await _eventBus.PublishAsync(new EmailToReporterEvent
-            {
-                ReportNumber = report.NotificationNumber,
-                ReporterEmail = reporter.Email
-            });
+            // await _eventBus.PublishAsync(new EmailToReporterEvent
+            // {
+            //     ReportNumber = report.NotificationNumber,
+            //     ReporterEmail = reporter.Email
+            // });
 
-            await _eventBus.PublishAsync(new EmailToSectionResponsibleEvent
-            {
-                ReportNumber = report.NotificationNumber,
-                SectionResponsibleEmail = sectionResponsibleUser.Email!
-            });
+            // await _eventBus.PublishAsync(new EmailToSectionResponsibleEvent
+            // {
+            //     ReportNumber = report.NotificationNumber,
+            //     SectionResponsibleEmail = sectionResponsibleUser.Email!
+            // });
 
 
             return new CreateReportResponseDto
