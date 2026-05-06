@@ -29,4 +29,23 @@ public class VaccinatedSubject : GuidEntity
 
     public ICollection<AefiReport> AefiReports { get; set; } = new List<AefiReport>();
 
+    public int Age => CalculateAge(DateOfBirth);
+
+    private static int CalculateAge(DateTime dateOfBirth)
+    {
+
+
+        var today = DateTime.Today;
+        Console.WriteLine(today);
+        int age = today.Year - dateOfBirth.Year;
+
+        Console.WriteLine(today.AddYears(-age));
+
+        if (dateOfBirth.Date > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return age;
+    }
 }

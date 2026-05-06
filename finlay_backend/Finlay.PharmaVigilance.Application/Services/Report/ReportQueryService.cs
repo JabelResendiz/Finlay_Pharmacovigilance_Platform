@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.IRepository;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
@@ -24,11 +25,19 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
                         };
 
     private readonly IUserContextService _userContextService;
+    private readonly IPdfService _pdfService;
+    private readonly IReportRepository _reportRepository;
 
-    public ReportQueryService(IUnitOfWork unitOfWork, IMapper mapper, IUserContextService userContextService)
+    public ReportQueryService(IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IUserContextService userContextService,
+        IPdfService pdfService,
+        IReportRepository reportRepository)
         : base(unitOfWork, mapper)
     {
         _userContextService = userContextService;
+        _pdfService = pdfService;
+        _reportRepository = reportRepository;
     }
 
     public override Expression<Func<AefiReport, object>>[] GetIncludes() => includes;
@@ -163,5 +172,63 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
     }
 
+
+    public async Task<byte[]> GetReportPdfAsync(string notificationNumber)
+    {
+        var report = await _unitOfWork.GetRepository<AefiReport>()
+                        .GetAllByItems(ar => ar.NotificationNumber == notificationNumber)
+                        .ProjectTo<ReportPdfDto>(_mapper.ConfigurationProvider)
+                        .FirstOrDefaultAsync() ?? throw new ArgumentNullException("Report not found");
+
+
+        return _pdfService.GenerateReportPdf(report);
+    }
+
+
+    public async Task<PagedResultDto<ReportAdminDto>> GetFilter(
+        PagedRequestDto paged,
+        string? vaccineName,
+        string? provinceName
+    )
+    {
+
+        var query = _reportRepository.GetByFilter(vaccineName, provinceName);
+
+        var totalItems = await query.CountAsync();
+
+        var items = await _reportRepository
+                    .GetPaged(query, (paged.PageNumber - 1) * paged.PageSize, paged.PageSize)
+                    .ProjectTo<ReportAdminDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+
+        var reportIds = items.Select(i => i.Id).ToList();
+
+        foreach (var item in items)
+        {
+            var medicalReview = await _unitOfWork.GetRepository<MedicalReview>()
+                                .FirstOrDefaultAsync(mr => mr.MedicalReviewAssignment.AefiReportId == item.Id);
+
+            if (medicalReview != null)
+            {
+                item.MedicalReview = _mapper.Map<MedicalReviewResponseDto>(medicalReview);
+            }
+
+        }
+
+        return new PagedResultDto<ReportAdminDto>
+        {
+            Items = items,
+            TotalCount = totalItems,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            NextPageUrl = paged.PageNumber * paged.PageSize < totalItems
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                        : null,
+            PreviousPageUrl = paged.PageNumber > 1
+                        ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                        : null
+
+        };
+    }
 
 }

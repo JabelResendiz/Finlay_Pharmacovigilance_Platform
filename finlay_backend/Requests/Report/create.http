@@ -9,23 +9,25 @@ Content-Type:  application/json
 {
   "reportDate": "2026-04-04T19:13:59.418Z",
   "reporter": {
-    "fullName": "Jabel",
-    "reporterRelationship": "Self",
-    "identityNumber": "03041868002",
-    "dateOfBirth": "2003-04-18T18:13:59.418Z",
-    "provinceId": 1,
-    "municipalityId": 2,
+    "fullName": "Jabel12",
+    "reporterRelationship": "Doctor",
+    "identityNumber": "03050200018",
+    "dateOfBirth": "2003-05-02T18:13:59.418Z",
+    "provinceId": 10,
+    "municipalityId":19 ,
     "phoneNumber": "55664266",
-    "email": "12aidenpearces@gmail.com"
+    "email": "12aidenpearces@gmail.com",
+    "professionalLicense": "asdasdas",
+    "institution": "asdasdasd"
   },
   "vaccinatedSubject": {
     "fullName": "Jabel",
-    "identityNumber": "03041868002",
-    "dateOfBirth": "2003-04-18T18:13:59.418Z",
+    "identityNumber": "03050200002",
+    "dateOfBirth": "2003-05-02T18:13:59.418Z",
     "gender": 1,
     "isPregnant": false,
-    "provinceId": 2,
-    "municipalityId": 4,
+    "provinceId": 10,
+    "municipalityId": 19,
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
@@ -36,7 +38,7 @@ Content-Type:  application/json
   },
   "vaccinations": [
     {
-      "vaccineId": "08dea54c-1466-426e-843c-be3f2cd6114a",
+      "vaccineId": "08dea54c-1471-4e1e-815d-79b1fcb24ec8",
       "batchNumber": "qweqweq",
       "site": "leftarm",
       "doseNumber": 5,

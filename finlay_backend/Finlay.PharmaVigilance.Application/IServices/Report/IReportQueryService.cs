@@ -11,6 +11,11 @@ public interface IReportQueryService : IGenericQueryService<AefiReport, PublicAe
 
     Task<PagedResultDto<ReportSectionResponsibleDto>> GetReportsBySectionResponsible(PagedRequestDto pagedRequestDto);
 
+    Task<byte[]> GetReportPdfAsync(string notificationNumber);
 
-
+    Task<PagedResultDto<ReportAdminDto>> GetFilter(
+        PagedRequestDto paged,
+        string? vaccineName,
+        string? provinceName
+    );
 }

@@ -1,7 +1,15 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImE3OTRiY2I3LTljOTAtNDRkNS1iYWU2LWI5OGJiN2IzZDlhMCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc2OTE0MjI1LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.OUbX5aAQ9B-TlJnNQHyctQ0URaWzlpSMlMn3rGzjdVk
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6ImFkbWluX3VzZXJuYW1lXzEiLCJqdGkiOiIwNGI4MDllMy1jZjUwLTQwNzgtYjRmMC03ZDk5ZTNiYzQ4NTEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc3NzQ0NTQxNiwiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.IknvV4bM6U9jwHUThi9WWArTMWxQCp-0QdowtbW3qq0
 
-GET {{host}}/api/GetCatalog/vaccine?pageNumber=1&pageSize=10&search=&status=true
+GET {{host}}/api/GetCatalog/vaccine?pageNumber=1&pageSize=10
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+####
+
+GET {{host}}/api/GetCatalog/symptom?pageNumber=1&pageSize=10&search=&status=
 Content-Type:  application/json
 Authorization: Bearer {{token}}
 

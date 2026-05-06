@@ -4,5 +4,6 @@ namespace Finlay.PharmaVigilance.Application.IRepository;
 
 public interface IReportRepository : IGenericRepository<AefiReport>
 {
+    IQueryable<AefiReport> GetByFilter(string? vaccineName, string? provinceName);
 
 }

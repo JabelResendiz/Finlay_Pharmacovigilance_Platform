@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.Interfaces;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Common;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
@@ -29,7 +28,6 @@ public class ReportCommandService : IReportCommandService
     private readonly IEnumerable<IReportValidator<ReportDto>> _validators;
     private readonly IEnumerable<IReportValidator<PublicAefiReportDto>> _publicValidators;
     private readonly IUserContextService _userContextService;
-    private readonly IEventBus _eventBus;
     private readonly ILogger<ReportCommandService> _logger;
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
@@ -42,7 +40,6 @@ public class ReportCommandService : IReportCommandService
         IEnumerable<IReportValidator<ReportDto>> validators,
         IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
         IUserContextService userContextService,
-        IEventBus eventBus,
         ILogger<ReportCommandService> logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -51,8 +48,6 @@ public class ReportCommandService : IReportCommandService
         _validators = validators ?? throw new ArgumentNullException(nameof(validators));
         _publicValidators = publicValidators ?? throw new ArgumentNullException(nameof(publicValidators));
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
-        //_emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -61,19 +56,29 @@ public class ReportCommandService : IReportCommandService
 
     public async Task<CreateReportResponseDto> CreatePublicReportAsync(PublicAefiReportDto reportDto)
     {
+
+        _logger.LogInformation("Starting public AEFI report creation process");
+
         if (reportDto == null)
             throw new ArgumentNullException(nameof(reportDto), "Report data is required.");
 
         try
         {
+
+            _logger.LogDebug("Executing {ValidatorCount} validators", _validators.Count());
+
             // Execute all validators in sequence using Chain of Responsibility pattern
             foreach (var validator in _validators)
             {
+
                 await validator.ValidateAsync(reportDto);
             }
 
+            _logger.LogDebug("Executing {ValidatorCount} validators", _publicValidators.Count());
+
             foreach (var validator in _publicValidators)
             {
+
                 await validator.ValidateAsync(reportDto);
             }
 
@@ -85,10 +90,14 @@ public class ReportCommandService : IReportCommandService
             VaccinatedSubject vaccinatedSubject;
             if (existingVaccinatedSubject != null)
             {
+                _logger.LogDebug("Existing vaccinated subject found with IdentityNumber");
+
                 vaccinatedSubject = existingVaccinatedSubject;
             }
             else
             {
+                _logger.LogDebug("Creating new vaccinated subject");
+
                 vaccinatedSubject = _mapper.Map<VaccinatedSubject>(reportDto.VaccinatedSubject);
             }
 
@@ -100,10 +109,13 @@ public class ReportCommandService : IReportCommandService
             Reporter reporter;
             if (existingReporter != null)
             {
+                _logger.LogDebug("Existing reporter found with IdentityNumber");
                 reporter = existingReporter;
             }
             else
             {
+                _logger.LogDebug("Creating new reporter");
+
                 reporter = _mapper.Map<Reporter>(reportDto.Reporter);
             }
 
@@ -119,7 +131,11 @@ public class ReportCommandService : IReportCommandService
                 .FirstOrDefaultAsync(sr => sr.MunicipalityId == reportDto.VaccinatedSubject.MunicipalityId);
 
             if (sectionResponsible == null)
+            {
+                _logger.LogWarning("No SectionResponsible found for MunicipalityId {MunicipalityId}", reportDto.VaccinatedSubject.MunicipalityId);
                 throw new InvalidOperationException("No SectionResponsible found.");
+            }
+            // throw new InvalidOperationException("No SectionResponsible found.");
 
             var alert = new Alert
             {
@@ -132,12 +148,14 @@ public class ReportCommandService : IReportCommandService
 
             report.Alerts.Add(alert);
 
+            _logger.LogInformation("Saving AEFI report with NotificationNumber {NotificationNumber}", report.NotificationNumber);
+
             await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
             await _unitOfWork.CompleteAsync();
 
-            // await _emailAppService.SendEmailToSectionResponsibleAsync(sectionResponsible);
-            // await _emailAppService.SendEmailToReporterAsync(reporter);
-            Console.WriteLine("TOdo perfecto");
+            // send email
+
+            _logger.LogDebug("Preparing to send notification emails for report");
 
             if (reporter.Email == null)
                 throw new InvalidOperationException("Reporter email is null.");
@@ -148,7 +166,7 @@ public class ReportCommandService : IReportCommandService
             if (sectionResponsibleUser == null)
                 throw new InvalidOperationException("Section responsible user is null.");
 
-            Console.WriteLine($"📧 Queremos enviar email a: {reporter.Email} y {sectionResponsibleUser.Email}");
+            _logger.LogDebug($"📧 Queremos enviar email a: {reporter.Email} y {sectionResponsibleUser.Email}");
 
             // await _eventBus.PublishAsync(new EmailToReporterEvent
             // {
@@ -171,6 +189,10 @@ public class ReportCommandService : IReportCommandService
         }
         catch (Exception ex)
         {
+
+            _logger.LogError(ex, "Error creating AEFI report");
+
+
             throw new InvalidOperationException(
                 $"Error to create AEFI report: {ex.Message}",
                 ex);

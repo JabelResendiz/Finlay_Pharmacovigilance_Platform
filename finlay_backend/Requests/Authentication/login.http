@@ -5,7 +5,7 @@ POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
 {
-  "email": "carlos@example.com",
+  "email": "admin_email_1@example.com",
   "password": "Password_123!"
 }
 
@@ -16,7 +16,7 @@ POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
 {
-  "email": "resp4@example.com",
+  "email": "resp19@example.com",
   "password": "Password_123!"
 }
 
@@ -26,7 +26,7 @@ POST {{host}}/api/Authentication/login
 Content-Type:  application/json
 
 {
-  "email": "medico_mariel_4_7@example.com",
+  "email": "medico_ciegodeavila_19_15@example.com",
   "password": "Password_123!"
 }
 

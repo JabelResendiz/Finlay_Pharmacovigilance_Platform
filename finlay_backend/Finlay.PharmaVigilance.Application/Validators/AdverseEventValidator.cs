@@ -2,6 +2,7 @@ using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
+using Microsoft.Extensions.Logging;
 
 namespace Finlay.PharmaVigilance.Application.Validators;
 
@@ -11,10 +12,13 @@ namespace Finlay.PharmaVigilance.Application.Validators;
 public class AdverseEventValidator : IReportValidator<ReportDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<AdverseEventValidator> _logger;
 
-    public AdverseEventValidator(IUnitOfWork unitOfWork)
+
+    public AdverseEventValidator(IUnitOfWork unitOfWork, ILogger<AdverseEventValidator> logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>

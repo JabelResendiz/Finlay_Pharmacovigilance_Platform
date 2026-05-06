@@ -21,3 +21,21 @@ public class AdverseEventDetailMedicalReviewerDto : AdverseEventDetailDto
 {
     public required Guid Id { get; set; }
 }
+
+public class AdverseEventAdminDto
+{
+    public required DateTime StartDate { get; set; }
+    public required bool VisitedDoctor { get; set; }
+    public required bool WentToEmergencyRoom { get; set; }
+    public required bool PermanentDisability { get; set; }
+    public required bool IsLifeThreatening { get; set; }
+    public required bool ResultedInDeath { get; set; }
+    public DateTime? DeathDate { get; set; }
+    public required PatientStatus CurrentStatus { get; set; }
+    public required IEnumerable<string> Symptoms { get; set; }
+    public string? Description { get; set; }
+
+    public string? MedDRACode { get; set; }
+    public string? RetClassification { get; set; }
+
+}

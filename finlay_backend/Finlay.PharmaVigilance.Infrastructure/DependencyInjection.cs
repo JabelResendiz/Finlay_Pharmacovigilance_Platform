@@ -19,9 +19,12 @@ using System.Text.Json;
 using Finlay.PharmaVigilance.Application.Repository;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Infrastructure.Email;
-using Finlay.PharmaVigilance.Infrastructure.Messaging;
-using Finlay.PharmaVigilance.Application.Interfaces;
 using Finlay.PharmaVigilance.Infrastructure.Consumers;
+using Finlay.PharmaVigilance.Infrastructure.Pdf;
+using Finlay.PharmaVigilance.Application.Services;
+using MassTransit;
+using Finlay.PharmaVigilance.Infrastructure.Settings;
+using Resend;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -63,20 +66,45 @@ public static class DependencyInjection
         // Authentication and Authorization
         services.AddAuth(configuration);
 
+        services.Configure<ResendSettings>(
+            configuration.GetSection("Email:Resend")
+        );
+
+
+        services.AddScoped<ICaptchaService, CaptchaService>();
+
+        //services.AddHttpClient<ResendClient>();
 
         // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddSingleton<IEmailService, SmtpEmailService>();
+        //services.AddSingleton<IEmailService, SmtpEmailService>();
+        //services.AddSingleton<IEmailService, ResendEmailService>();
+
+        services.AddHttpClient<IEmailService, ResendEmailService>();
+
+        var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<MedicalReviewerConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqUrl);
+                cfg.ConfigureEndpoints(context);
+            });
+        });
 
 
-        services.AddHostedService<MedicalReviewerConsumer>();
-        services.AddHostedService<EmailToReporterConsumer>();
-        services.AddHostedService<EmailToSectionResponsibleConsumer>();
-        services.AddScoped<IEventBus, RabbitMqEventBus>();
 
 
+        //services.AddHostedService<MedicalReviewerConsumer>();
+        // services.AddHostedService<EmailToReporterConsumer>();
+        // services.AddHostedService<EmailToSectionResponsibleConsumer>();
+        // services.AddScoped<IEventBus, RabbitMqEventBus>();
+
+        services.AddScoped<IPdfService, PdfService>();
 
         services.AddScoped<IIdentityManager, IdentityManager>();
         services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();

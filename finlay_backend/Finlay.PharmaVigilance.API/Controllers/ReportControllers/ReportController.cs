@@ -1,6 +1,5 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
-using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +11,16 @@ public class ReportController : ControllerBase
 {
     private readonly IReportQueryService _reportQueryService;
     private readonly IReportCommandService _reportCommandService;
+    private readonly ICaptchaService _captchaService;
+
 
     public ReportController(IReportQueryService reportQueryService,
-                            IReportCommandService reportCommandService)
+                            IReportCommandService reportCommandService,
+                            ICaptchaService captchaService)
     {
         _reportQueryService = reportQueryService;
         _reportCommandService = reportCommandService;
+        _captchaService = captchaService;
     }
 
     [HttpPost("createPublic")]
@@ -29,6 +32,12 @@ public class ReportController : ControllerBase
     {
         if (reportDto == null)
             throw new ArgumentNullException(nameof(reportDto), "Report data is required.");
+
+        var isValid = await _captchaService.VerifyToken(reportDto.Token);
+
+        if (!isValid)
+            return BadRequest(new { success = false });
+
 
         var result = await _reportCommandService.CreatePublicReportAsync(reportDto);
 
@@ -127,5 +136,53 @@ public class ReportController : ControllerBase
 
         return Ok(result);
     }
+
+
+
+
+
+
+    [HttpGet("{notificationNumber}/pdf")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetPdf(
+       string notificationNumber
+   )
+    {
+        if (notificationNumber == null)
+            throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
+
+        var pdf = await _reportQueryService.GetReportPdfAsync(notificationNumber);
+
+        return File(pdf, "application/pdf", $"report_{notificationNumber}.pdf");
+
+    }
+
+
+
+
+
+    [HttpGet("admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetReportsAdmin(
+       [FromQuery] PagedRequestDto paged,
+       [FromQuery] string? vaccineName,
+       [FromQuery] string? provinceName
+   )
+    {
+        if (paged == null)
+            throw new ArgumentNullException(nameof(paged), "Paged is required.");
+
+        var result = await _reportQueryService.GetFilter(paged, vaccineName, provinceName);
+
+        return Ok(result);
+
+    }
+
 
 }

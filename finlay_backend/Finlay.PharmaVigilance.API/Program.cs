@@ -19,6 +19,7 @@ services.AddPresentation();
 services.AddAplication(builder.Configuration);
 services.AddInfrastructure(builder.Configuration);
 
+services.AddHttpClient();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

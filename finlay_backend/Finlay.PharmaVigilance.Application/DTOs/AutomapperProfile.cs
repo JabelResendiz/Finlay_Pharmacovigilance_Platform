@@ -60,9 +60,18 @@ public class AutomapperProfile : Profile
         CreateMap<Vaccination, VaccinationSummaryDto>()
             .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
 
+        CreateMap<Vaccination, VaccinationPdfDto>()
+            .ForMember(dest => dest.VaccineName, opt => opt.MapFrom(src => src.Vaccine.Name));
+
+        // VaccinatedSubject
+
         CreateMap<VaccinatedSubject, VaccinatedSubjectDetailsDto>();
         CreateMap<VaccinatedSubject, VaccinatedSubjectSummaryDto>();
 
+        CreateMap<VaccinatedSubject, VaccinatedSubjectPdfDto>();
+
+        CreateMap<VaccinatedSubject, VaccinatedSubjectAdminDto>()
+            .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.Name));
 
 
         // AdverseEvent
@@ -98,7 +107,21 @@ public class AutomapperProfile : Profile
 
         CreateMap<AdverseEvent, AdverseEventSummaryDto>();
 
+        CreateMap<AdverseEvent, AdverseEventPdfDto>()
+                .ForMember(dest => dest.SymptomsName,
+            opt => opt.MapFrom(src =>
+                src.AdverseEventSymptoms.Select(x => x.Symptom.Name)
+            )
+        );
 
+
+        CreateMap<AdverseEvent, AdverseEventAdminDto>()
+            .ForMember(dest => dest.Symptoms,
+            opt => opt.MapFrom(src =>
+            src.AdverseEventSymptoms.Select(x => x.Symptom.Name)));
+
+
+        //
 
 
         // Reporter
@@ -112,6 +135,9 @@ public class AutomapperProfile : Profile
         CreateMap<Reporter, ReporterDetailsDto>();
         CreateMap<Reporter, ReporterSummaryDto>();
 
+        CreateMap<Reporter, ReporterPdfDto>();
+
+        CreateMap<Reporter, ReporterAdminDto>();
 
 
 
@@ -123,16 +149,26 @@ public class AutomapperProfile : Profile
         CreateMap<AefiReport, ReportMedicalReviewerDto>();
         CreateMap<AefiReport, ReportUserDto>();
 
+        CreateMap<AefiReport, ReportPdfDto>();
+
+        CreateMap<AefiReport, ReportAdminDto>();
+
 
         // medicalAssignment - Medical Reviews Dtos
 
         CreateMap<MedicalReviewDto, MedicalReview>();
+        CreateMap<MedicalReview, MedicalReviewResponseDto>();
+
         CreateMap<MedicalReviewAssignmentDTO,
                  MedicalReviewAssignment>();
 
 
         CreateMap<MedicalReviewAssignment, ReportUserDto>();
         CreateMap<MedicalReviewAssignment, ReportMedicalReviewerDto>();
+
+        CreateMap<MedicalReviewAssignment, AssignmentResponse>()
+            .ForMember(dest => dest.MedicalReviewerName, opt => opt.MapFrom(src => src.MedicalReviewer.User.UserName))
+            .ForMember(dest => dest.SectionResponsibleName, opt => opt.MapFrom(src => src.SectionResponsible.User.UserName));
 
     }
 }
