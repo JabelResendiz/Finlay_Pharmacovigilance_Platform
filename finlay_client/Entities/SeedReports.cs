@@ -56,7 +56,7 @@ public static class SeedReports
         }
 
         using var doc = JsonDocument.Parse(json);
-        token = doc.RootElement.GetProperty("token").GetString();
+        token = doc.RootElement.GetProperty("accessToken").GetString();
 
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
@@ -305,7 +305,7 @@ public static class SeedReports
                         deathDate = (string?)null,
                         currentStatus = i % 2 == 0 ? "Recovered" : "Recovering",
                         intensity = i%3 == 0 ? "Mild" : (i%3==1) ? "Severe" : "Moderate",
-                        severityLevel = i%3 == 0 ? "Mild" : (i%3==1) ? "Severe" : "Moderate",
+                        severityLevel = (i%3==0 || i%4==0 || i%5==0 || i%6 == 0) ? "Serious" : "NonSerious",
                         symptomId = symptomId.ToString()
                     }
                 }

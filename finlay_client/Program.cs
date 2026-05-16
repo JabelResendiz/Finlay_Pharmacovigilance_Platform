@@ -4,13 +4,13 @@ using Manual;
 // await SectionResponsibleSeed.Run();
 // await MedicalReviewerSeed.Run();
 
-//await SeedCatalog.Run();
+// await SeedCatalog.Run();
 
 //await SeedLot.Run();
 
 //await SeedVaccinationCenter.Run();
 
 
-//await SeedReports.Run();
+// await SeedReports.Run();
 
-//await SeedAssignment.Run();
+await SeedAssignment.Run();

@@ -54,7 +54,7 @@ public static class SeedAssignment
         }
 
         using var doc = JsonDocument.Parse(json);
-        token = doc.RootElement.GetProperty("token").GetString();
+        token = doc.RootElement.GetProperty("accessToken").GetString();
 
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
@@ -109,7 +109,7 @@ public static class SeedAssignment
         Console.WriteLine("📋 Loading AEFI reports...");
 
         var response = await client.GetAsync(
-            "/api/Report/assigned?pageNumber=1&pageSize=100"
+            "/api/Report/sectionResponsible/assigned?pageNumber=1&pageSize=100"
         );
 
         if (!response.IsSuccessStatusCode)

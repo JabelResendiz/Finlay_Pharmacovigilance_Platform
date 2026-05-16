@@ -53,7 +53,7 @@ public static class MedicalReviewerSeed
         }
 
         using var document = JsonDocument.Parse(json);
-        return document.RootElement.GetProperty("token").GetString();
+        return document.RootElement.GetProperty("accessToken").GetString();
     }
 
     private static int identityNumberCounter = 1000;

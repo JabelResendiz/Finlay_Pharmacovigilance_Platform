@@ -21,7 +21,7 @@ public static class SectionResponsibleSeed
     {
         Console.WriteLine("🔥 Starting SectionResponsible seed...");
 
-        await EnsureAdminExistsAsync();
+        //await EnsureAdminExistsAsync();
         await LoginAdminAsync();
         await SeedSectionResponsiblesAsync();
 
@@ -80,7 +80,7 @@ public static class SectionResponsibleSeed
         }
 
         using var doc = JsonDocument.Parse(json);
-        var token = doc.RootElement.GetProperty("token").GetString();
+        var token = doc.RootElement.GetProperty("accessToken").GetString();
         if (string.IsNullOrWhiteSpace(token))
             throw new InvalidOperationException("El token de admin no se recibió correctamente.");
 

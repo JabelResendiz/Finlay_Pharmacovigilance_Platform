@@ -50,7 +50,7 @@ public static class SeedCatalog
         }
 
         using var doc = JsonDocument.Parse(json);
-        token = doc.RootElement.GetProperty("token").GetString();
+        token = doc.RootElement.GetProperty("accessToken").GetString();
 
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
