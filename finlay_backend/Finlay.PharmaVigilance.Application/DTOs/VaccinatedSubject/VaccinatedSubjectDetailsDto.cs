@@ -17,6 +17,7 @@ public class VaccinatedSubjectAdminDto
     public required Gender Gender { get; set; }
     public required bool? IsPregnant { get; set; }
     public required string ProvinceName { get; set; }
+    public required string MunicipalityName { get; set; }
     public required string? CurrentMedications { get; set; }
     public required string? Allergies { get; set; }
     public required string? MedicalHistory { get; set; }

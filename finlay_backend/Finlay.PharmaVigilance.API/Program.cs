@@ -19,6 +19,8 @@ services.AddPresentation();
 services.AddAplication(builder.Configuration);
 services.AddInfrastructure(builder.Configuration);
 
+services.AddRateLimitingConfiguration();
+
 services.AddHttpClient();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -71,11 +73,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("Frontend");
 //app.UseCors("LocalhostPolicy");
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

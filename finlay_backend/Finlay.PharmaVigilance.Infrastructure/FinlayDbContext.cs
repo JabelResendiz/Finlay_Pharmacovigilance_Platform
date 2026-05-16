@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finlay.PharmaVigilance.Infrastructure;
 
 
-public class FinlayDbContext : IdentityDbContext<User, Role, int>
+public class FinlayDbContext : IdentityDbContext<User, Role, Guid>
 {
         public FinlayDbContext(DbContextOptions options) : base(options)
         {
@@ -54,7 +54,7 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AdverseEvent> AdverseEvents { get; set; }
-        public DbSet<AdverseEventSymptom> AdverseEventSymptoms { get; set; }
+        // public DbSet<AdverseEventSymptom> AdverseEventSymptoms { get; set; }
         public DbSet<AefiReport> AefiReport { get; set; }
         public DbSet<Alert> Alerts { get; set; }
         public DbSet<MedicalReview> MedicalReviews { get; set; }
@@ -68,6 +68,10 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
         public DbSet<Vaccination> Vaccinations { get; set; }
         public DbSet<Vaccine> Vaccines { get; set; }
         public DbSet<MedicalReviewAssignment> MedicalReviewAssignments { get; set; }
+        public DbSet<VaccinationCenter> VaccinationCenters { get; set; }
+        public DbSet<Lot> Lots { get; set; }
+        public DbSet<Manufacturer> Manufacturers { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -262,9 +266,15 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                         entity.Property(e => e.StartDate)
                       .IsRequired();
                         entity.Property(e => e.Description)
-                      .IsRequired()
+                      .IsRequired(false)
                       .HasMaxLength(800);
                         entity.Property(e => e.CurrentStatus)
+                      .IsRequired()
+                      .HasConversion<string>();
+                        entity.Property(e => e.Intensity)
+                      .IsRequired()
+                      .HasConversion<string>();
+                        entity.Property(e => e.SeverityLevel)
                       .IsRequired()
                       .HasConversion<string>();
                         entity.Property(e => e.VisitedDoctor)
@@ -301,29 +311,12 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                   .HasForeignKey(e => e.AefiReportId)
                   .OnDelete(DeleteBehavior.Cascade);
 
+                        entity.HasOne(e => e.Symptom)
+                  .WithMany(s => s.AdverseEvents)
+                  .HasForeignKey(e => e.SymptomId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
                 });
-
-                builder.Entity<AdverseEventSymptom>(entity =>
-              {
-
-                      entity.HasKey(e => new { e.AdverseEventId, e.SymptomId });
-
-                      //       entity.Property(e => e.SpecificDetail)
-                      //     .IsRequired(false)
-                      //     .HasMaxLength(300);
-
-
-                      entity.HasOne(e => e.AdverseEvent)
-                .WithMany(r => r.AdverseEventSymptoms)
-                .HasForeignKey(e => e.AdverseEventId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-                      entity.HasOne(e => e.Symptom)
-               .WithMany(r => r.AdverseEventSymptoms)
-               .HasForeignKey(e => e.SymptomId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-              });
 
                 builder.Entity<AefiReport>(entity =>
                 {
@@ -355,12 +348,6 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                 .WithMany(p => p.AefiReports)
                 .HasForeignKey(r => r.ReporterId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-                        //         entity.HasOne(r => r.Alert)
-                        //     .WithOne(a => a.AefiReport)
-                        //     .HasForeignKey<AefiReport>(r => r.AlertId)
-                        //     .OnDelete(DeleteBehavior.Restrict);
-
 
                 });
 
@@ -406,17 +393,9 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                 {
                         entity.HasKey(e => e.Id);
 
-                        entity.Property(e => e.BatchNumber)
-                  .IsRequired()
-                  .HasMaxLength(50);
-
                         entity.Property(e => e.Site)
                   .IsRequired()
                   .HasConversion<string>();
-
-                        entity.Property(e => e.VaccinationCenter)
-                      .IsRequired(false)
-                      .HasMaxLength(300);
 
 
                         entity.Property(e => e.DoseNumber)
@@ -426,14 +405,19 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                   .IsRequired();
 
 
-                        entity.HasOne(v => v.Vaccine)
-                  .WithMany(v => v.Vaccinations)
-                  .HasForeignKey(v => v.VaccineId)
+                        entity.HasOne(v => v.Lot)
+                  .WithMany()
+                  .HasForeignKey(v => v.LotId)
                   .OnDelete(DeleteBehavior.Restrict);
 
                         entity.HasOne(v => v.AefiReport)
                     .WithMany(ar => ar.Vaccinations)
                     .HasForeignKey(v => v.AefiReportId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                        entity.HasOne(v => v.VaccinationCenter)
+                    .WithMany()
+                    .HasForeignKey(v => v.VaccinationCenterId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 });
@@ -457,6 +441,12 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                         entity.Property(e => e.Type)
                   .IsRequired()
                   .HasConversion<string>();
+
+                        entity.HasOne(e => e.Manufacturer)
+                .WithMany()
+                .HasForeignKey(e => e.ManufacturerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
                         entity.Property(e => e.Code)
                       .IsRequired(false)
@@ -596,25 +586,9 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
                .IsRequired();
 
                         entity.HasOne(mr => mr.MedicalReviewAssignment)
-                .WithOne()
+                .WithOne(mra => mra.MedicalReview)
                 .HasForeignKey<MedicalReview>(mr => mr.MedicalReviewAssignmentId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-                        //         entity.HasOne(mr => mr.AefiReport)
-                        //   .WithOne()
-                        //   .HasForeignKey<MedicalReview>(mr => mr.AefiReportId)
-                        //   .OnDelete(DeleteBehavior.Cascade);
-
-                        //         entity.HasOne(mr => mr.MedicalReviewer)
-                        //   .WithMany(mr => mr.MedicalReviews)
-                        //   .HasForeignKey(mr => mr.MedicalReviewerId)
-                        //   .OnDelete(DeleteBehavior.Restrict);
-
-                        //         entity.HasOne(mr => mr.SectionResponsible)
-                        //     .WithMany(sr => sr.ManagedReviews)
-                        //     .HasForeignKey(mr => mr.SectionResponsibleId)
-                        //     .OnDelete(DeleteBehavior.Restrict);
-
 
                 });
 
@@ -695,5 +669,78 @@ public class FinlayDbContext : IdentityDbContext<User, Role, int>
 
 
                 });
+
+                builder.Entity<VaccinationCenter>(entity =>
+                {
+                        entity.HasKey(e => e.Id);
+
+                        entity.Property(a => a.Name)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                        entity.Property(a => a.Address)
+                   .IsRequired()
+                   .HasMaxLength(300);
+
+                        entity.HasOne(vc => vc.Municipality)
+                    .WithMany()
+                    .HasForeignKey(vc => vc.MunicipalityId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                        entity.HasOne(vc => vc.Province)
+                    .WithMany()
+                    .HasForeignKey(vc => vc.ProvinceId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                });
+
+                builder.Entity<Lot>(entity =>
+               {
+                       entity.HasKey(e => e.Id);
+
+                       entity.Property(l => l.LotNumber)
+                   .IsRequired()
+                   .HasMaxLength(50);
+
+                       entity.HasOne(l => l.Vaccine)
+                   .WithMany()
+                   .HasForeignKey(vc => vc.VaccineId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+               });
+
+
+                builder.Entity<Manufacturer>(entity =>
+               {
+                       entity.HasKey(e => e.Id);
+
+                       entity.Property(e => e.Name)
+                   .IsRequired()
+                   .HasMaxLength(150);
+
+                       entity.HasIndex(e => e.Name);
+
+                       entity.Property(e => e.Country)
+                .IsRequired(false)
+                .HasMaxLength(150);
+
+                       //        entity.HasData(
+                       //                new Manufacturer { Name = "Instituto Finlay de Vacunas (IFV)", Country = "Cuba" }
+                       //        );
+
+               });
+
+
+                builder.Entity<RefreshToken>(entity =>
+             {
+                     entity.HasKey(e => e.Id);
+
+                     entity.HasOne(l => l.User)
+                 .WithMany()
+                 .HasForeignKey(vc => vc.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+             });
+
         }
 }

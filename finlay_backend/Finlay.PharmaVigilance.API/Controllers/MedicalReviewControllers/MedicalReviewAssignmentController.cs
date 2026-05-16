@@ -2,11 +2,13 @@ using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Finlay.PharmaVigilance.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("GeneralQuery")]
 public class MedicalReviewAssignmentController : ControllerBase
 {
     private readonly IMedicalReviewAssignmentCommandService _medicalReviewAssignmentCommandService;

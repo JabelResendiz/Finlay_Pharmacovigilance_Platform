@@ -7,4 +7,6 @@ namespace Finlay.PharmaVigilance.Application.Services;
 public interface IPdfService
 {
     byte[] GenerateReportPdf(ReportPdfDto report);
+
+    byte[] GenerateReportDetailsPdf(ReportDetailAdminDto report);
 }

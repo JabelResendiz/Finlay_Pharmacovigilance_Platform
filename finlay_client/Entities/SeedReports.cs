@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Manual;
 
@@ -16,6 +17,8 @@ public static class SeedReports
 
     private static Guid[]? vaccineIds;
     private static Guid[]? symptomIds;
+    private static Guid[]? vaccinationCenterIds;
+    private static Guid[]? lotIds;
 
     public static async Task Run()
     {
@@ -105,6 +108,56 @@ public static class SeedReports
         }
     }
 
+
+    private static async Task LoadVaccinationCenterAsync(int provinceId, int municipalityId)
+    {
+        Console.WriteLine("📚 Loading vaccinationCenter data ...");
+
+        // Get active vaccines
+        var vaccinesResponse = await client.GetAsync($"/api/VaccinationCenter/getByMunicipality?municipalityId={municipalityId}&provinceId={provinceId}");
+
+        if (vaccinesResponse.IsSuccessStatusCode)
+        {
+            var vaccinesJson = await vaccinesResponse.Content.ReadAsStringAsync();
+            using var vaccinesDoc = JsonDocument.Parse(vaccinesJson);
+            // var vaccines = vaccinesDoc.RootElement.GetProperty("items").EnumerateArray()
+            //     .Select(v => Guid.Parse(v.GetProperty("id").GetString()!))
+            //     .ToArray();
+
+            var vaccines = vaccinesDoc.RootElement.EnumerateArray()
+    .Select(v => Guid.Parse(v.GetProperty("id").GetString()!))
+    .ToArray();
+
+            vaccinationCenterIds = vaccines;
+            Console.WriteLine($"✅ Loaded {vaccines.Length} vaccinationCenters");
+        }
+
+
+    }
+
+    private static async Task LoadLotAsync(Guid vaccineId)
+    {
+        Console.WriteLine($"📚 Loading lot data from {vaccineId}...");
+
+        // Get active vaccines
+        var vaccinesResponse = await client.GetAsync($"/api/Lot/getByVaccine?vaccineId={vaccineId}");
+
+        if (vaccinesResponse.IsSuccessStatusCode)
+        {
+            var vaccinesJson = await vaccinesResponse.Content.ReadAsStringAsync();
+            using var vaccinesDoc = JsonDocument.Parse(vaccinesJson);
+
+
+            var vaccines = vaccinesDoc.RootElement.EnumerateArray()
+    .Select(v => Guid.Parse(v.GetProperty("id").GetString()!))
+    .ToArray();
+
+            lotIds = vaccines;
+            Console.WriteLine($"✅ Loaded {vaccines.Length} lot");
+        }
+
+    }
+
     // =========================
     // 📋 PUBLIC REPORTS SEED
     // =========================
@@ -118,7 +171,7 @@ public static class SeedReports
 
         Console.WriteLine("📋 Seeding public reports...");
 
-        var reports = GenerateReports();
+        var reports = await GenerateReports();
 
         for (int i = 0; i < reports.Length; i++)
         {
@@ -144,7 +197,7 @@ public static class SeedReports
         return $"{identityNumberBase}{identityNumberCounter++.ToString("D5")}";
     }
 
-    private static object[] GenerateReports()
+    private static async Task<object[]> GenerateReports()
     {
         var relationships = new[] { "Parent", "Other" };
         var reporterNames = new[]
@@ -180,13 +233,23 @@ public static class SeedReports
             var reportDate = DateTime.Parse("2026-04-11T21:38:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
             var vaccinationDate = DateTime.Parse("2026-04-09T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
             var adverseEventDate = DateTime.Parse("2026-04-10T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+            var adverseEventFinishDate = DateTime.Parse("2026-04-11T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
             var vaccineId = vaccineIds![i % vaccineIds.Length];
             var symptomId = symptomIds![i % symptomIds.Length];
 
+            await LoadLotAsync(vaccineId);
+            await LoadVaccinationCenterAsync(1, 2);
+
+            var lotId = lotIds![i % lotIds.Length];
+            var vaccinationCenterId = vaccinationCenterIds![i % vaccinationCenterIds.Length];
+
+            Console.WriteLine(vaccinationCenterId.ToString());
+
             var report = new
             {
                 reportDate = reportDate,
+                token = "aksjaksjkasj",
                 reporter = new
                 {
                     fullName = reporterNames[i],
@@ -220,11 +283,11 @@ public static class SeedReports
                     new
                     {
                         vaccineId = vaccineId.ToString(),
-                        batchNumber = $"BATCH-{i + 1:D3}",
+                        lotId = lotId.ToString(),
                         site = i % 2 == 0 ? "leftarm" : "rightarm",
                         doseNumber = (i % 4) + 1,
                         administrationDate = vaccinationDate,
-                        vaccinationCenter = $"Centro de Salud {i + 1}"
+                        vaccinationCenterId = vaccinationCenterId.ToString()
                     }
                 },
                 adverseEvents = new[]
@@ -232,6 +295,7 @@ public static class SeedReports
                     new
                     {
                         startDate = adverseEventDate,
+                        finishDate = adverseEventFinishDate,
                         description = descriptions[i],
                         visitedDoctor = i % 3 == 0,
                         wentToEmergencyRoom = i% 4 == 0,
@@ -240,7 +304,9 @@ public static class SeedReports
                         resultedInDeath = false,
                         deathDate = (string?)null,
                         currentStatus = i % 2 == 0 ? "Recovered" : "Recovering",
-                        symptoms = new[] { symptomId.ToString() }
+                        intensity = i%3 == 0 ? "Mild" : (i%3==1) ? "Severe" : "Moderate",
+                        severityLevel = i%3 == 0 ? "Mild" : (i%3==1) ? "Severe" : "Moderate",
+                        symptomId = symptomId.ToString()
                     }
                 }
             };

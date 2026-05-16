@@ -5,6 +5,7 @@ using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Finlay.PharmaVigilance.Api.Controllers;
 
@@ -14,6 +15,7 @@ namespace Finlay.PharmaVigilance.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("GeneralQuery")]
 public class CatalogController : ControllerBase
 {
     private readonly ICatalogCommandService _catalogCommandService;
@@ -115,82 +117,22 @@ public class CatalogController : ControllerBase
 
     }
 
-    // [HttpPost("deactivate/vaccine/{vaccineId}")]
-    // [Authorize(Roles = "Admin")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // [ProducesResponseType(StatusCodes.Status409Conflict)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // public async Task<IActionResult> DeactivateVaccine(int vaccineId)
-    // {
 
-    //     var result = await _catalogCommandService.DeactivateVaccine(vaccineId);
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteVaccine(Guid vaccineId)
+    {
 
-    //     return Ok(new
-    //     {
-    //         message = result,
-    //         success = true
-    //     });
+        await _catalogCommandService.DeleteVaccine(vaccineId);
 
-    // }
+        return Ok(new
+        {
+            message = "Vaccine deleted succesffuly"
+        });
 
+    }
 
-    // [HttpPost("activate/vaccine/{vaccineId}")]
-    // [Authorize(Roles = "Admin")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // [ProducesResponseType(StatusCodes.Status409Conflict)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // public async Task<IActionResult> ActivateVaccine(int vaccineId)
-    // {
-
-    //     var result = await _catalogCommandService.ActivateVaccine(vaccineId);
-
-    //     return Ok(new
-    //     {
-    //         message = result,
-    //         success = true
-    //     });
-
-    // }
-
-
-    // [HttpPost("deactivate/symptom/{symptomId}")]
-    // [Authorize(Roles = "Admin")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // [ProducesResponseType(StatusCodes.Status409Conflict)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // public async Task<IActionResult> DeactivateSymptom(int symptomId)
-    // {
-
-    //     var result = await _catalogCommandService.DeactivateSymptom(symptomId);
-
-    //     return Ok(new
-    //     {
-    //         message = result,
-    //         success = true
-    //     });
-
-    // }
-
-
-    // [HttpPost("activate/symptom/{symptomId}")]
-    // [Authorize(Roles = "Admin")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // [ProducesResponseType(StatusCodes.Status409Conflict)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // public async Task<IActionResult> ActivateSymptom(int symptomId)
-    // {
-
-    //     var result = await _catalogCommandService.ActivateSymptom(symptomId);
-
-    //     return Ok(new
-    //     {
-    //         message = result,
-    //         success = true
-    //     });
-
-    // }
 }

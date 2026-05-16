@@ -65,6 +65,17 @@ public static class DependencyInjection
 
         services.AddScoped<IMedicalReviewAssignmentCommandService, MedicalReviewAssignmentCommandService>();
 
+        services.AddScoped<IVaccinationCenterCommandService, VaccinationCenterCommandService>();
+        services.AddScoped<IVaccinationCenterQueryService, VaccinationCenterQueryService>();
+
+
+        services.AddScoped<ILotCommandService, LotCommandService>();
+        services.AddScoped<ILotQueryService, LotQueryService>();
+
+        services.AddScoped<IManufacturerQueryService, ManufacturerQueryService>();
+
+        services.AddScoped<IMunicipalDashboardService, MunicipalDashboardService>();
+
         return services;
 
 

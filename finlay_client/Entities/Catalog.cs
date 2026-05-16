@@ -20,7 +20,7 @@ public static class SeedCatalog
 
         await LoginAsync();
         await SeedSymptomsAsync();
-        await SeedVaccinesAsync();
+        //await SeedVaccinesAsync();
 
         Console.WriteLine("✅ Seed completed!");
     }
@@ -96,12 +96,51 @@ public static class SeedCatalog
 
         var vaccines = new[]
         {
-            new { Name = "Soberana 02", Type = 0, Code = "CUBA-001", IsActive = true, Description = "Cuban recombinant protein vaccine", ApprovalDate = "2020-04-03T09:18:28.095Z" },
-            new { Name = "Abdala", Type = 0, Code = "CUBA-002", IsActive = true, Description = "Another Cuban COVID-19 vaccine", ApprovalDate = "2020-07-01T09:18:28.095Z" },
-            new { Name = "Pfizer-BioNTech", Type = 0, Code = "PFZ-001", IsActive = true, Description = "mRNA vaccine for COVID-19", ApprovalDate = "2020-12-01T09:18:28.095Z" },
-            new { Name = "Moderna", Type = 0, Code = "MOD-001", IsActive = true, Description = "mRNA vaccine developed in USA", ApprovalDate = "2020-11-15T09:18:28.095Z" },
-            new { Name = "AstraZeneca", Type = 1, Code = "AZ-001", IsActive = true, Description = "Viral vector vaccine", ApprovalDate = "2020-08-01T09:18:28.095Z" }
-        };
+            new { Name = "Soberana 02", Type = 0, Code = "CUBA-001", IsActive = true, Description = "Cuban recombinant protein vaccine", ApprovalDate = "2020-04-03T09:18:28.095Z",
+                Manufacturer = new
+                {
+                    Name = "IFV",
+                    Id = 1,
+                    IsNew= false,
+                    Country= "Cuba"
+                }
+                },
+            new { Name = "Abdala", Type = 0, Code = "CUBA-002", IsActive = true, Description = "Another Cuban COVID-19 vaccine", ApprovalDate = "2020-07-01T09:18:28.095Z",
+                Manufacturer = new
+                 {
+                    Name = "IFV",
+                    Id = 1,
+                    IsNew= false,
+                    Country= "Cuba"
+                }
+                },
+            new { Name = "Pfizer-BioNTech", Type = 0, Code = "PFZ-001", IsActive = true, Description = "mRNA vaccine for COVID-19", ApprovalDate = "2020-12-01T09:18:28.095Z",
+                Manufacturer = new
+                {
+                    Name = "IFV",
+                    Id = 1,
+                    IsNew= false,
+                    Country= "Cuba"
+                } },
+            new {
+        Name = "Moderna", Type = 0, Code = "MOD-001", IsActive = true, Description = "mRNA vaccine developed in USA", ApprovalDate = "2020-11-15T09:18:28.095Z",
+            Manufacturer=new
+            {
+                Name = "IFV",
+                Id = 1,
+                IsNew= false,
+                Country= "Cuba"
+            } },
+            new {
+        Name = "AstraZeneca", Type = 1, Code = "AZ-001", IsActive = true, Description = "Viral vector vaccine", ApprovalDate = "2020-08-01T09:18:28.095Z",
+                Manufacturer = new
+                {
+                    Name = "IFV",
+                    Id= 1,
+                    IsNew= false,
+                    Country= "Cuba"
+                } }
+};
 
         foreach (var v in vaccines)
         {

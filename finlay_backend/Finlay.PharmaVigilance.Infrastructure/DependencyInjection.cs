@@ -107,7 +107,6 @@ public static class DependencyInjection
         services.AddScoped<IPdfService, PdfService>();
 
         services.AddScoped<IIdentityManager, IdentityManager>();
-        services.AddScoped<IAdverseEventSymptomRepository, AdverseEventSymptomRepository>();
         services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();
         services.AddScoped<IVaccinatedSubjectRepository, VaccinatedSubjectRepository>();
         services.AddScoped<IReporterRepository, ReporterRepository>();
@@ -118,6 +117,9 @@ public static class DependencyInjection
         services.AddScoped<ISectionResponsibleRepository, SectionResponsibleRepository>();
         services.AddScoped<IMedicalReviewerRepository, MedicalReviewerRepository>();
         services.AddScoped<IMedicalReviewRepository, MedicalReviewRepository>();
+        services.AddScoped<IVaccinationCenterRepository, VaccinationCenterRepository>();
+        services.AddScoped<ILotRepository, LotRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();

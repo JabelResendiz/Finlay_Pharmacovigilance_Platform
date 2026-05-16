@@ -127,6 +127,7 @@ public class ReportCommandService : IReportCommandService
             report.Status = ReportStatus.Submitted;
             report.NotificationNumber = _generator.Generate();
 
+
             var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
                 .FirstOrDefaultAsync(sr => sr.MunicipalityId == reportDto.VaccinatedSubject.MunicipalityId);
 
