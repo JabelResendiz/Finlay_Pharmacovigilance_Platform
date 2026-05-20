@@ -285,7 +285,8 @@ public static class SeedReports
                         vaccineId = vaccineId.ToString(),
                         lotId = lotId.ToString(),
                         site = i % 2 == 0 ? "leftarm" : "rightarm",
-                        doseNumber = (i % 4) + 1,
+                        doseNumber = i%5 == 0 ? "primera" : (i%5==1 ? "segunda" : (i%5 == 2) ? "tercera" :
+                        (i%5 == 3) ? "refuerzo" : "única"),
                         administrationDate = vaccinationDate,
                         vaccinationCenterId = vaccinationCenterId.ToString()
                     }

@@ -6,11 +6,11 @@ using Manual;
 
 // await SeedCatalog.Run();
 
-//await SeedLot.Run();
+// await SeedLot.Run();
 
-//await SeedVaccinationCenter.Run();
+// await SeedVaccinationCenter.Run();
 
 
-// await SeedReports.Run();
+//await SeedReports.Run();
 
-await SeedAssignment.Run();
+//await SeedAssignment.Run();

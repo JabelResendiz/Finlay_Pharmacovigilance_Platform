@@ -80,7 +80,9 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
     }
 
 
-    public async Task<PagedResultDto<ReportMedicalReviewerDto>> GetReportAssigment(PagedRequestDto paged)
+    public async Task<PagedResultDto<ReportMedicalReviewerDto>> GetReportAssigment(
+        PagedRequestDto paged,
+        ReportMedicalReviewerFilter filter)
     {
         var userId = _userContextService.GetUserId();
 
@@ -100,6 +102,11 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
         var query = _unitOfWork.GetRepository<AefiReport>()
                                .GetAllByItems(r => reportId.Contains(r.Id));
 
+
+        query = _reportRepository
+                        .GetMedicalReviewerByFilter(
+                            query,
+                            filter);
 
         var totalItems = await query.CountAsync();
 
@@ -165,8 +172,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
         reportsQuery = _reportRepository
                         .GetSectionResponsibleByFilter(
                             reportsQuery,
-                            filter)
-                        .OrderByDescending(r => r.ReportDate);
+                            filter);
 
         var totalItems = await reportsQuery.CountAsync();
 
