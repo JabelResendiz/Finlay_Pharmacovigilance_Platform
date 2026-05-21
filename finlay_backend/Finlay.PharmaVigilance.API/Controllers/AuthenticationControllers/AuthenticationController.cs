@@ -1,4 +1,5 @@
 using Finlay.PharmaVigilance.Application.DTO.Authentication;
+using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,16 +13,26 @@ namespace Finlay.PharmaVigilance.Api.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IIdentityService _identityService;
+    private readonly ICaptchaService _captchaService;
 
-    public AuthenticationController(IIdentityService identityService)
+    public AuthenticationController(
+        IIdentityService identityService,
+        ICaptchaService captchaService)
     {
         _identityService = identityService;
+        _captchaService = captchaService;
     }
 
     [HttpPost]
     [Route("login")]
     public async Task<IActionResult> LoginUser(LoginUserDto loginDto)
     {
+
+        var isValid = await _captchaService.VerifyToken(loginDto.Token);
+
+        if (!isValid)
+            return BadRequest(new { success = false });
+
 
         var authResult = await _identityService.LoginUserAsync(loginDto);
 
