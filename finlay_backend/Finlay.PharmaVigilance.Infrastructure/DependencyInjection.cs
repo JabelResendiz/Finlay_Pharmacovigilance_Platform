@@ -25,6 +25,7 @@ using Finlay.PharmaVigilance.Application.Services;
 using MassTransit;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Resend;
+using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -66,9 +67,9 @@ public static class DependencyInjection
         // Authentication and Authorization
         services.AddAuth(configuration);
 
-        services.Configure<ResendSettings>(
-            configuration.GetSection("Email:Resend")
-        );
+        // services.Configure<ResendSettings>(
+        //     configuration.GetSection("Email:Resend")
+        // );
 
 
         services.AddScoped<ICaptchaService, CaptchaService>();
@@ -79,15 +80,16 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        //services.AddSingleton<IEmailService, SmtpEmailService>();
+        services.AddSingleton<IEmailService, SmtpEmailService>();
         //services.AddSingleton<IEmailService, ResendEmailService>();
 
-        services.AddHttpClient<IEmailService, ResendEmailService>();
+        //services.AddHttpClient<IEmailService, SmtpEmailService>();
 
         var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
         services.AddMassTransit(x =>
         {
             x.AddConsumer<MedicalReviewerConsumer>();
+            x.AddConsumer<AssignmentExpiredConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -98,6 +100,7 @@ public static class DependencyInjection
 
 
 
+        services.AddHostedService<AssignmentExpirationBackgroundService>();
 
         //services.AddHostedService<MedicalReviewerConsumer>();
         // services.AddHostedService<EmailToReporterConsumer>();
@@ -120,6 +123,7 @@ public static class DependencyInjection
         services.AddScoped<IVaccinationCenterRepository, VaccinationCenterRepository>();
         services.AddScoped<ILotRepository, LotRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IMedicalAssignmentRepository, MedicalAssignmentRepository>();
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();

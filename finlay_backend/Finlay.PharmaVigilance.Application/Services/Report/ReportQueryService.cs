@@ -160,8 +160,7 @@ public class ReportQueryService : GenericQueryService<AefiReport, PublicAefiRepo
 
 
         var reportIds = _unitOfWork.GetRepository<Alert>()
-                            .GetAllByItems(a => a.SectionResponsibleId == sectionResponsible.Id &&
-                                a.AefiReport.Status == ReportStatus.Submitted)
+                            .GetAllByItems(a => a.SectionResponsibleId == sectionResponsible.Id)
                             .Select(a => a.AefiReportId)
                             .Distinct();
 
