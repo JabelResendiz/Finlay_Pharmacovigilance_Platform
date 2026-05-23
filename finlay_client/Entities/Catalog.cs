@@ -5,6 +5,15 @@ using System.Text.Json;
 
 namespace Manual;
 
+public class ManufacturerResponseDto
+{
+    public required string Name { get; set; }
+    public required Guid Id { get; set; }
+    public required string Country { get; set; }
+}
+
+
+
 public static class SeedCatalog
 {
     private static string? token;
@@ -19,8 +28,8 @@ public static class SeedCatalog
         Console.WriteLine("🔥 Starting Seed...");
 
         await LoginAsync();
-        await SeedSymptomsAsync();
-        //await SeedVaccinesAsync();
+        //await SeedSymptomsAsync();
+        await SeedVaccinesAsync();
 
         Console.WriteLine("✅ Seed completed!");
     }
@@ -94,55 +103,57 @@ public static class SeedCatalog
     {
         Console.WriteLine("💉 Seeding vaccines...");
 
-        var vaccines = new[]
+        // 1. Vacunas base (una por centro inicial)
+        var baseVaccines = new[]
         {
-            new { Name = "Soberana 02", Type = 0, Code = "CUBA-001", IsActive = true, Description = "Cuban recombinant protein vaccine", ApprovalDate = "2020-04-03T09:18:28.095Z",
-                Manufacturer = new
-                {
-                    Name = "IFV",
-                    Id = 1,
-                    IsNew= false,
-                    Country= "Cuba"
-                }
-                },
-            new { Name = "Abdala", Type = 0, Code = "CUBA-002", IsActive = true, Description = "Another Cuban COVID-19 vaccine", ApprovalDate = "2020-07-01T09:18:28.095Z",
-                Manufacturer = new
-                 {
-                    Name = "IFV",
-                    Id = 1,
-                    IsNew= false,
-                    Country= "Cuba"
-                }
-                },
-            new { Name = "Pfizer-BioNTech", Type = 0, Code = "PFZ-001", IsActive = true, Description = "mRNA vaccine for COVID-19", ApprovalDate = "2020-12-01T09:18:28.095Z",
-                Manufacturer = new
-                {
-                    Name = "IFV",
-                    Id = 1,
-                    IsNew= false,
-                    Country= "Cuba"
-                } },
-            new {
-        Name = "Moderna", Type = 0, Code = "MOD-001", IsActive = true, Description = "mRNA vaccine developed in USA", ApprovalDate = "2020-11-15T09:18:28.095Z",
-            Manufacturer=new
+        new
+        {
+            Name = "Soberana 02",
+            Type = "mRNA",
+            Code = "CUBA-001",
+            IsActive = true,
+            Description = "Cuban recombinant protein vaccine",
+            ApprovalDate = "2020-04-03T09:18:28.095Z",
+            Manufacturer = new
             {
                 Name = "IFV",
-                Id = 1,
-                IsNew= false,
-                Country= "Cuba"
-            } },
-            new {
-        Name = "AstraZeneca", Type = 1, Code = "AZ-001", IsActive = true, Description = "Viral vector vaccine", ApprovalDate = "2020-08-01T09:18:28.095Z",
-                Manufacturer = new
-                {
-                    Name = "IFV",
-                    Id= 1,
-                    IsNew= false,
-                    Country= "Cuba"
-                } }
-};
+                IsNew = true,
+                Country = "Cuba"
+            }
+        },
+        new
+        {
+            Name = "Abdala",
+            Type = "mRNA",
+            Code = "CUBA-002",
+            IsActive = true,
+            Description = "Another Cuban COVID-19 vaccine",
+            ApprovalDate = "2020-07-01T09:18:28.095Z",
+            Manufacturer = new
+            {
+                Name = "CIGB",
+                IsNew = true,
+                Country = "Cuba"
+            }
+        },
+        new
+        {
+            Name = "Pfizer-BioNTech",
+            Type = "mRNA",
+            Code = "PFZ-001",
+            IsActive = true,
+            Description = "mRNA vaccine for COVID-19",
+            ApprovalDate = "2020-12-01T09:18:28.095Z",
+            Manufacturer = new
+            {
+                Name = "Pfizer",
+                IsNew = true,
+                Country = "USA"
+            }
+        }
+    };
 
-        foreach (var v in vaccines)
+        foreach (var v in baseVaccines)
         {
             var response = await client.PostAsJsonAsync(
                 "/api/Catalog/register/vaccine",
@@ -150,6 +161,70 @@ public static class SeedCatalog
             );
 
             Console.WriteLine($"➡ Vaccine {v.Name}: {response.StatusCode}");
+        }
+
+        // 2. Obtener manufacturers desde API
+        var manufacturers = await client
+            .GetFromJsonAsync<List<ManufacturerResponseDto>>("/api/Manufacturer");
+
+        if (manufacturers == null)
+            return;
+
+        // 3. Filtrar IFV
+        var ifv = manufacturers.FirstOrDefault(m => m.Name == "IFV");
+
+        if (ifv == null)
+        {
+            Console.WriteLine("❌ IFV manufacturer not found");
+            return;
+        }
+
+        // 4. Vacunas adicionales basadas en IFV
+        var finlayVaccines = new[]
+        {
+        new
+        {
+            Name = "Finlay Vaccine A",
+            Type = "mRNA",
+            Code = "FIN-001",
+            IsActive = true,
+            Description = "Finlay Institute vaccine A",
+            ApprovalDate = "2021-01-01T00:00:00.000Z",
+            Manufacturer = new
+            {
+                Name = ifv.Name,
+                Id = ifv.Id,
+                IsNew = false,
+                Country = ifv.Country
+            }
+        },
+        new
+        {
+            Name = "Finlay Vaccine B",
+            Type = "mRNA",
+            Code = "FIN-002",
+            IsActive = true,
+            Description = "Finlay Institute vaccine B",
+            ApprovalDate = "2021-06-01T00:00:00.000Z",
+            Manufacturer = new
+            {
+                Name = ifv.Name,
+                Id = ifv.Id,
+                IsNew = false,
+                Country = ifv.Country
+            }
+        }
+    };
+
+        // 5. Insertar vacunas IFV derivadas
+        foreach (var v in finlayVaccines)
+        {
+            var response = await client.PostAsJsonAsync(
+                "/api/Catalog/register/vaccine",
+                v
+            );
+
+            Console.WriteLine($"➡ Finlay Vaccine {v.Name}: {response.StatusCode}");
         }
     }
 }

@@ -49,7 +49,7 @@ public static class SeedLot
         }
 
         using var doc = JsonDocument.Parse(json);
-        token = doc.RootElement.GetProperty("token").GetString();
+        token = doc.RootElement.GetProperty("accessToken").GetString();
 
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
@@ -66,32 +66,38 @@ public static class SeedLot
     {
         Console.WriteLine("🧠 Seeding lots...");
 
-        var vaccines = new[]
-        {
-            "08deb05a-94b1-4ee5-874c-7ccf61f710dd",
-            "08deb05a-aeb2-4757-8cd6-9cff873f0f11",
-            "08deb05a-d1d8-4a10-8765-373a10823365",
-            "08deb05a-dac3-4cab-8cf4-416e6aa4370a",
-            "08deb05a-e2ee-4055-8053-19e7686eaa01"
-        };
+        // Obtener vacunas
+        var vaccines = await client.GetFromJsonAsync<List<VaccineDto>>(
+            "/api/GetCatalog/finlayVaccines"
+        );
 
-        var lotPrefixes = new[] { "SOB", "ABD", "PFZ", "MOD", "AZ" };
+        if (vaccines == null || !vaccines.Any())
+        {
+            Console.WriteLine("❌ No vaccines found.");
+            return;
+        }
+
         var lots = new List<object>();
 
-        var vaccines_with_prefixes = vaccines.Zip(lotPrefixes);
-
-        foreach (var (vaccineId, prefix) in vaccines_with_prefixes)
+        foreach (var vaccine in vaccines)
         {
+            // Tomar primeras 3 letras y convertir a mayúsculas
+            var prefix = vaccine.Name.Length >= 3
+                ? vaccine.Name.Substring(0, 3).ToUpper()
+                : vaccine.Name.ToUpper();
+
+            // Generar 5 lotes
             for (int i = 1; i <= 5; i++)
             {
                 lots.Add(new
                 {
-                    LotNumber = $"{prefix}-2024-{i:D3}",
-                    VaccineId = vaccineId
+                    LotNumber = $"{prefix}-00{i}",
+                    VaccineId = vaccine.Id
                 });
             }
         }
 
+        // Registrar lotes
         foreach (var l in lots)
         {
             var response = await client.PostAsJsonAsync(
@@ -99,8 +105,16 @@ public static class SeedLot
                 l
             );
 
-            Console.WriteLine($"➡ Lot {((dynamic)l).LotNumber}: {response.StatusCode}");
+            Console.WriteLine(
+                $"➡ Lot {((dynamic)l).LotNumber}: {response.StatusCode}"
+            );
         }
+    }
+
+    public class VaccineDto
+    {
+        public string Id { get; set; } = default!;
+        public string Name { get; set; } = default!;
     }
 
 

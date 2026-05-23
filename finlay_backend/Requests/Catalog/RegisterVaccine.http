@@ -1,5 +1,5 @@
 @host = http://localhost:5137
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGRlYWZjNS05NWM1LTRiY2YtOGI4MS03ZDY2YzQ0NGU4ZTciLCJnaXZlbl9uYW1lIjoiYWRtaW5fdXNlcm5hbWVfMSIsImp0aSI6IjJkY2E1YTg1LWEwOWItNGI2Zi04ODdkLTE4ZWVlMzE4NTAxNCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc4NjA5MDczLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.zPQ3wVnhWesasTnsC44atKYlHa0psfuyw5G4PWRM9Po
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGRlYjg0MS1lOTg0LTQ3MDEtOGU1MC1lODVjZGI0ODgwODIiLCJnaXZlbl9uYW1lIjoiYWRtaW5fdXNlcm5hbWVfMSIsImp0aSI6IjBkYjFhYzc1LWE5NmMtNGY5Mi1iNDc0LTczZGE5MzBmM2I0MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc5NDg3MTc3LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.h7ZHXk35voUObT5ZMNle6jQxP797YqPHINyYrDCXCgM
 
 
 POST {{host}}/api/Catalog/register/vaccine
@@ -7,17 +7,22 @@ Content-Type:  application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Q123",
+  "name": "vax-TyVi",
   "type": "mRNA",
-  "code": "sas13214",
+  "code": "string12",
   "isActive": true,
-  "approvalDate": "2026-05-11T01:32:08.640Z",
+  "description": "string",
+  "approvalDate": "2026-05-20T20:45:07.206Z",
   "manufacturerDto": {
-    "name": "AJJASDJKSDH",
-    "isNew": true,
+    "name": "IFV",
+    "id":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "isNew": false,
     "country": "Cuba"
   }
 }
+
+
+
 
 
 
