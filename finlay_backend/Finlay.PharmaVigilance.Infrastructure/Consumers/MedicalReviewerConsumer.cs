@@ -18,11 +18,27 @@ public class MedicalReviewerConsumer : IConsumer<MedicalReviewerRegisteredEvent>
     {
         var data = context.Message;
 
+        // await _emailService.SendEmailAsync(
+        //     data.Email,
+        //     "Welcome",
+        //     $"Hola {data.Email}, bienvenido"
+        // );
+
+        var token = data.Token;
+
+        Console.WriteLine(token);
+
+        var url =
+            $"http://localhost:5173/activate-account" +
+            $"?email={data.Email}" +
+            $"&token={Uri.EscapeDataString(token)}";
+
         await _emailService.SendEmailAsync(
-            data.Email,
-            "Welcome",
-            $"Hola {data.Email}, bienvenido"
+            data.Email!,
+            "Activación de cuenta",
+            $"Active su cuenta aquí: {url}"
         );
+
     }
 
 }
