@@ -65,13 +65,12 @@ public static class SeedAssignment
     // =========================
     // 📚 LOAD CATALOG DATA
     // =========================
-
     private static async Task LoadMedicalReviewerAsync()
     {
         Console.WriteLine("🧑‍⚕️ Loading medical reviewers...");
 
         var response = await client.GetAsync(
-            "/api/MedicalReviewer/by-current-user-municipality?pageNumber=1&pageSize=100"
+            "/api/MedicalReviewer/summary"
         );
 
         if (!response.IsSuccessStatusCode)
@@ -82,25 +81,20 @@ public static class SeedAssignment
         }
 
         var json = await response.Content.ReadAsStringAsync();
+
         using var doc = JsonDocument.Parse(json);
 
         var root = doc.RootElement;
 
-        // 👉 extraer "items"
-        if (!root.TryGetProperty("items", out var items))
-        {
-            Console.WriteLine("❌ 'items' not found in response");
-            return;
-        }
-
-        medicalReviewerIds = items
+        medicalReviewerIds = root
             .EnumerateArray()
-            .Select(x => Guid.Parse(x.GetProperty("id").GetString()!))
+            .Select(x => Guid.Parse(
+                x.GetProperty("id").GetString()!
+            ))
             .ToArray();
 
         Console.WriteLine($"✅ Loaded {medicalReviewerIds.Length} medical reviewers");
     }
-
     // =========================
     // 📋 PUBLIC REPORTS SEED
     // =========================

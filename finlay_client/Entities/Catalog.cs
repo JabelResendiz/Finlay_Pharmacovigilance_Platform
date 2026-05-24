@@ -28,7 +28,7 @@ public static class SeedCatalog
         Console.WriteLine("🔥 Starting Seed...");
 
         await LoginAsync();
-        //await SeedSymptomsAsync();
+        await SeedSymptomsAsync();
         await SeedVaccinesAsync();
 
         Console.WriteLine("✅ Seed completed!");
