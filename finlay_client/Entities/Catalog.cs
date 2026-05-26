@@ -29,7 +29,7 @@ public static class SeedCatalog
 
         await LoginAsync();
         await SeedSymptomsAsync();
-        await SeedVaccinesAsync();
+        //await SeedVaccinesAsync();
 
         Console.WriteLine("✅ Seed completed!");
     }
@@ -78,11 +78,11 @@ public static class SeedCatalog
 
         var symptoms = new[]
         {
-            new { Name = "Dolor de cabeza intenso", StandardCode = "SYM001", CodingSystem = "ICD-10", Category = "Neurological", IsActive = true, Description = "Severe headache after vaccination" },
-            new { Name = "Fiebre leve", StandardCode = "SYM002", CodingSystem = "ICD-10", Category = "General", IsActive = true, Description = "Mild fever within 24h" },
-            new { Name = "Fatiga post vacuna", StandardCode = "SYM003", CodingSystem = "ICD-10", Category = "General", IsActive = true, Description = "Temporary fatigue after dose" },
-            new { Name = "Dolor muscular", StandardCode = "SYM004", CodingSystem = "ICD-10", Category = "Muscular", IsActive = true, Description = "Muscle pain after injection" },
-            new { Name = "Inflamación local", StandardCode = "SYM005", CodingSystem = "ICD-10", Category = "Local", IsActive = true, Description = "Swelling at injection site" }
+            new { Name = "Dolor de cabeza intenso", Category = "Neurological", IsActive = true, Description = "Severe headache after vaccination" },
+            new { Name = "Fiebre leve", Category = "General", IsActive = true, Description = "Mild fever within 24h" },
+            new { Name = "Fatiga post vacuna", Category = "General", IsActive = true, Description = "Temporary fatigue after dose" },
+            new { Name = "Dolor muscular", Category = "Muscular", IsActive = true, Description = "Muscle pain after injection" },
+            new { Name = "Inflamación local", Category = "Local", IsActive = true, Description = "Swelling at injection site" }
         };
 
         foreach (var s in symptoms)
@@ -108,47 +108,53 @@ public static class SeedCatalog
         {
         new
         {
-            Name = "Soberana 02",
-            Type = "mRNA",
-            Code = "CUBA-001",
-            IsActive = true,
-            Description = "Cuban recombinant protein vaccine",
-            ApprovalDate = "2020-04-03T09:18:28.095Z",
-            Manufacturer = new
+            name = "Soberana 02",
+            type = "mRNA",
+            code = "CUBA-001",
+            isActive = true,
+            description = "Cuban recombinant protein vaccine",
+            approvalDate = "2020-04-03T09:18:28.095Z",
+            targetPathology = "asdasda",
+            manufacturer = new
             {
-                Name = "IFV",
-                IsNew = true,
-                Country = "Cuba"
+                name = "IFV",
+                id= "",
+                isNew = true,
+                country = "Cuba"
             }
         },
         new
         {
-            Name = "Abdala",
-            Type = "mRNA",
-            Code = "CUBA-002",
-            IsActive = true,
-            Description = "Another Cuban COVID-19 vaccine",
-            ApprovalDate = "2020-07-01T09:18:28.095Z",
-            Manufacturer = new
+            name = "Abdala",
+            type = "mRNA",
+            code = "CUBA-002",
+            isActive = true,
+            description = "Another Cuban COVID-19 vaccine",
+            approvalDate = "2020-07-01T09:18:28.095Z",
+            targetPathology = "asdasda",
+            manufacturer = new
             {
-                Name = "CIGB",
-                IsNew = true,
-                Country = "Cuba"
+                name = "CIGB",
+                id= "",
+                isNew = true,
+                country = "Cuba"
             }
         },
         new
         {
-            Name = "Pfizer-BioNTech",
-            Type = "mRNA",
-            Code = "PFZ-001",
-            IsActive = true,
-            Description = "mRNA vaccine for COVID-19",
-            ApprovalDate = "2020-12-01T09:18:28.095Z",
-            Manufacturer = new
+            name = "Pfizer-BioNTech",
+            type = "mRNA",
+            code = "PFZ-001",
+            isActive = true,
+            description = "mRNA vaccine for COVID-19",
+            approvalDate = "2020-12-01T09:18:28.095Z",
+            targetPathology = "asdasda",
+            manufacturer = new
             {
-                Name = "Pfizer",
-                IsNew = true,
-                Country = "USA"
+                name = "Pfizer",
+                id= "",
+                isNew = true,
+                country = "USA"
             }
         }
     };
@@ -160,7 +166,7 @@ public static class SeedCatalog
                 v
             );
 
-            Console.WriteLine($"➡ Vaccine {v.Name}: {response.StatusCode}");
+            Console.WriteLine($"➡ Vaccine {v.name}: {response.StatusCode}");
         }
 
         // 2. Obtener manufacturers desde API
@@ -184,34 +190,36 @@ public static class SeedCatalog
         {
         new
         {
-            Name = "Finlay Vaccine A",
-            Type = "mRNA",
-            Code = "FIN-001",
-            IsActive = true,
-            Description = "Finlay Institute vaccine A",
-            ApprovalDate = "2021-01-01T00:00:00.000Z",
-            Manufacturer = new
+            name = "VA-MENGOC-BC",
+            type = "mRNA",
+            code = "FIN-002",
+            isActive = true,
+            description = "Finlay Institute vaccine A",
+            approvalDate = "2021-01-01T00:00:00.000Z",
+            targetPathology = "asdasda",
+            manufacturer = new
             {
-                Name = ifv.Name,
-                Id = ifv.Id,
-                IsNew = false,
-                Country = ifv.Country
+                name = ifv.Name,
+                id = ifv.Id,
+                isNew = false,
+                country = ifv.Country
             }
         },
         new
         {
-            Name = "Finlay Vaccine B",
-            Type = "mRNA",
-            Code = "FIN-002",
-            IsActive = true,
-            Description = "Finlay Institute vaccine B",
-            ApprovalDate = "2021-06-01T00:00:00.000Z",
-            Manufacturer = new
+            name = "Finlay Vaccine B",
+            type = "mRNA",
+            code = "FIN-002",
+            isActive = true,
+            description = "Finlay Institute vaccine B",
+            approvalDate = "2021-06-01T00:00:00.000Z",
+            targetPathology = "asdasda",
+            manufacturer = new
             {
-                Name = ifv.Name,
-                Id = ifv.Id,
-                IsNew = false,
-                Country = ifv.Country
+                name = ifv.Name,
+                id = ifv.Id,
+                isNew = false,
+                country = ifv.Country
             }
         }
     };
@@ -224,7 +232,7 @@ public static class SeedCatalog
                 v
             );
 
-            Console.WriteLine($"➡ Finlay Vaccine {v.Name}: {response.StatusCode}");
+            Console.WriteLine($"➡ Finlay Vaccine {v.name}: {response.StatusCode}");
         }
     }
 }

@@ -1,20 +1,20 @@
 @host = http://localhost:5137
 @token_Admin=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6IkNhcmxvcyIsImp0aSI6ImUwYjhiOTIxLTE2ZjItNGQzMS1hNzhmLTc4NDJmZjA3Mjk0NyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc3MzQzNjUzLCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.PSXiuWdlcfLt73XoziPZk6afZ-8dwvjCeiF5UFXW2bk
 
-@token_Jefe=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGRlYjg0MS1lYjliLTRiMGItODI0Yi05YWFhYWE3OWNiZGIiLCJnaXZlbl9uYW1lIjoicmVzcG9uc2FibGVfMl9waW5hcmRlbHJpbyIsImp0aSI6ImExNmNkODAxLWVjZjAtNGRjZi1hOWI4LWQ2ZTg4YmFjYzU1MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlY3Rpb25SZXNwb25zaWJsZSIsImV4cCI6MTc3OTYzMTkwMywiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.4L3Xo921cbMNHTtkd3leclPMkx2lHGamYtL3ifoVs8U
+@token_Jefe=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGRlYjlkZS1kMTNmLTRjOWMtODczNi01ZWE1NmU0Y2FiZmQiLCJnaXZlbl9uYW1lIjoicmVzcG9uc2FibGVfMl9waW5hcmRlbHJpbyIsImp0aSI6ImZjMjM2NzJmLTMyNGUtNGMwMS05OTU0LWNlN2RhMGQ5ZjdmYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlNlY3Rpb25SZXNwb25zaWJsZSIsImV4cCI6MTc3OTc0MDc0NywiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.IVf3l6hNmCl4BF4U7eXd6WithdiO_b85CYx2OcPHNnE
 
 POST {{host}}/api/MedicalReviewer/register
 Content-Type:  application/json
 Authorization: Bearer {{token_Jefe}}
 
 {
-  "userName": "JabelResendiz01",
-  "email": "jabelresendiz03@gmail.com",
+  "userName": "JabelResendiz",
+  "email": "jabelresendiz00@gmail.com",
   "password": "Password_123!",
   "phoneNumber": "55664266",
   "institution": "Hospital Provincial",
-  "professionalLicense": "334324re1",
-  "identityNumber": "92010710171",
+  "professionalLicense": "334324111",
+  "identityNumber": "92010711171",
   "specialty": "Medicina General"
 }
 

@@ -64,6 +64,12 @@ public static class DependencyInjection
                .AddEntityFrameworkStores<FinlayDbContext>() // Configures EF for Identity
                .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
 
+        services.Configure<PasswordHasherOptions>(options =>
+        {
+            options.IterationCount = 600000;
+        });
+
+
         // Authentication and Authorization
         services.AddAuth(configuration);
 
@@ -71,25 +77,30 @@ public static class DependencyInjection
         //     configuration.GetSection("Email:Resend")
         // );
 
+        services.Configure<EmailJsSettings>(
+            configuration.GetSection("Email:EmailJS")
+        );
+
 
         services.AddScoped<ICaptchaService, CaptchaService>();
-
-        //services.AddHttpClient<ResendClient>();
 
         // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddSingleton<IEmailService, SmtpEmailService>();
-        //services.AddSingleton<IEmailService, ResendEmailService>();
 
-        //services.AddHttpClient<IEmailService, SmtpEmailService>();
+
+        //services.AddSingleton<IEmailService, SmtpEmailService>();
+        //services.AddSingleton<IEmailService, ResendEmailService>();
+        services.AddHttpClient<IEmailService, EmailJsService>();
+
 
         var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
         services.AddMassTransit(x =>
         {
             x.AddConsumer<MedicalReviewerConsumer>();
             x.AddConsumer<AssignmentExpiredConsumer>();
+            x.AddConsumer<ReportConfirmationConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {

@@ -257,6 +257,7 @@ public static class SeedReports
                     identityNumber = GetNextIdentityNumber(),
                     dateOfBirth = DateTime.Parse("2003-04-07T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
                     provinceId = 1,
+                    gender = genders[i],
                     municipalityId = 2,
                     phoneNumber = $"555100{i + 1:D2}",
                     email = $"{reporterNames[i].Replace(" ", ".").ToLower()}@example.com"
@@ -301,7 +302,9 @@ public static class SeedReports
                         visitedDoctor = i % 3 == 0,
                         wentToEmergencyRoom = i% 4 == 0,
                         permanentDisability = i%5 == 0,
-                        isLifeThreatening = i%6 == 0,
+                        wasHospitalized = i%6 == 0,
+                        noComplications = i% 7 == 0 && i%3!=0 && i%2!=0 && i%5!=0 ,
+                        anomaly = i% 8 == 0,
                         resultedInDeath = false,
                         deathDate = (string?)null,
                         currentStatus = i % 2 == 0 ? "Recovered" : "Recovering",

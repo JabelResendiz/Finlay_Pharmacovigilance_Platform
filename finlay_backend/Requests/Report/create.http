@@ -10,13 +10,13 @@ Content-Type:  application/json
   "reportDate": "2026-04-04T19:13:59.418Z",
   "reporter": {
     "fullName": "Jabel12",
-    "reporterRelationship": "Doctor",
+    "reporterRelationship": "Self",
     "identityNumber": "03050200018",
     "dateOfBirth": "2003-05-02T18:13:59.418Z",
     "provinceId": 10,
     "municipalityId":19 ,
     "phoneNumber": "55664266",
-    "email": "12aidenpearces@gmail.com",
+    "email": "jabelresendiz00@gmail.com",
     "professionalLicense": "asdasdas",
     "institution": "asdasdasd"
   },
@@ -31,7 +31,7 @@ Content-Type:  application/json
     "healthArea": "string",
     "address": "string",
     "phoneNumber": "55664266",
-    "email": "12aidenpearces@gmail.com",
+    "email": "jabelresendiz00@gmail.com",
     "currentMedications": "string",
     "allergies": "string",
     "medicalHistory": "string"
