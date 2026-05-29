@@ -81,6 +81,10 @@ public static class DependencyInjection
             configuration.GetSection("Email:EmailJS")
         );
 
+        services.Configure<WhatsAppSettings>(
+            configuration.GetSection("WhatsApp")
+        );
+
 
         services.AddScoped<ICaptchaService, CaptchaService>();
 
@@ -93,6 +97,8 @@ public static class DependencyInjection
         //services.AddSingleton<IEmailService, SmtpEmailService>();
         //services.AddSingleton<IEmailService, ResendEmailService>();
         services.AddHttpClient<IEmailService, EmailJsService>();
+
+        services.AddHttpClient<IWhatsAppService,WhatsAppService>();
 
 
         var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
