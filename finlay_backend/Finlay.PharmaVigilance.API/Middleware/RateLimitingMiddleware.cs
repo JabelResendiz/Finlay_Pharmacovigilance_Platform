@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 
 namespace Finlay.PharmaVigilance.Api.Middleware;
@@ -82,19 +83,31 @@ public static class RateLimitingMiddleware
                 config.QueueLimit = 10;
             });
 
+            // Comandos con límite diario (ej: completar revisiones médicas)
+            options.AddSlidingWindowLimiter("CommandDaily", config =>
+            {
+                config.PermitLimit = 50;
+                config.Window = TimeSpan.FromDays(1);
+                config.SegmentsPerWindow = 24;
+                config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                config.QueueLimit = 0;
+            });
+
             // ==========================================
             // LIMITADOR GLOBAL POR IP (MEJORADO)
             // ==========================================
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
                 httpContext =>
                 {
-                    var ipAddress = GetClientIp(httpContext);
+                    // Usar ID de usuario si está autenticado, IP si es anónimo
+                    var userId = httpContext.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    var partitionKey = userId ?? GetClientIp(httpContext);
 
                     return RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: ipAddress,
+                        partitionKey: partitionKey,
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 10000000,
+                            PermitLimit = userId != null ? 200 : 100, // Más permisivo para autenticados
                             Window = TimeSpan.FromMinutes(1),
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                             QueueLimit = 0

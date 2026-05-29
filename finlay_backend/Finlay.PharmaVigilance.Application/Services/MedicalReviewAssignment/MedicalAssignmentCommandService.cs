@@ -7,6 +7,8 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Application.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
+using MassTransit;
+using Finlay.PharmaVigilance.Domain.Events;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -15,18 +17,19 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserContextService _userContextService;
-    //private readonly IEmailAppService _emailAppService;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public MedicalReviewAssignmentCommandService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        IUserContextService userContextService
+        IUserContextService userContextService,
+        IPublishEndpoint publishEndpoint
     )
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
-        //_emailAppService = emailAppService ?? throw new ArgumentNullException(nameof(emailAppService));
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<MedicalReviewAssignmentDTO> CreateAsync(MedicalReviewAssignmentDTO dto)
@@ -91,13 +94,22 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
         medicalReviewAssignment.MedicalReviewer = medicalReviewer;
         medicalReviewAssignment.AefiReport = report;
         medicalReviewAssignment.SectionResponsibleId = sectionResponsible.Id;
+
+
         medicalReviewAssignment.Status = ReviewAssignmentStatus.Pending;
-
-
         report.Status = ReportStatus.UnderReview;
 
-        await _unitOfWork.GetRepository<MedicalReviewAssignment>().CreateAsync(medicalReviewAssignment);
+        await _unitOfWork
+        .GetRepository<MedicalReviewAssignment>()
+        .CreateAsync(medicalReviewAssignment);
         await _unitOfWork.CompleteAsync();
+
+        await _publishEndpoint.Publish(new NewAssignmentEvent
+        {
+            MedicalReviewerName = medicalReviewer.User.UserName!,
+            MedicalReviewerEmail = medicalReviewer.User.Email!,
+            ReportNumber = report.NotificationNumber
+        });
 
         //await _emailAppService.SendEmailToMedicalReviewerAsync(medicalReviewer);
 

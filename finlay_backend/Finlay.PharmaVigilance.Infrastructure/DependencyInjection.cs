@@ -82,7 +82,9 @@ public static class DependencyInjection
         );
 
 
-        services.AddScoped<ICaptchaService, CaptchaService>();
+        //services.AddScoped<ICaptchaService, CaptchaService>();
+        services.AddScoped<ICaptchaService, FriendlyCaptchaService>();
+
 
         // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();

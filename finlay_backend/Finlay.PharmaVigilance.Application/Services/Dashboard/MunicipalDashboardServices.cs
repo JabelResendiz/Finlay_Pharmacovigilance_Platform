@@ -330,22 +330,22 @@ public class MunicipalDashboardService : IMunicipalDashboardService
         {
             new()
             {
-                VaccineName = "Abdala",
+                VaccineName = "Soberana",
                 TotalReports = 45
             },
             new()
             {
-                VaccineName = "Soberana 02",
+                VaccineName = "VA-MENGOC-BC",
                 TotalReports = 33
             },
             new()
             {
-                VaccineName = "Pfizer-BioNTech",
+                VaccineName = "PCV11",
                 TotalReports = 25
             },
             new()
             {
-                VaccineName = "Moderna",
+                VaccineName = "QuimiHib",
                 TotalReports = 18
             },
         },
