@@ -26,6 +26,7 @@ using MassTransit;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Resend;
 using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
+using Finlay.PharmaVigilance.Infrastructure.WhatsApp;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;

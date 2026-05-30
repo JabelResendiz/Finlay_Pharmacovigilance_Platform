@@ -32,6 +32,7 @@ public class ReportCommandService : IReportCommandService
     private readonly IUserContextService _userContextService;
     private readonly ILogger<ReportCommandService> _logger;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IWhatsAppService _whatsAppService;
 
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
@@ -45,7 +46,8 @@ public class ReportCommandService : IReportCommandService
         IEnumerable<IReportValidator<PublicAefiReportDto>> publicValidators,
         IUserContextService userContextService,
         ILogger<ReportCommandService> logger,
-        IPublishEndpoint publishEndpoint)
+        IPublishEndpoint publishEndpoint,
+        IWhatsAppService whatsAppService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -55,6 +57,7 @@ public class ReportCommandService : IReportCommandService
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
+        _whatsAppService = whatsAppService ?? throw new ArgumentNullException(nameof(whatsAppService));
     }
 
     public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;
@@ -199,14 +202,37 @@ public class ReportCommandService : IReportCommandService
                 .ToListAsync();
 
 
-            await _publishEndpoint.Publish(new ReportConfirmationEvent
+            // await _publishEndpoint.Publish(new ReportConfirmationEvent
+            // {
+            //     ReportNumber = report.NotificationNumber,
+            //     Email = reporter.Email,
+            //     SymptomsName = symptomNames,
+            //     VaccinesName = vaccinesNames,
+            //     ReportDate = report.ReportDate
+            // });
+
+            // Send WhatsApp message to reporter
+            _logger.LogDebug($"📱 Enviando mensaje WhatsApp al reportante: {reporter.PhoneNumber}");
+            
+            if (!string.IsNullOrWhiteSpace(reporter.PhoneNumber))
             {
-                ReportNumber = report.NotificationNumber,
-                Email = reporter.Email,
-                SymptomsName = symptomNames,
-                VaccinesName = vaccinesNames,
-                ReportDate = report.ReportDate
-            });
+                var whatsAppSent = await _whatsAppService.SendReportCreationConfirmationAsync(
+                    reporter.PhoneNumber, 
+                    report.NotificationNumber);
+
+                if (whatsAppSent)
+                {
+                    _logger.LogInformation($"✅ Mensaje WhatsApp enviado exitosamente a {reporter.PhoneNumber}");
+                }
+                else
+                {
+                    _logger.LogWarning($"⚠️ No se pudo enviar mensaje WhatsApp a {reporter.PhoneNumber}");
+                }
+            }
+            else
+            {
+                _logger.LogWarning($"⚠️ El reportante no tiene número de teléfono registrado");
+            }
 
             // await _eventBus.PublishAsync(new EmailToSectionResponsibleEvent
             // {

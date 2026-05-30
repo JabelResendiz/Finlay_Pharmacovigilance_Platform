@@ -1,12 +1,12 @@
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace Finlay.PharmaVigilance.Infrastructure.WhatsApp
 {
@@ -14,6 +14,7 @@ namespace Finlay.PharmaVigilance.Infrastructure.WhatsApp
     {
         private readonly string _apiBaseUrl;
         private readonly string _apiKey;
+        private readonly string _sessionId;
         private readonly int _timeoutSeconds;
         private readonly HttpClient _httpClient;
         private readonly ILogger<WhatsAppService> _logger;
@@ -26,6 +27,7 @@ namespace Finlay.PharmaVigilance.Infrastructure.WhatsApp
             var settings = options.Value;
             _apiBaseUrl = settings.ApiBaseUrl;
             _apiKey = settings.ApiKey;
+            _sessionId = settings.SessionId;
             _timeoutSeconds = settings.TimeoutSeconds;
             
             _httpClient.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
@@ -54,45 +56,93 @@ namespace Finlay.PharmaVigilance.Infrastructure.WhatsApp
                     return false;
                 }
 
-                var chatId = $"{phoneNumber}@c.us"; // Formato WhatsApp
+                // Normalizar número de teléfono - remover caracteres especiales
+                var cleanPhoneNumber = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
+                
+                // Formato correcto para OpenWA
+                var chatId = $"{cleanPhoneNumber}@c.us";
+                
+                _logger.LogDebug($"📱 Intentando enviar mensaje a {chatId} con sessionId: {sessionId}");
                 
                 var requestBody = new
                 {
                     chatId = chatId,
-                    text = message,
-                    options = new { }
+                    text = message
                 };
 
-                var json = JsonConvert.SerializeObject(requestBody);
+                var json = JsonSerializer.Serialize(requestBody);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(
-                    $"{_apiBaseUrl}/sessions/{sessionId}/messages/send-text",
-                    content
-                );
+                _logger.LogDebug($"📤 Payload: {json}");
+
+                // Endpoint correcto de OpenWA
+                var endpoint = $"{_apiBaseUrl}/sessions/{sessionId}/messages/send-text";
+                
+                _logger.LogDebug($"🔗 Endpoint: {endpoint}");
+
+                var response = await _httpClient.PostAsync(endpoint, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Mensaje WhatsApp enviado exitosamente a {phoneNumber} en sesión {sessionId}");
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"✅ Mensaje WhatsApp enviado exitosamente a {phoneNumber} en sesión {sessionId}. Response: {responseContent}");
                     return true;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError($"Error al enviar mensaje WhatsApp: {response.StatusCode} - {errorContent}");
+                    _logger.LogError($"❌ Error al enviar mensaje WhatsApp: {response.StatusCode} - {errorContent}");
                     return false;
                 }
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Error de conexión al enviar mensaje WhatsApp");
+                _logger.LogError(ex, "❌ Error de conexión al enviar mensaje WhatsApp");
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inesperado al enviar mensaje WhatsApp");
+                _logger.LogError(ex, "❌ Error inesperado al enviar mensaje WhatsApp");
+                return false;
+            }
+        }
+
+        public async Task<bool> SendReportCreationConfirmationAsync(string phoneNumber, string notificationNumber)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_sessionId))
+                {
+                    _logger.LogWarning("SendReportCreationConfirmationAsync: sessionId no puede estar vacío");
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(phoneNumber))
+                {
+                    _logger.LogWarning("SendReportCreationConfirmationAsync: phoneNumber no puede estar vacío");
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(notificationNumber))
+                {
+                    _logger.LogWarning("SendReportCreationConfirmationAsync: notificationNumber no puede estar vacío");
+                    return false;
+                }
+
+                var message = $"✅ Reporte creado exitosamente.\n" +
+                            $"Número de notificación: {notificationNumber}\n" +
+                            $"Gracias por reportar.";
+
+                return await SendMessageAsync(_sessionId, phoneNumber, message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al enviar confirmación de creación de reporte por WhatsApp");
                 return false;
             }
         }
     }
 }
+
+
+
