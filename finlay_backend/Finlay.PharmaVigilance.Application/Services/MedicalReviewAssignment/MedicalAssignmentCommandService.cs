@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using AutoMapper;
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
@@ -7,8 +6,8 @@ using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
 using Finlay.PharmaVigilance.Application.Helpers;
 using Finlay.PharmaVigilance.Domain.Entities;
 using Finlay.PharmaVigilance.Domain.Enum;
-using MassTransit;
 using Finlay.PharmaVigilance.Domain.Events;
+using Finlay.PharmaVigilance.Application.Common.EventBus;
 
 namespace Finlay.PharmaVigilance.Application.Services;
 
@@ -17,19 +16,19 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserContextService _userContextService;
-    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IEventBus _eventBus;
 
     public MedicalReviewAssignmentCommandService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IUserContextService userContextService,
-        IPublishEndpoint publishEndpoint
+        IEventBus eventBus
     )
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
         _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
-        _publishEndpoint = publishEndpoint;
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
     public async Task<MedicalReviewAssignmentDTO> CreateAsync(MedicalReviewAssignmentDTO dto)
@@ -59,7 +58,8 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
             throw new InvalidOperationException("This report is already assigned to a medical reviewer.");
 
         var medicalReviewer = await _unitOfWork.GetRepository<MedicalReviewer>()
-                                    .GetByIdAsync(dto.MedicalReviewerId);
+                                    .GetByIdAsync(dto.MedicalReviewerId, default, o => o.User);
+
         if (medicalReviewer == null)
             throw new KeyNotFoundException("Medical Reviewer not found.");
 
@@ -82,9 +82,6 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
             throw new ArgumentException("Assigned At date cannot be in the future. It must be less than or equal to the current date (Eastern Time UTC-5).",
                             nameof(dto.AssignedAt));
 
-        Console.WriteLine($"========================dto.AssignedAt : {dto.AssignedAt}=======================");
-        Console.WriteLine($"========================report.ReportDate : {report.ReportDate}=======================");
-
         if (dto.AssignedAt < report.ReportDate)
             throw new ArgumentException("Assigned At date cannot be before the report creation date.",
                             nameof(dto.AssignedAt));
@@ -104,14 +101,13 @@ public class MedicalReviewAssignmentCommandService : IMedicalReviewAssignmentCom
         .CreateAsync(medicalReviewAssignment);
         await _unitOfWork.CompleteAsync();
 
-        await _publishEndpoint.Publish(new NewAssignmentEvent
-        {
-            MedicalReviewerName = medicalReviewer.User.UserName!,
-            MedicalReviewerEmail = medicalReviewer.User.Email!,
-            ReportNumber = report.NotificationNumber
-        });
 
-        //await _emailAppService.SendEmailToMedicalReviewerAsync(medicalReviewer);
+        // await _eventBus.PublishAsync(new NewAssignmentEvent
+        // {
+        //     MedicalReviewerName = medicalReviewer.User.UserName!,
+        //     MedicalReviewerEmail = medicalReviewer.User.Email!,
+        //     ReportNumber = report.NotificationNumber
+        // });
 
         return dto;
     }

@@ -1,163 +1,279 @@
-
-using System.Diagnostics;
-using System.Text;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.Services;
-using iText.Forms;
-using iText.Kernel.Pdf;
+using Finlay.PharmaVigilance.Application.Enum;
+using Finlay.PharmaVigilance.Application.IServices.Pdf;
+using Microsoft.AspNetCore.Hosting;
+using System.Net;
+using System.Text;
 
 namespace Finlay.PharmaVigilance.Infrastructure.Pdf;
 
 public class PdfService : IPdfService
 {
-    public byte[] GenerateReportPdf(ReportPdfDto report)
+    private readonly IConverter _converter;
+    private readonly string _templateDirectory;
+    private readonly string _logoBase64;
+    private readonly IDictionary<ReportPdfTemplateType, string> _templates;
+
+    public PdfService(IConverter converter, IWebHostEnvironment env)
     {
-        using var ms = new MemoryStream();
+        _converter = converter ?? throw new ArgumentNullException(nameof(converter));
+        _templateDirectory = FindTemplateDirectory(env);
 
-        var path = Path.Combine(
-    AppDomain.CurrentDomain.BaseDirectory,
-    "Templates",
-    "report-template.pdf"
-);
-
-        var reader = new PdfReader(path);
-
-        //var reader = new PdfReader("Templates/report-template.pdf");
-
-        var writer = new PdfWriter(ms);
-
-        var pdfDoc = new PdfDocument(reader, writer);
-
-        // var form = PdfAcroForm.GetAcroForm(pdfDoc, true);
-
-        var form = PdfAcroForm.GetAcroForm(pdfDoc, false);
-
-        foreach (var field in form.GetAllFormFields())
+        _templates = new Dictionary<ReportPdfTemplateType, string>
         {
-            Console.WriteLine(field.Key);
-        }
-
-        form.GetField("nombre_reportante")?.SetValue(report.Reporter.FullName);
-        form.GetField("email")?.SetValue(report.Reporter.Email);
-        // form.GetField("sintomas")?.SetValue(report.A);
-        // form.GetField("fecha_evento")?.SetValue(report.EventDate.ToString("yyyy-MM-dd"));
-
-        pdfDoc.Close();
-
-        return ms.ToArray();
-    }
-
-
-    public byte[] GenerateReportDetailsPdf(ReportDetailAdminDto report)
-    {
-        var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "admin-report.tex");
-
-        var texContent = File.ReadAllText(templatePath);
-
-        // =========================
-        // 1. Replace simple fields
-        // =========================
-        texContent = texContent
-            .Replace("{{REPORT-DATE}}", DateTime.Now.ToString("yyyy-MM-dd"))
-            .Replace("{{NOTIFICATION-NUMBER}}", report.NotificationNumber)
-            .Replace("{{STATUS}}", report.Status.ToString())
-            .Replace("{{SEVERITY}}", report.GlobalSeverityLevel.ToString())
-            .Replace("{{AGE}}", report.VaccinatedSubject.Age.ToString())
-            .Replace("{{GENDER}}", report.VaccinatedSubject.Gender.ToString())
-            .Replace("{{PROVINCE}}", report.VaccinatedSubject.ProvinceName)
-            .Replace("{{PREGNANT}}", report.VaccinatedSubject.IsPregnant != null ? (report.VaccinatedSubject.IsPregnant.Value ? "Sí" : "No") : "No")
-            .Replace("{{MEDICAL-HISTORY}}", report.VaccinatedSubject.MedicalHistory ?? "N/A")
-            .Replace("{{MEDICATIONS}}", report.VaccinatedSubject.CurrentMedications ?? "N/A")
-            .Replace("{{ALLERGIES}}", report.VaccinatedSubject.Allergies ?? "N/A");
-
-        // =========================
-        // 2. Build VACCINATIONS block
-        // =========================
-        var vaccinationsBuilder = new StringBuilder();
-
-        foreach (var v in report.Vaccinations)
-        {
-            vaccinationsBuilder.AppendLine(@$"
-\begin{{tabularx}}{{\textwidth}}{{X X}}
-\textbf{{Vacuna}} & {Escape(v.VaccineName)} \\
-\textbf{{Lote}} & {Escape(v.LotNumber)} \\
-\textbf{{Dosis}} & {v.DoseNumber} \\
-\textbf{{Sitio}} & {Escape(v.AdministrationSite.ToString())} \\
-\textbf{{Fecha}} & {v.AdministrationDate:yyyy-MM-dd} \\
-\textbf{{Centro}} & {Escape(v.VaccinationCenterName)} \\
-\end{{tabularx}}
-\vspace{{5mm}}
-");
-        }
-
-        texContent = texContent.Replace("{{VACCINATIONS}}", vaccinationsBuilder.ToString());
-
-        // =========================
-        // 3. Build ADVERSE EVENTS
-        // =========================
-        var eventsBuilder = new StringBuilder();
-
-        foreach (var e in report.AdverseEvents)
-        {
-            eventsBuilder.AppendLine(@$"
-\textbf{{Síntoma}}: {Escape(e.Symptom)}\\
-\textbf{{Descripción}}: {Escape(e.Description)}\\
-\textbf{{Severidad}}: {Escape(e.SeverityLevel.ToString())}\\
-\textbf{{Estado}}: {Escape(e.CurrentStatus.ToString())}\\
-\vspace{{3mm}}
-\hrule
-\vspace{{3mm}}
-");
-        }
-
-        texContent = texContent.Replace("{{ADVERSE-EVENTS}}", eventsBuilder.ToString());
-
-        // =========================
-        // 4. Write temp .tex file
-        // =========================
-        var tempDir = Path.Combine(Path.GetTempPath(), "finlay-latex");
-        Directory.CreateDirectory(tempDir);
-
-        var texFile = Path.Combine(tempDir, $"report-{Guid.NewGuid()}.tex");
-        var pdfFile = Path.ChangeExtension(texFile, ".pdf");
-
-        File.WriteAllText(texFile, texContent, Encoding.UTF8);
-
-        // =========================
-        // 5. Compile using Docker LaTeX
-        // =========================
-        var psi = new ProcessStartInfo
-        {
-            FileName = "docker",
-            Arguments = $@"run --rm -v {tempDir}:/workdir texlive/texlive latexmk -pdf report.tex",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
+            [ReportPdfTemplateType.Admin] = LoadTemplate("admin.html"),
+            [ReportPdfTemplateType.User] = LoadTemplate("user.html"),
+            [ReportPdfTemplateType.MedicalReview] = LoadTemplate("medical-review.html")
         };
 
-        var process = Process.Start(psi);
-        process.WaitForExit();
-
-        if (!File.Exists(pdfFile))
-            throw new Exception("LaTeX compilation failed");
-
-        return File.ReadAllBytes(pdfFile);
+        _logoBase64 = LoadLogoBase64();
     }
 
-    private string Escape(string input)
+    public byte[] GenerateReportPdf(ReportPdfDto report, ReportPdfTemplateType templateType)
     {
-        if (string.IsNullOrEmpty(input)) return "N/A";
+        if (report == null)
+            throw new ArgumentNullException(nameof(report));
 
-        return input
-            .Replace("\\", @"\textbackslash{}")
-            .Replace("&", @"\&")
-            .Replace("%", @"\%")
-            .Replace("$", @"\$")
-            .Replace("#", @"\#")
-            .Replace("_", @"\_")
-            .Replace("{", @"\{")
-            .Replace("}", @"\}");
+        var template = GetTemplate(templateType);
+        var html = ReplaceMarkers(template, report);
+
+        return ConvertHtmlToPdf(html, report.NotificationNumber);
     }
 
+    public byte[] GenerateReportPdf(ReportDetailAdminDto report, ReportPdfTemplateType templateType)
+    {
+        if (report == null)
+            throw new ArgumentNullException(nameof(report));
+
+        var reportDto = MapAdminReportToPdfDto(report);
+        return GenerateReportPdf(reportDto, templateType);
+    }
+
+    private string FindTemplateDirectory(IWebHostEnvironment env)
+    {
+        var candidates = new[]
+        {
+            Path.Combine(env.ContentRootPath, "Pdf", "Templates"),
+            Path.Combine(env.ContentRootPath, "Templates"),
+            Path.Combine(AppContext.BaseDirectory, "Pdf", "Templates"),
+            Path.Combine(AppContext.BaseDirectory, "Templates"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "Pdf", "Templates"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Pdf", "Templates"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Pdf", "Templates")
+        };
+
+        foreach (var candidate in candidates)
+        {
+            var normalized = Path.GetFullPath(candidate);
+            if (Directory.Exists(normalized))
+                return normalized;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the PDF template directory.");
+    }
+
+    private string LoadTemplate(string fileName)
+    {
+        var path = Path.Combine(_templateDirectory, fileName);
+        if (!File.Exists(path))
+            throw new FileNotFoundException($"PDF template not found: {path}");
+
+        return File.ReadAllText(path, Encoding.UTF8);
+    }
+
+    private string LoadLogoBase64()
+    {
+        var logoPath = Path.Combine(_templateDirectory, "logo.png");
+        if (!File.Exists(logoPath))
+            return string.Empty;
+
+        var logoBytes = File.ReadAllBytes(logoPath);
+        return Convert.ToBase64String(logoBytes);
+    }
+
+    private string GetTemplate(ReportPdfTemplateType templateType)
+    {
+        if (!_templates.TryGetValue(templateType, out var template))
+            throw new ArgumentException($"Unknown PDF template type: {templateType}", nameof(templateType));
+
+        return template;
+    }
+
+    private static string Encode(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "N/A" : WebUtility.HtmlEncode(value);
+    }
+
+    private static string BuildVaccinationSummary(IEnumerable<VaccinationPdfDto> vaccinations)
+    {
+        if (vaccinations == null || !vaccinations.Any())
+            return "No reportado";
+
+        return string.Join("<br />", vaccinations.Select(v =>
+            $"{Encode(v.VaccineName)} - Lote: {Encode(v.LotNumber)} ({v.AdministrationDate:dd/MM/yyyy})"));
+    }
+
+    private static string BuildAdverseEventSummary(IEnumerable<AdverseEventPdfDto> events)
+    {
+        if (events == null || !events.Any())
+            return "No reportado";
+
+        return string.Join("<br /><br />", events.Select(a =>
+        {
+            var lines = new List<string>
+            {
+                $"<strong>{Encode(a.SymptomName)}</strong>",
+                Encode(a.Description),
+                $"Inicio: {Encode(a.StartDate.ToString("dd/MM/yyyy"))}" +
+                    (a.FinishDate.HasValue ? $" - Fin: {Encode(a.FinishDate.Value.ToString("dd/MM/yyyy"))}" : string.Empty),
+                $"Visitó médico: {(a.VisitedDoctor ? "Sí" : "No")} | Urgencias: {(a.WentToEmergencyRoom ? "Sí" : "No")} | Hospitalizado: {(a.WasHospitalized ? "Sí" : "No")}",
+                $"Discapacidad permanente: {(a.PermanentDisability ? "Sí" : "No")} | Anomalía: {(a.Anomaly ? "Sí" : "No")} | Sin complicaciones: {(a.NoComplications ? "Sí" : "No")}",
+                $"Estado actual: {Encode(a.CurrentStatus?.ToString())} | Intensidad: {Encode(a.Intensity?.ToString())} | Severidad: {Encode(a.SeverityLevel?.ToString())}"
+            };
+
+            if (a.ResultedInDeath)
+            {
+                lines.Add($"Fallecimiento: Sí{(a.DeathDate.HasValue ? $" - Fecha: {Encode(a.DeathDate.Value.ToString("dd/MM/yyyy"))}" : string.Empty)}");
+            }
+
+            return string.Join("<br/>", lines);
+        }));
+    }
+
+    private string ReplaceMarkers(string template, ReportPdfDto report)
+    {
+        var html = template
+            .Replace("{{REPORT-DATE}}", report.ReportDate?.ToString("dd/MM/yyyy") ?? "N/A")
+            .Replace("{{REPORT-CREATION-DATE}}", report.ReportDate?.ToString("dd/MM/yyyy") ?? "N/A")
+            .Replace("{{REQUESTED-AT}}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
+            .Replace("{{NOTIFICATION-NUMBER}}", Encode(report.NotificationNumber))
+            .Replace("{{STATUS}}", Encode(report.Status))
+            .Replace("{{SEVERITY}}", Encode(report.GlobalSeverityLevel))
+            .Replace("{{PATIENT-NAME}}", Encode(report.VaccinatedSubject?.FullName))
+            .Replace("{{AGE}}", Encode(report.VaccinatedSubject?.Age.ToString()))
+            .Replace("{{GENDER}}", Encode(report.VaccinatedSubject?.Gender.ToString()))
+            .Replace("{{PROVINCE}}", Encode(report.VaccinatedSubject?.ProvinceName))
+            .Replace("{{PATIENT-MUNICIPALITY}}", Encode(report.VaccinatedSubject?.MunicipalityName))
+            .Replace("{{PREGNANT}}", Encode(report.VaccinatedSubject?.IsPregnant == true ? "Sí" : "No"))
+            .Replace("{{REPORTER-NAME}}", Encode(report.Reporter?.Name))
+            .Replace("{{REPORTER-RELATIONSHIP}}", Encode(report.Reporter?.ReporterRelationship.ToString()))
+            .Replace("{{REPORTER-PROVINCE}}", Encode(report.Reporter?.ProvinceName))
+            .Replace("{{REPORTER-MUNICIPALITY}}", Encode(report.Reporter?.MunicipalityName))
+            .Replace("{{VACCINATIONS}}", BuildVaccinationSummary(report.Vaccinations))
+            .Replace("{{ADVERSE-EVENTS}}", BuildAdverseEventSummary(report.AdverseEvents))
+            .Replace("{{CAUSALITY}}", Encode(report.Causality))
+            .Replace("{{CLINICAL-SIGNIFICANCE}}", Encode(report.ClinicalSignificance))
+            .Replace("{{REVIEWED-AT}}", Encode(report.ReviewedAt?.ToString("dd/MM/yyyy")))
+            .Replace("{{LOGO-BASE64}}", _logoBase64);
+
+        if (!string.IsNullOrEmpty(_logoBase64))
+            html = html.Replace("src=\"logo.png\"", $"src=\"data:image/png;base64,{_logoBase64}\"");
+
+        return html;
+    }
+
+    private byte[] ConvertHtmlToPdf(string html, string notificationNumber)
+    {
+        var doc = new HtmlToPdfDocument()
+        {
+            GlobalSettings = {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings {
+                    Top = 15,
+                    Bottom = 25,  // Más espacio abajo para el footer
+                    Left = 15,
+                    Right = 15
+                },
+                DocumentTitle = $"Reporte FV - {notificationNumber}"
+            },
+            Objects = {
+                new ObjectSettings
+                {
+                    HtmlContent = html,
+                    WebSettings = {
+                        DefaultEncoding = "utf-8",
+                        EnableIntelligentShrinking = true,
+                        LoadImages = true,
+                        PrintMediaType = true
+                    },
+                    // Si necesitas header en cada página
+                    HeaderSettings = new HeaderSettings
+                    {
+                        FontSize = 8,
+                        Right = "Generado: [date] [time]",
+                        Line = false,
+                        Spacing = 3
+                    },
+                    FooterSettings = new FooterSettings
+                    {
+                        FontSize = 8,
+                        Left = "CONFIDENCIAL - Instituto Finlay de Vacunas",
+                        Right = "Página [page] de [toPage]",
+                        Line = true,
+                        Spacing = 5
+                    }
+                }
+            }
+        };
+
+        return _converter.Convert(doc);
+    }
+
+    private static ReportPdfDto MapAdminReportToPdfDto(ReportDetailAdminDto report)
+    {
+        return new ReportPdfDto
+        {
+            ReportDate = report.ReportDate,
+            NotificationNumber = report.NotificationNumber,
+            Status = report.Status.ToString(),
+            GlobalSeverityLevel = report.GlobalSeverityLevel.ToString(),
+            VaccinatedSubject = new VaccinatedSubjectPdfDto
+            {
+                FullName = string.Empty,
+                Age = report.VaccinatedSubject.Age,
+                Gender = report.VaccinatedSubject.Gender,
+                ProvinceName = report.VaccinatedSubject.ProvinceName,
+                MunicipalityName = report.VaccinatedSubject.MunicipalityName,
+                IsPregnant = report.VaccinatedSubject.IsPregnant ?? false
+            },
+            Vaccinations = report.Vaccinations.Select(v => new VaccinationPdfDto
+            {
+                VaccineName = v.VaccineName,
+                LotNumber = v.LotNumber,
+                AdministrationDate = v.AdministrationDate
+            }).ToList(),
+            AdverseEvents = report.AdverseEvents.Select(a => new AdverseEventPdfDto
+            {
+                StartDate = a.StartDate,
+                FinishDate = null,
+                Description = a.Description,
+                VisitedDoctor = a.VisitedDoctor,
+                WentToEmergencyRoom = a.WentToEmergencyRoom,
+                PermanentDisability = a.PermanentDisability,
+                WasHospitalized = false,
+                Anomaly = false,
+                NoComplications = false,
+                ResultedInDeath = a.ResultedInDeath,
+                DeathDate = a.DeathDate,
+                CurrentStatus = a.CurrentStatus,
+                Intensity = a.Intensity,
+                SeverityLevel = a.SeverityLevel,
+                SymptomName = a.Symptom
+            }).ToList(),
+            Reporter = new ReporterPdfDto
+            {
+                Name = report.Reporter.FullName,
+                ReporterRelationship = report.Reporter.reporterRelationship,
+                ProvinceName = string.Empty,
+                MunicipalityName = string.Empty
+            },
+            Causality = report.MedicalReview != null ? report.MedicalReview.Causality.ToString() : null,
+            ClinicalSignificance = report.MedicalReview != null ? report.MedicalReview.ClinicalSignificance.ToString() : null,
+            ReviewedAt = report.MedicalReview?.ReviewedAt
+        };
+    }
 }

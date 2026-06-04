@@ -1,4 +1,5 @@
 using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.Enum;
 using Finlay.PharmaVigilance.Application.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,6 +80,48 @@ public class ReportController : ControllerBase
         });
     }
 
+
+
+    [HttpGet("admin/pdf")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EnableRateLimiting("GeneralQuery")]
+    public async Task<IActionResult> GetReportPdf([FromQuery] ReportPdfQueryDto request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.NotificationNumber))
+            throw new ArgumentNullException(nameof(request), "Notification number is required.");
+
+        var pdf = await _reportQueryService.GetReportPdfByNotificationNumber(request.NotificationNumber, request.TemplateType);
+
+        return File(pdf, "application/pdf", $"report_{request.NotificationNumber}.pdf");
+    }
+
+    [HttpGet("{notificationNumber}/pdf")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [EnableRateLimiting("GeneralQuery")]
+    public async Task<IActionResult> DownloadReportPdf(
+        [FromRoute] string notificationNumber,
+        [FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(notificationNumber))
+            throw new ArgumentNullException(nameof(notificationNumber), "Notification number is required.");
+
+        if (string.IsNullOrWhiteSpace(token))
+            throw new ArgumentNullException(nameof(token), "Captcha token is required.");
+
+        // var isValid = await _captchaService.VerifyToken(token);
+        // if (!isValid)
+        //     return BadRequest(new { success = false });
+
+        var pdf = await _reportQueryService.GetReportPdfByNotificationNumber(notificationNumber, ReportPdfTemplateType.User);
+
+        return File(pdf, "application/pdf", $"report_{notificationNumber}.pdf");
+    }
 
 
     [HttpGet("get-report-assigment")]

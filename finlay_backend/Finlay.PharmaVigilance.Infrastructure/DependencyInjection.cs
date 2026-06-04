@@ -17,15 +17,18 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using Finlay.PharmaVigilance.Application.Repository;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Application.IServices.Pdf;
 using Finlay.PharmaVigilance.Infrastructure.Email;
-using Finlay.PharmaVigilance.Infrastructure.Consumers;
 using Finlay.PharmaVigilance.Infrastructure.Pdf;
-using Finlay.PharmaVigilance.Application.Services;
+using Finlay.PharmaVigilance.Infrastructure.Consumers;
 using MassTransit;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
-using Resend;
 using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
+using Finlay.PharmaVigilance.Application.Common.EventBus;
+using Finlay.PharmaVigilance.Infrastructure.EventBus;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -43,8 +46,21 @@ public static class DependencyInjection
 
         // Database Configuration
         var connectionString = configuration.GetConnectionString("AppDbConnectionString");
-        var db = services.AddDbContext<FinlayDbContext>(options => options.UseMySql(
-                                                        connectionString, ServerVersion.AutoDetect(connectionString)));
+
+        services.AddScoped<AuditInterceptor>();
+
+        // var db = services.AddDbContext<FinlayDbContext>(options => options.UseMySql(
+        //                                                 connectionString, ServerVersion.AutoDetect(connectionString)));
+
+        services.AddDbContext<FinlayDbContext>((serviceProvider, options) =>
+        {
+            options.UseMySql(
+                connectionString,
+                ServerVersion.AutoDetect(connectionString));
+
+            options.AddInterceptors(
+                serviceProvider.GetRequiredService<AuditInterceptor>());
+        });
 
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
@@ -90,7 +106,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-
+        services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
+        services.AddScoped<IPdfService, PdfService>();
 
         //services.AddSingleton<IEmailService, SmtpEmailService>();
         //services.AddSingleton<IEmailService, ResendEmailService>();
@@ -114,13 +131,7 @@ public static class DependencyInjection
 
 
         services.AddHostedService<AssignmentExpirationBackgroundService>();
-
-        //services.AddHostedService<MedicalReviewerConsumer>();
-        // services.AddHostedService<EmailToReporterConsumer>();
-        // services.AddHostedService<EmailToSectionResponsibleConsumer>();
-        // services.AddScoped<IEventBus, RabbitMqEventBus>();
-
-        services.AddScoped<IPdfService, PdfService>();
+        services.AddScoped<IEventBus, MassTransitEventBus>();
 
         services.AddScoped<IIdentityManager, IdentityManager>();
         services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();
@@ -140,7 +151,6 @@ public static class DependencyInjection
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();
-
 
 
         return services;
