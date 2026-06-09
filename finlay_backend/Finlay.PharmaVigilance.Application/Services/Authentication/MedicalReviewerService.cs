@@ -30,7 +30,6 @@ public class MedicalReviewerService : IMedicalReviewerService
     private readonly ILogger<MedicalReviewerService> _logger;
     private readonly IEventBus _eventBus;
 
-
     /// <summary>
     /// Initializes a new instance of the MedicalReviewerService class.
     /// </summary>
@@ -111,12 +110,12 @@ public class MedicalReviewerService : IMedicalReviewerService
             await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);
             await _unitOfWork.CompleteAsync();
 
-            await _eventBus.PublishAsync(new MedicalReviewerRegisteredEvent
-            {
-                Email = createdUser.Email!,
-                FullName = createdUser.UserName!,
-                Token = await _identityManager.GeneratePasswordResetToken(user)
-            });
+            // await _eventBus.PublishAsync(new MedicalReviewerRegisteredEvent
+            // {
+            //     Email = createdUser.Email!,
+            //     FullName = createdUser.UserName!,
+            //     Token = await _identityManager.GeneratePasswordResetToken(user)
+            // });
 
             return "Medical Reviewer successfully registered";
         }

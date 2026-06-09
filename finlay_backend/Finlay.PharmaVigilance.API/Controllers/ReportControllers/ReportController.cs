@@ -31,7 +31,9 @@ public class ReportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [EnableRateLimiting("PharmaCritical")]
-    public async Task<IActionResult> CreatePublicReport([FromBody] PublicAefiReportDto reportDto)
+    public async Task<IActionResult> CreatePublicReport(
+        [FromBody] PublicAefiReportDto reportDto,
+        [FromHeader(Name = "Idempotency-Key")] string idempotencyKey)
     {
         if (reportDto == null)
             throw new ArgumentNullException(nameof(reportDto), "Report data is required.");
@@ -42,7 +44,7 @@ public class ReportController : ControllerBase
         //     return BadRequest(new { success = false });
 
 
-        var result = await _reportCommandService.CreatePublicReportAsync(reportDto);
+        var result = await _reportCommandService.CreatePublicReportAsync(reportDto, idempotencyKey);
 
         return StatusCode(StatusCodes.Status201Created, new
         {
@@ -65,10 +67,10 @@ public class ReportController : ControllerBase
             throw new ArgumentNullException(nameof(request), "Request Dto is required.");
 
 
-        var isValid = await _captchaService.VerifyToken(request.Token);
+        // var isValid = await _captchaService.VerifyToken(request.Token);
 
-        if (!isValid)
-            return BadRequest(new { success = false });
+        // if (!isValid)
+        //     return BadRequest(new { success = false });
 
 
         var result = await _reportQueryService.GetReportByNotificationNumber(request.NotificationNumber);
@@ -174,48 +176,6 @@ public class ReportController : ControllerBase
 
         return Ok(result);
     }
-
-
-
-
-
-
-    //     [HttpGet("{notificationNumber}/pdf")]
-    //     [ProducesResponseType(StatusCodes.Status200OK)]
-    //     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    //     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    //     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    //     public async Task<IActionResult> GetPdf(
-    //        string notificationNumber
-    //    )
-    //     {
-    //         if (notificationNumber == null)
-    //             throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
-
-    //         var pdf = await _reportQueryService.GetReportPdfAsync(notificationNumber);
-
-    //         return File(pdf, "application/pdf", $"report_{notificationNumber}.pdf");
-
-    //     }
-
-
-    //     [HttpGet("{notificationNumber}/pdf")]
-    //     [ProducesResponseType(StatusCodes.Status200OK)]
-    //     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    //     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    //     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    //     public async Task<IActionResult> GetReportDetailsPdf(
-    //        string notificationNumber
-    //    )
-    //     {
-    //         if (notificationNumber == null)
-    //             throw new ArgumentNullException(nameof(notificationNumber), "notificationNumber is required.");
-
-    //         var pdf = await _reportQueryService.GetReportDetailsPdfAsync(notificationNumber);
-
-    //         return File(pdf, "application/pdf", $"report_{notificationNumber}.pdf");
-
-    //     }
 
 
 

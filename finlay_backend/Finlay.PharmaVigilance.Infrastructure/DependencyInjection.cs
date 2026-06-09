@@ -49,18 +49,16 @@ public static class DependencyInjection
 
         services.AddScoped<AuditInterceptor>();
 
-        // var db = services.AddDbContext<FinlayDbContext>(options => options.UseMySql(
-        //                                                 connectionString, ServerVersion.AutoDetect(connectionString)));
-
         services.AddDbContext<FinlayDbContext>((serviceProvider, options) =>
-        {
-            options.UseMySql(
-                connectionString,
-                ServerVersion.AutoDetect(connectionString));
+                {
+                    options.UseMySql(
+                        connectionString,
+                        ServerVersion.AutoDetect(connectionString));
 
-            options.AddInterceptors(
-                serviceProvider.GetRequiredService<AuditInterceptor>());
-        });
+                    options.AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditInterceptor>());
+                });
+
 
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
@@ -148,6 +146,7 @@ public static class DependencyInjection
         services.AddScoped<ILotRepository, LotRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IMedicalAssignmentRepository, MedicalAssignmentRepository>();
+        services.AddScoped<IReportDuplicateRepository, ReportDuplicateRepository>();
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();

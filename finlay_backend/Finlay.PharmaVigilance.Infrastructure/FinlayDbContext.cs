@@ -391,6 +391,13 @@ public class FinlayDbContext : IdentityDbContext<User, Role, Guid>
                   .IsRequired()
                   .HasMaxLength(100);
 
+            entity.Property(e => e.IdempotencyKey)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.HasIndex(e => e.IdempotencyKey)
+            .IsUnique();
+
             entity.HasIndex(e => e.NotificationNumber)
             .IsUnique();
 
@@ -702,6 +709,9 @@ public class FinlayDbContext : IdentityDbContext<User, Role, Guid>
             entity.Property(a => a.RejectionReason)
                 .IsRequired(false)
                 .HasMaxLength(300);
+
+            entity.Property(a => a.RowVersion)
+                .IsRowVersion();
 
 
             entity.HasOne(a => a.SectionResponsible)
