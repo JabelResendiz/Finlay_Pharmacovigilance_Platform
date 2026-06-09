@@ -17,7 +17,8 @@ Content-Type:  application/json
 
 {
   "email": "resp2@example.com",
-  "password": "Password_123!"
+  "password": "Password_123!",
+  "token" : "kdjfksjdl"
 }
 
 ###

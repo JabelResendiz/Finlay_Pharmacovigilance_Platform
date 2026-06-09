@@ -29,7 +29,7 @@ public static class SeedCatalog
 
         await LoginAsync();
         await SeedSymptomsAsync();
-        //await SeedVaccinesAsync();
+        await SeedVaccinesAsync();
 
         Console.WriteLine("✅ Seed completed!");
     }
@@ -44,7 +44,8 @@ public static class SeedCatalog
         var login = new
         {
             Email = "admin_email_1@example.com",
-            Password = "Password_123!"
+            Password = "Password_123!",
+            Token = "kasjdkajsklj"
         };
 
         var response = await client.PostAsJsonAsync("/api/Authentication/login", login);
@@ -108,51 +109,45 @@ public static class SeedCatalog
         {
         new
         {
-            name = "Soberana 02",
+            name = "Soberana 0212",
             type = "mRNA",
-            code = "CUBA-001",
             isActive = true,
             description = "Cuban recombinant protein vaccine",
             approvalDate = "2020-04-03T09:18:28.095Z",
             targetPathology = "asdasda",
-            manufacturer = new
+            manufacturerDto = new
             {
                 name = "IFV",
-                id= "",
                 isNew = true,
                 country = "Cuba"
             }
         },
         new
         {
-            name = "Abdala",
+            name = "Abdala121",
             type = "mRNA",
-            code = "CUBA-002",
             isActive = true,
             description = "Another Cuban COVID-19 vaccine",
             approvalDate = "2020-07-01T09:18:28.095Z",
             targetPathology = "asdasda",
-            manufacturer = new
+            manufacturerDto = new
             {
                 name = "CIGB",
-                id= "",
                 isNew = true,
                 country = "Cuba"
             }
         },
         new
         {
-            name = "Pfizer-BioNTech",
+            name = "Pfizer-BioNTech1212",
             type = "mRNA",
-            code = "PFZ-001",
             isActive = true,
             description = "mRNA vaccine for COVID-19",
             approvalDate = "2020-12-01T09:18:28.095Z",
             targetPathology = "asdasda",
-            manufacturer = new
+            manufacturerDto = new
             {
                 name = "Pfizer",
-                id= "",
                 isNew = true,
                 country = "USA"
             }
@@ -190,14 +185,13 @@ public static class SeedCatalog
         {
         new
         {
-            name = "VA-MENGOC-BC",
+            name = "VA-MENGOC-BC232",
             type = "mRNA",
-            code = "FIN-002",
             isActive = true,
             description = "Finlay Institute vaccine A",
             approvalDate = "2021-01-01T00:00:00.000Z",
             targetPathology = "asdasda",
-            manufacturer = new
+            manufacturerDto = new
             {
                 name = ifv.Name,
                 id = ifv.Id,
@@ -207,14 +201,13 @@ public static class SeedCatalog
         },
         new
         {
-            name = "Finlay Vaccine B",
+            name = "Finlay Vaccine 121B",
             type = "mRNA",
-            code = "FIN-002",
             isActive = true,
             description = "Finlay Institute vaccine B",
             approvalDate = "2021-06-01T00:00:00.000Z",
             targetPathology = "asdasda",
-            manufacturer = new
+            manufacturerDto = new
             {
                 name = ifv.Name,
                 id = ifv.Id,

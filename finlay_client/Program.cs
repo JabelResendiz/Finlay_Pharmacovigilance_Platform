@@ -13,6 +13,6 @@ using Manual;
 
 
 
-// await SeedReports.Run();
+await SeedReports.Run();
 
-// await SeedAssignment.Run();
+//await SeedAssignment.Run();
