@@ -30,6 +30,16 @@ public class AdminDashboardService : IAdminDashboardService
 
         var reportStatusDto = await _report.GetReportStatus();
 
+        var provinceStatusDto = await _report.GetReportStatusByProvinces();
+
+        var causality = await _report.GetCausalityDistributionAsync();
+
+        var significance = await _report.GetSignificanceDistributionAsync();
+
+        var severity = await _report.GetSeverityLevelDistributionAsync();
+
+        var monthly = await _report.GetMonthlyReportTrendAsync();
+
         return new AdminReportDashboardDto
         {
             TotalReports = reportStatusDto?.TotalReports ?? 0,
@@ -39,11 +49,11 @@ public class AdminDashboardService : IAdminDashboardService
             Rejected = reportStatusDto?.RejectedReports ?? 0,
             Reopened = reportStatusDto?.ReopenedReports ?? 0,
             Closed = reportStatusDto?.ClosedReports ?? 0,
-            Provinces = { },
-            SeverityDistribution = { },
-            CausalityDistribution = { },
-            SignificanceDistribution = { },
-            MonthlyTrends = { }
+            Provinces = provinceStatusDto,
+            SeverityDistribution = severity,
+            CausalityDistribution = causality,
+            SignificanceDistribution = significance,
+            MonthlyTrends = monthly
         };
 
     }

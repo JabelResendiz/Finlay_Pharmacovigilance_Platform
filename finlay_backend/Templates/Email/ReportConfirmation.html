@@ -1,0 +1,45 @@
+<div
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background-color:#f4f6f7; padding:18px; color:#1f2933; font-size:15px;">
+    <div
+        style="max-width:700px; margin:0 auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(16,24,40,0.06)">
+        <div style="background:#01080b; padding:18px; text-align:center">
+            <img src="cid:logo.png" alt="IFV" style="height:44px; vertical-align:middle">
+        </div>
+
+        <div style="padding:22px 28px;">
+            <h2 style="margin:0 0 10px; color:#0b2f3d; font-size:20px;">Confirmación de recepción de reporte</h2>
+
+            <p style="margin:0 0 12px; line-height:1.5">Estimado/a <strong>{{reporterName}}</strong>,</p>
+
+            <p style="margin:0 0 12px; line-height:1.5">Hemos recibido correctamente tu reporte de Evento Adverso
+                (ESAVI). A continuación, encontrarás los datos principales:</p>
+
+            <ul style="margin:0 0 14px; padding-left:18px; color:#2e3b3f">
+                <li><strong>ID de reporte:</strong> {{reportId}}</li>
+                <li><strong>Fecha y hora:</strong> {{reportDate}}</li>
+                <li><strong>Municipio:</strong> {{municipio}}</li>
+            </ul>
+
+            <div style="background:#f7fafb; padding:12px; border-radius:6px; margin-bottom:14px; color:#253238">
+                <strong>Resumen del reporte:</strong>
+                <p style="margin:8px 0 0; line-height:1.4">{{reportSummary}}</p>
+            </div>
+
+            <p style="margin:0 0 16px;">Puedes ver el detalle del reporte y su estado en la plataforma:</p>
+
+            <p style="text-align:center; margin:8px 0 18px">
+                <a href="{{reportUrl}}" target="_blank"
+                    style="display:inline-block; background:#0b557a; color:#fff; text-decoration:none; padding:10px 18px; border-radius:6px; font-weight:600">Ver
+                    reporte</a>
+            </p>
+
+            <p style="margin:0; color:#526168; font-size:13px">Gracias por tu colaboración en la seguridad de los
+                medicamentos y vacunas.</p>
+        </div>
+
+        <div style="background:#fafbfc; padding:12px 20px; font-size:12px; color:#7b8790; text-align:center">
+            Si necesitas ayuda contacta a <a href="mailto:pharmacovigilance@ifv.example"
+                style="color:#0b557a; text-decoration:none">pharmacovigilance@ifv.example</a>
+        </div>
+    </div>
+</div>

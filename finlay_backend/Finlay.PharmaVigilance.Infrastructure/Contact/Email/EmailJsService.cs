@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Domain.Enum;
+using Finlay.PharmaVigilance.Domain.Events;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 
@@ -27,7 +28,7 @@ public class EmailJsService : IEmailService
     public async Task SendEmailAsync<T>(
         string toEmail,
         EmailTemplateType templateType,
-        T templateData)
+        T templateData) where T : BasicEvent
     {
         var url = "https://api.emailjs.com/api/v1.0/email/send";
 

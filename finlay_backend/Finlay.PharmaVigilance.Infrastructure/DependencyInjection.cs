@@ -23,7 +23,6 @@ using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Pdf;
 using Finlay.PharmaVigilance.Infrastructure.Email;
 using Finlay.PharmaVigilance.Infrastructure.Pdf;
-using Finlay.PharmaVigilance.Infrastructure.Consumers;
 using MassTransit;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
@@ -95,6 +94,10 @@ public static class DependencyInjection
             configuration.GetSection("Email:EmailJS")
         );
 
+        services.Configure<WhatsAppSettings>(
+            configuration.GetSection("WhatsApp")
+        );
+
 
         //services.AddScoped<ICaptchaService, CaptchaService>();
         services.AddScoped<ICaptchaService, FriendlyCaptchaService>();
@@ -102,7 +105,6 @@ public static class DependencyInjection
 
         // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
         services.AddScoped<IPdfService, PdfService>();
@@ -110,14 +112,15 @@ public static class DependencyInjection
         //services.AddSingleton<IEmailService, SmtpEmailService>();
         //services.AddSingleton<IEmailService, ResendEmailService>();
         services.AddHttpClient<IEmailService, EmailJsService>();
+        services.AddHttpClient<IMessageService, WhatsAppService>();
 
 
         var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<MedicalReviewerConsumer>();
-            x.AddConsumer<AssignmentExpiredConsumer>();
-            x.AddConsumer<ReportConfirmationConsumer>();
+            // x.AddConsumer<MedicalReviewerConsumer>();
+            //x.AddConsumer<AssignmentExpiredConsumer>();
+            // x.AddConsumer<ReportConfirmationConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
