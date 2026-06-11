@@ -28,6 +28,7 @@ using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
 using Finlay.PharmaVigilance.Application.Common.EventBus;
 using Finlay.PharmaVigilance.Infrastructure.EventBus;
+using Finlay.PharmaVigilance.Infrastructure.Consumers;
 
 
 namespace Finlay.PharmaVigilance.Infrastructure;
@@ -62,11 +63,6 @@ public static class DependencyInjection
         // Add HttpContextAccessor for accessing the current HTTP context
         services.AddHttpContextAccessor();
 
-        // services.Configure<RabbitMqSettings>(
-        //     configuration.GetSection("RabbitMQ")
-        // );
-
-
         //Identity configuration
         services.AddIdentity<User, Role>(options =>
                 {
@@ -85,10 +81,6 @@ public static class DependencyInjection
 
         // Authentication and Authorization
         services.AddAuth(configuration);
-
-        // services.Configure<ResendSettings>(
-        //     configuration.GetSection("Email:Resend")
-        // );
 
         services.Configure<EmailJsSettings>(
             configuration.GetSection("Email:EmailJS")
@@ -109,8 +101,7 @@ public static class DependencyInjection
         services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
         services.AddScoped<IPdfService, PdfService>();
 
-        //services.AddSingleton<IEmailService, SmtpEmailService>();
-        //services.AddSingleton<IEmailService, ResendEmailService>();
+        // Message
         services.AddHttpClient<IEmailService, EmailJsService>();
         services.AddHttpClient<IMessageService, WhatsAppService>();
 
@@ -120,7 +111,8 @@ public static class DependencyInjection
         {
             // x.AddConsumer<MedicalReviewerConsumer>();
             //x.AddConsumer<AssignmentExpiredConsumer>();
-            // x.AddConsumer<ReportConfirmationConsumer>();
+            //   x.AddConsumer<ReportConfirmationConsumer>();
+            x.AddConsumer<SectionReportAlertConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {

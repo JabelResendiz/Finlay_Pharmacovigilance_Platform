@@ -1,3 +1,4 @@
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Domain.Enum;
 using Finlay.PharmaVigilance.Domain.Events;
 
@@ -8,5 +9,5 @@ public interface IEmailService
     Task SendEmailAsync<T>(
         string toEmail,
         EmailTemplateType template,
-        T templateData) where T : BasicEvent;
+        T templateData) where T : IBasicTemplate;
 }

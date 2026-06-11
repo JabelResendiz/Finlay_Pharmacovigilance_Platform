@@ -62,6 +62,8 @@ public static class SeedReports
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+        client.DefaultRequestHeaders.Add("Idempotency-Key", idempotencyKey);
 
 
         Console.WriteLine("✅ Login success");
@@ -175,8 +177,6 @@ public static class SeedReports
 
         for (int i = 0; i < reports.Length; i++)
         {
-            var idempotencyKey = Guid.NewGuid().ToString();
-            client.DefaultRequestHeaders.Add("Idempotency-Key", idempotencyKey);
 
             var response = await client.PostAsJsonAsync("/api/Report/createPublic", reports[i]);
             Console.WriteLine($"➡ Report {i + 1}: {response.StatusCode} : {await response.Content.ReadAsStringAsync()}");
@@ -232,7 +232,7 @@ public static class SeedReports
 
 
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1; i++)
         {
             var reportDate = DateTime.Parse("2026-04-11T21:38:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
             var vaccinationDate = DateTime.Parse("2026-04-09T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);

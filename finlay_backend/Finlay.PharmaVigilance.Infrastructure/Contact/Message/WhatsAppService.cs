@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
+using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Domain.Enum;
-using Finlay.PharmaVigilance.Domain.Events;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,32 +11,30 @@ namespace Finlay.PharmaVigilance.Infrastructure.Email;
 
 public class WhatsAppService : IMessageService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly WhatsAppSettings _settings;
+    // private readonly IHttpClientFactory _httpClientFactory;
+
     private readonly HttpClient _client;
+    private readonly WhatsAppSettings _settings;
     private readonly ILogger<WhatsAppService> _logger;
 
 
     public WhatsAppService(
-        IHttpClientFactory httpClientFactory,
+        HttpClient client,
         IOptions<WhatsAppSettings> options,
         ILogger<WhatsAppService> logger)
     {
-        _httpClientFactory = httpClientFactory;
+        _client = client;
         _settings = options.Value;
         _logger = logger;
 
-        _client = _httpClientFactory.CreateClient();
-
         _client.DefaultRequestHeaders.Add("X-API-Key", _settings.ApiKey);
         _client.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds);
-
     }
 
     public async Task SendEmailAsync<T>(
         string phoneNumber,
         EmailTemplateType templateType,
-        T templateData) where T : BasicEvent
+        T templateData) where T : IBasicTemplate
     {
         try
         {
@@ -52,6 +50,8 @@ public class WhatsAppService : IMessageService
                 return;
             }
 
+            Console.WriteLine($"{_settings.ApiBaseUrl} ----> {_settings.SessionId}");
+
 
             string messageText;
             try
@@ -64,11 +64,17 @@ public class WhatsAppService : IMessageService
                 return;
             }
 
+
+            Console.WriteLine(messageText);
+
             // Normalizar número de teléfono - remover caracteres especiales
             var cleanPhoneNumber = System.Text.RegularExpressions.Regex.Replace(phoneNumber, @"[^\d]", "");
 
             // Formato correcto para OpenWA
             var chatId = $"{cleanPhoneNumber}@c.us";
+
+            Console.WriteLine(chatId);
+
 
             var requestBody = new
             {
@@ -83,10 +89,14 @@ public class WhatsAppService : IMessageService
 
             var response = await _client.PostAsync(endpoint, content);
 
-            if (!response.IsSuccessStatusCode)
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                _logger.LogInformation($"✅ Mensaje WhatsApp enviado exitosamente a {phoneNumber} en sesión {_settings.SessionId}. Response: {responseContent}");
+                _logger.LogInformation(
+                    "WhatsApp enviado. Status: {StatusCode}. Response: {Response}",
+                    response.StatusCode,
+                    responseContent);
             }
             else
             {

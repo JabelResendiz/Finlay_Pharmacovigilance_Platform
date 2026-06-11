@@ -1,23 +1,23 @@
-using Finlay.PharmaVigilance.Domain.Events;
+using Finlay.PharmaVigilance.Application.DTO;
 
 namespace Finlay.PharmaVigilance.Infrastructure.Email;
 
 public static class WhatsAppMessageFactory
 {
-    public static string Build(BasicEvent eventData)
+    public static string Build(IBasicTemplate basicTemplate)
     {
-        return eventData switch
+        return basicTemplate switch
         {
-            ReportConfirmationEvent e => BuildReportConfirmation(e),
-            AssignmentExpiredEvent e => BuildAssignmentExpired(e),
-            SectionReportAlertEvent e => BuildSectionAlert(e),
-            MedicalReviewerAssignmentEvent e => BuildMedicalReviewerAssignment(e),
+            ReportConfirmationTemplate e => BuildReportConfirmation(e),
+            AssignmentExpiredTemplate e => BuildAssignmentExpired(e),
+            SectionReportAlertTemplate e => BuildSectionAlert(e),
+            NewAssignmentTemplate e => BuildMedicalReviewerAssignment(e),
             _ => throw new NotSupportedException(
-                $"Event type '{eventData.GetType().Name}' is not supported for WhatsApp messages")
+                $"Event type '{basicTemplate.GetType().Name}' is not supported for WhatsApp messages")
         };
     }
 
-    private static string BuildReportConfirmation(ReportConfirmationEvent e)
+    private static string BuildReportConfirmation(ReportConfirmationTemplate e)
     {
         // return $"✅ *Reporte Creado Exitosamente*\n\n" +
         //        $"Número de notificación: {e.ReportNumber}\n" +
@@ -27,7 +27,7 @@ public static class WhatsAppMessageFactory
         return $"✅ *Reporte Creado Exitosamente*\n\n";
     }
 
-    private static string BuildAssignmentExpired(AssignmentExpiredEvent e)
+    private static string BuildAssignmentExpired(AssignmentExpiredTemplate e)
     {
         // return $"⚠️ *Asignación Vencida*\n\n" +
         //        $"ID Asignación: {e.AssignmentId}\n" +
@@ -38,7 +38,7 @@ public static class WhatsAppMessageFactory
         return $"⚠️ *Asignación Vencida*\n\n";
     }
 
-    private static string BuildSectionAlert(SectionReportAlertEvent e)
+    private static string BuildSectionAlert(SectionReportAlertTemplate e)
     {
         // return $"📊 *Alerta de Sección*\n\n" +
         //        $"Sección: {e.SectionName}\n" +
@@ -49,7 +49,7 @@ public static class WhatsAppMessageFactory
         return $"📊 *Alerta de Reporte*\n\n";
     }
 
-    private static string BuildMedicalReviewerAssignment(MedicalReviewerAssignmentEvent e)
+    private static string BuildMedicalReviewerAssignment(NewAssignmentTemplate e)
     {
         // return $"👨‍⚕️ *Nueva Asignación Médica*\n\n" +
         //        $"Reporte: {e.ReportId}\n" +

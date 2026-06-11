@@ -1,7 +1,7 @@
 namespace Finlay.PharmaVigilance.Domain.Events;
 
 
-public class SectionReportAlertEvent : BasicEvent
+public class RegisterUserEvent : BasicEvent
 {
     public string Email { get; set; } = null!;
     public string FullName { get; set; } = null!;
