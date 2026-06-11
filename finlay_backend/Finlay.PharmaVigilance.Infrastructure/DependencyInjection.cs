@@ -22,7 +22,6 @@ using DinkToPdf.Contracts;
 using Finlay.PharmaVigilance.Application.IServices;
 using Finlay.PharmaVigilance.Application.IServices.Pdf;
 using Finlay.PharmaVigilance.Infrastructure.Email;
-using Finlay.PharmaVigilance.Infrastructure.Pdf;
 using MassTransit;
 using Finlay.PharmaVigilance.Infrastructure.Settings;
 using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
@@ -98,8 +97,8 @@ public static class DependencyInjection
         // Add custom repositories and services       
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
-        services.AddScoped<IPdfService, PdfService>();
+        // services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
+        // services.AddScoped<IPdfService, PdfService>();
 
         // Message
         services.AddHttpClient<IEmailService, EmailJsService>();
