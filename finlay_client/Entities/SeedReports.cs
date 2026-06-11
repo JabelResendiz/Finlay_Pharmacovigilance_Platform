@@ -188,6 +188,13 @@ public static class SeedReports
                 Console.WriteLine($"   Error: {errorContent}");
             }
 
+            var content = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"   Response: {content}");
+
+            // using var doc = JsonDocument.Parse(content);
+            // var notificationNumber = doc.RootElement.GetProperty("notificationNumber").GetString();
+
             // Small delay to avoid overwhelming the server
             await Task.Delay(100);
         }
