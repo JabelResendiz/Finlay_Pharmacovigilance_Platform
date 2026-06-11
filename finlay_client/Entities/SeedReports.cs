@@ -19,6 +19,7 @@ public static class SeedReports
     private static Guid[]? symptomIds;
     private static Guid[]? vaccinationCenterIds;
     private static Guid[]? lotIds;
+    private static readonly List<string> notifications = new();
 
     public static async Task Run()
     {
@@ -27,6 +28,14 @@ public static class SeedReports
         await LoginAsync();
         await LoadCatalogDataAsync();
         await SeedPublicReportsAsync();
+
+        if (!File.Exists("reports.csv"))
+        {
+            File.WriteAllText(
+                "reports.csv",
+                "notificationNumber" + Environment.NewLine
+            );
+        }
 
         Console.WriteLine("✅ Reports seed completed!");
     }
@@ -179,8 +188,6 @@ public static class SeedReports
         {
 
             var response = await client.PostAsJsonAsync("/api/Report/createPublic", reports[i]);
-            Console.WriteLine($"➡ Report {i + 1}: {response.StatusCode} : {await response.Content.ReadAsStringAsync()}");
-
 
             if (!response.IsSuccessStatusCode)
             {
@@ -192,8 +199,21 @@ public static class SeedReports
 
             Console.WriteLine($"   Response: {content}");
 
-            // using var doc = JsonDocument.Parse(content);
-            // var notificationNumber = doc.RootElement.GetProperty("notificationNumber").GetString();
+            using var doc = JsonDocument.Parse(content);
+
+            var notificationNumber =
+                doc.RootElement
+                   .GetProperty("data")
+                   .GetProperty("notificationNumber")
+                   .GetString();
+
+            if (!string.IsNullOrEmpty(notificationNumber))
+            {
+                File.AppendAllText(
+                        "reports.csv",
+                        notificationNumber + Environment.NewLine
+                    );
+            }
 
             // Small delay to avoid overwhelming the server
             await Task.Delay(100);

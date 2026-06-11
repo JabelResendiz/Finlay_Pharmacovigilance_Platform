@@ -1,18 +1,3 @@
-// import http from 'k6/http';
-
-// export const options = {
-//     vus: 1,
-//     duration: '20s'
-// };
-
-// export default function () {
-//     let res = http.get('http://localhost:5137/api/Report/get-report?notificationNumber=AEFI-20260610-L70CDYMN&token=jsdfhjkshfkj');
-
-// }
-
-
-
-
 import http from 'k6/http';
 
 export const options = {

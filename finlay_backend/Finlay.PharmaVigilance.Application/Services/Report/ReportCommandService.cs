@@ -193,12 +193,12 @@ public class ReportCommandService : IReportCommandService
             // send email
             _logger.LogDebug("Preparing to send notification emails for report");
 
-            await _eventBus.PublishAsync(new SectionReportAlertEvent
-            {
-                ReportNumber = report.NotificationNumber,
-                EmailSectionResponsible = sectionResponsible.User.Email!,
-                PhoneNumber = sectionResponsible.User.PhoneNumber!
-            });
+            // await _eventBus.PublishAsync(new SectionReportAlertEvent
+            // {
+            //     ReportNumber = report.NotificationNumber,
+            //     EmailSectionResponsible = sectionResponsible.User.Email!,
+            //     PhoneNumber = sectionResponsible.User.PhoneNumber!
+            // });
 
 
             return new CreateReportResponseDto
