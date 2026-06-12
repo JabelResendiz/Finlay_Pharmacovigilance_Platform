@@ -33,4 +33,8 @@ public interface IReportRepository : IGenericRepository<AefiReport>
     Task<IEnumerable<SeverityLevelDistributionDto>> GetSeverityLevelDistributionAsync();
 
     Task<IEnumerable<MonthlyReportTrendDto>> GetMonthlyReportTrendAsync();
+
+    Task<PerformanceDto> GetPerformanceMetrics();
+
+    Task<IEnumerable<ProvinceMedicalActivityDto>> GetProvinceMedicalActivityAsync();
 }

@@ -4,3 +4,4 @@ bin/
 obj/
 Entities/
 Program.cs
+reports.csv

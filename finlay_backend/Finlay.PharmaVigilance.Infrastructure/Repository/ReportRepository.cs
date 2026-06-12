@@ -368,4 +368,127 @@ public class ReportRepository : GenericRepository<AefiReport>, IReportRepository
             .ToListAsync();
     }
 
+
+    public async Task<PerformanceDto> GetPerformanceMetrics()
+    {
+        var assignments = await _context.MedicalReviewAssignments
+            .Include(a => a.MedicalReview)
+            .Include(a => a.AefiReport)
+            .ToListAsync();
+
+        var activeDoctors = await _context.MedicalReviewers.CountAsync();
+        var totalReports = await _entity.CountAsync();
+
+        var avgReportsPerDoctor = activeDoctors > 0
+            ? (double)totalReports / activeDoctors
+            : 0;
+
+        var avgReviewTimeHours = assignments
+        .Where(a => a.MedicalReview != null)
+        .Select(a => (a.MedicalReview!.ReviewedAt - a.AssignedAt).TotalHours)
+        .DefaultIfEmpty(0)
+        .Average();
+
+        var avgAssignmentHours = assignments
+        .Where(a => a.AefiReport != null)
+        .Select(a => (a.AssignedAt - a.AefiReport.ReportDate).TotalHours)
+        .DefaultIfEmpty(0)
+        .Average();
+
+        return new PerformanceDto
+        {
+            ActiveDoctors = activeDoctors,
+            AvgReportsPerDoctor = Math.Round(avgReportsPerDoctor, 2),
+            AvgReviewTimeHours = Math.Round(avgReviewTimeHours, 2),
+            AvgAssignmentHours = Math.Round(avgAssignmentHours, 2)
+        };
+    }
+
+
+
+
+
+    public async Task<IEnumerable<ProvinceMedicalActivityDto>> GetProvinceMedicalActivityAsync()
+    {
+        var data = await _context.MedicalReviewAssignments
+            .AsNoTracking()
+            .Select(a => new
+            {
+                Province = a.AefiReport.VaccinatedSubject.Municipality.Province.Name,
+                Municipality = a.AefiReport.VaccinatedSubject.Municipality.Name,
+
+                DoctorId = a.MedicalReviewerId,
+                ReportId = a.AefiReportId,
+
+                ReportDate = a.AefiReport.ReportDate,
+                AssignedAt = a.AssignedAt,
+                ReviewedAt = a.MedicalReview != null ? a.MedicalReview.ReviewedAt : (DateTime?)null
+            })
+            .ToListAsync();
+
+        var provinces = data
+            .GroupBy(x => x.Province)
+            .Select(provinceGroup =>
+            {
+                var provinceDoctors = provinceGroup.Select(x => x.DoctorId).Distinct().Count();
+                var provinceReports = provinceGroup.Select(x => x.ReportId).Distinct().Count();
+
+                var provinceReviewAvg = provinceGroup
+                    .Where(x => x.ReviewedAt != null)
+                    .Select(x => (x.ReviewedAt!.Value - x.AssignedAt).TotalHours)
+                    .DefaultIfEmpty(0)
+                    .Average();
+
+                var provinceAssignmentAvg = provinceGroup
+                    .Select(x => (x.AssignedAt - x.ReportDate).TotalHours)
+                    .DefaultIfEmpty(0)
+                    .Average();
+
+                var municipalities = provinceGroup
+                    .GroupBy(x => x.Municipality)
+                    .Select(municipalityGroup =>
+                    {
+                        var doctors = municipalityGroup.Select(x => x.DoctorId).Distinct().Count();
+                        var reports = municipalityGroup.Select(x => x.ReportId).Distinct().Count();
+
+                        var reviewAvg = municipalityGroup
+                            .Where(x => x.ReviewedAt != null)
+                            .Select(x => (x.ReviewedAt!.Value - x.AssignedAt).TotalHours)
+                            .DefaultIfEmpty(0)
+                            .Average();
+
+                        var assignmentAvg = municipalityGroup
+                            .Select(x => (x.AssignedAt - x.ReportDate).TotalHours)
+                            .DefaultIfEmpty(0)
+                            .Average();
+
+                        return new MunicipalityMedicalActivityDto
+                        {
+                            MunicipalityName = municipalityGroup.Key,
+                            ActiveDoctors = doctors,
+                            AvgReportsPerDoctor = doctors > 0 ? (double)reports / doctors : 0,
+                            AvgReviewTimeHours = Math.Round(reviewAvg, 2),
+                            AvgAssignmentHours = Math.Round(assignmentAvg, 2)
+                        };
+                    })
+                    .ToList();
+
+                return new ProvinceMedicalActivityDto
+                {
+                    ProvinceName = provinceGroup.Key,
+
+                    ActiveDoctors = provinceDoctors,
+                    AvgReportsPerDoctor = provinceDoctors > 0 ? (double)provinceReports / provinceDoctors : 0,
+                    AvgReviewTimeHours = Math.Round(provinceReviewAvg, 2),
+                    AvgAssignmentHours = Math.Round(provinceAssignmentAvg, 2),
+
+                    Municipalities = municipalities
+                };
+            })
+            .ToList();
+
+        return provinces;
+    }
+
+
 }
