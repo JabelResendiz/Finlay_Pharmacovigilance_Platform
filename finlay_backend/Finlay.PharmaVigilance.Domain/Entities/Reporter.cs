@@ -8,7 +8,10 @@ public class Reporter : GuidEntity
 {
     public string FullName { get; set; } = null!;
     public ReporterRelationship ReporterRelationship { get; set; }
-    public IdentityNumber IdentityNumber { get; set; } = null!;
+    // public IdentityNumber IdentityNumber { get; set; } = null!;
+    public string IdentityNumberEncrypted { get; set; } = null!;
+    public string IdentityNumberBlindIndex { get; set; } = null!;
+    public DateTime DateOfBirth { get; set; }
     public int ProvinceId { get; set; }
     public Province Province { get; set; } = null!;
     public int MunicipalityId { get; set; }

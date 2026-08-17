@@ -9,7 +9,6 @@ namespace Finlay.PharmaVigilance.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [EnableRateLimiting("GeneralQuery")]
-[Authorize(Roles = "SectionResponsible")]
 public class MunicipalDashboardController : ControllerBase
 {
     private readonly IMunicipalDashboardService _municipalDashboardService;

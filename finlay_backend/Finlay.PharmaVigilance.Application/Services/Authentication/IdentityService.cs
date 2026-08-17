@@ -129,9 +129,6 @@ public class IdentityService : IIdentityService
 
     public async Task<RefreshTokenResponseDto> RefreshTokenAsync(string refreshToken)
     {
-        Console.WriteLine($"============================Received refresh token: {refreshToken}==================================="); // Debug log
-
-
         var storedToken = await _unitOfWork
             .GetRepository<RefreshToken>()
             .FirstOrDefaultAsync(rt => rt.Token == refreshToken);

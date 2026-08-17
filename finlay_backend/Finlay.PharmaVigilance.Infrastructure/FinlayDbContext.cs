@@ -584,17 +584,29 @@ public class FinlayDbContext : IdentityDbContext<User, Role, Guid>
                      .IsRequired()
                      .HasConversion<string>();
 
-           entity.OwnsOne(e => e.IdentityNumber, id =>
-                     {
-                         id.Property(p => p.Value)
-                                 .HasColumnName("IdentityNumber")
-                                 .IsRequired()
-                                 .HasMaxLength(20);
+           //    entity.OwnsOne(e => e.IdentityNumber, id =>
+           //              {
+           //                  id.Property(p => p.Value)
+           //                          .HasColumnName("IdentityNumber")
+           //                          .IsRequired()
+           //                          .HasMaxLength(20);
 
-                         id.HasIndex(p => p.Value)
-                                 .IsUnique();
-                     });
+           //                  id.HasIndex(p => p.Value)
+           //                          .IsUnique();
+           //              });
+           entity.Property(x => x.IdentityNumberEncrypted)
+                   .HasMaxLength(500)
+                   .IsRequired();
 
+           entity.Property(x => x.IdentityNumberBlindIndex)
+               .HasMaxLength(64)
+               .IsRequired();
+
+           entity.HasIndex(x => x.IdentityNumberBlindIndex)
+               .IsUnique();
+
+           entity.Property(x => x.DateOfBirth)
+               .IsRequired();
 
            entity.Property(e => e.ReporterRelationship)
           .IsRequired()

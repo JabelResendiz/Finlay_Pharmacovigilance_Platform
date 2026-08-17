@@ -1,5 +1,4 @@
-@host = http://localhost:5137
-
+@host = https://backend-production-f150.up.railway.app
 # Admin
 POST {{host}}/api/Authentication/login
 Content-Type:  application/json

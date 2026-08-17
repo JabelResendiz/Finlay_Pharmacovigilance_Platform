@@ -1,6 +1,7 @@
 using Finlay.PharmaVigilance.Application.DTO;
 using Finlay.PharmaVigilance.Application.Enum;
 using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Application.IServices.Pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -14,15 +15,17 @@ public class ReportController : ControllerBase
     private readonly IReportQueryService _reportQueryService;
     private readonly IReportCommandService _reportCommandService;
     private readonly ICaptchaService _captchaService;
-
+    // private readonly IPdfService _pdfService;
 
     public ReportController(IReportQueryService reportQueryService,
                             IReportCommandService reportCommandService,
                             ICaptchaService captchaService)
+
     {
         _reportQueryService = reportQueryService;
         _reportCommandService = reportCommandService;
         _captchaService = captchaService;
+
     }
 
     [HttpPost("createPublic")]
@@ -100,6 +103,7 @@ public class ReportController : ControllerBase
     //     return File(pdf, "application/pdf", $"report_{request.NotificationNumber}.pdf");
     // }
 
+
     // [HttpGet("{notificationNumber}/pdf")]
     // [ProducesResponseType(StatusCodes.Status200OK)]
     // [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -120,7 +124,10 @@ public class ReportController : ControllerBase
     //     // if (!isValid)
     //     //     return BadRequest(new { success = false });
 
-    //     var pdf = await _reportQueryService.GetReportPdfByNotificationNumber(notificationNumber, ReportPdfTemplateType.User);
+    //     var result = await _reportQueryService.GetReportByNotificationNumber(notificationNumber);
+
+    //     var pdf = _pdfService.GenerateReportPdf(result);
+
 
     //     return File(pdf, "application/pdf", $"report_{notificationNumber}.pdf");
     // }

@@ -25,7 +25,8 @@ using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
 using Finlay.PharmaVigilance.Application.Common.EventBus;
 using Finlay.PharmaVigilance.Infrastructure.EventBus;
 using Finlay.PharmaVigilance.Infrastructure.Consumers;
-
+using Finlay.PharmaVigilance.Infrastructure.Encryption;
+using QuestPDF.Infrastructure;
 
 namespace Finlay.PharmaVigilance.Infrastructure;
 
@@ -39,6 +40,8 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, ConfigurationManager configuration)
 
     {
+
+        QuestPDF.Settings.License = LicenseType.Community;
 
         // Database Configuration
         var connectionString = configuration.GetConnectionString("AppDbConnectionString");
@@ -86,6 +89,10 @@ public static class DependencyInjection
             configuration.GetSection("WhatsApp")
         );
 
+        services.Configure<EncryptionOptions>(
+            configuration.GetSection("Encryption")
+        );
+
 
         //services.AddScoped<ICaptchaService, CaptchaService>();
         services.AddScoped<ICaptchaService, FriendlyCaptchaService>();
@@ -109,6 +116,7 @@ public static class DependencyInjection
             //x.AddConsumer<AssignmentExpiredConsumer>();
             //   x.AddConsumer<ReportConfirmationConsumer>();
             x.AddConsumer<SectionReportAlertConsumer>();
+            x.AddConsumer<RegisterUserConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {
@@ -138,6 +146,8 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IMedicalAssignmentRepository, MedicalAssignmentRepository>();
         services.AddScoped<IReportDuplicateRepository, ReportDuplicateRepository>();
+        services.AddScoped<IEncryptionService, EncryptionService>();
+
 
         //Register a service of type IHostedService in the dependency container
         services.AddHostedService<RoleInitializer>();
@@ -168,10 +178,10 @@ public static class DependencyInjection
 
         // Configuración de autenticación JWT
         services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters

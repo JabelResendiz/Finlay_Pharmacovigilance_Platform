@@ -38,57 +38,17 @@ public class MockMunicipalDashboardService : IMunicipalDashboardService
     }
     public async Task<MunicipalDashboardOverviewDto> GetOverviewAsync()
     {
-
-        var user = _userContextService.GetUserId();
-
-        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
-                                .FirstOrDefaultAsync(sr => sr.UserId == user)
-                                ?? throw new Exception("Section Responsible not found for the current user.");
-
-        var data = await _unitOfWork.GetRepository<AefiReport>()
-                .GetAllByItems(r =>
-                    r.VaccinatedSubject.MunicipalityId == sectionResponsible.MunicipalityId)
-                .GroupBy(r => 1)
-                .Select(g => new
-                {
-                    Total = g.Count(),
-                    Pending = g.Count(x => x.Status == ReportStatus.Submitted),
-                    UnderReview = g.Count(x => x.Status == ReportStatus.UnderReview),
-                    Completed = g.Count(x => x.Status == ReportStatus.Approved),
-                    Rejected = g.Count(x => x.Status == ReportStatus.Rejected),
-                    Reopened = g.Count(x => x.Status == ReportStatus.Reopened)
-                })
-                .FirstOrDefaultAsync();
-
-        var query = _unitOfWork.GetRepository<MedicalReviewAssignment>()
-    .GetAllByItems(a => a.MedicalReview != null);
-
-        var queryData = await query
-        .Select(a => new
-        {
-            a.AssignedAt,
-            a.MedicalReview!.ReviewedAt,
-            MunicipalityId = a.AefiReport.VaccinatedSubject.MunicipalityId
-        })
-        .Where(x => x.MunicipalityId == sectionResponsible.MunicipalityId)
-        .ToListAsync();
-
-
-        var avg = queryData.Count() > 0 ? queryData.Average(x => (x.ReviewedAt - x.AssignedAt).TotalHours) : 0;
-
         return new MunicipalDashboardOverviewDto
         {
-            TotalReports = data?.Total ?? 0,
-            PendingReports = data?.Pending ?? 0,
-            UnderReviewReports = data?.UnderReview ?? 0,
-            CompletedReports = data?.Completed ?? 0,
-            RejectedReports = data?.Rejected ?? 0,
-            ReopenedReports = data?.Reopened ?? 0,
-            AverageReviewTimeHours = avg,
+            TotalReports = 2134,
+            PendingReports = 19,
+            UnderReviewReports = 15,
+            CompletedReports = 2000,
+            RejectedReports = 0,
+            ReopenedReports = 100,
+            AverageReviewTimeHours = 10.9,
 
-            CompletionRate = (data == null || data.Total == 0)
-                ? 0
-                : (double)data.Completed * 100 / data.Total
+            CompletionRate = 200000 / 2134
         };
     }
 

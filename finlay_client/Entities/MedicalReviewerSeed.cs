@@ -66,7 +66,7 @@ public static class MedicalReviewerSeed
     private static async Task SeedMedicalReviewersForMunicipalityAsync(SectionResponsibleDto sr)
     {
         var municipalityName = SeedData.GetMunicipalityName(sr.MunicipalityId);
-        var doctorCount = random.Next(10, 26);
+        var doctorCount = random.Next(3, 5);
         var normalizedMunicipality = SeedData.NormalizeNameForUserName(municipalityName);
 
         Console.WriteLine($"🩺 Creating {doctorCount} medical reviewers for {municipalityName}...");

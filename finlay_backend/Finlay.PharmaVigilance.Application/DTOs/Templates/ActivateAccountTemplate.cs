@@ -8,6 +8,6 @@ public class ActivateAccountTemplate : IBasicTemplate
     [JsonPropertyName("reviewer_name")]
     public string FullName { get; set; } = null!;
 
-    [JsonPropertyName("activation_url")]
-    public string ActivationUrl { get; set; } = null!;
+    [JsonPropertyName("activationLink")]
+    public string ActivationLink { get; set; } = null!;
 }

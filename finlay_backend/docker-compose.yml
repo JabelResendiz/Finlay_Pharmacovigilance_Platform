@@ -1,8 +1,21 @@
 version: '3.8'
 
 services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_Jabel
+      MYSQL_DATABASE: finlay_dev
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   rabbitmq:
     image: rabbitmq:3-management
+    restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -12,5 +25,22 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - rabbitmq
+    ports:
+      - "5137:5137"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5137
+      ConnectionStrings__AppDbConnectionString: "server=mysql;database=finlay_dev;uid=root;pwd=root_Jabel;"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+
 volumes:
+  mysql_data:
   rabbitmq_data:

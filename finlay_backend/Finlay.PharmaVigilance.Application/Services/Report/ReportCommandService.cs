@@ -33,6 +33,7 @@ public class ReportCommandService : IReportCommandService
     private readonly ILogger<ReportCommandService> _logger;
     private readonly IEventBus _eventBus;
     private readonly IReportDuplicateService _reportDuplicate;
+    private readonly IReporterService _reporterService;
 
     private static readonly Expression<Func<MedicalReviewer, object>>[] includes =
                             { e => e.User! };
@@ -46,7 +47,8 @@ public class ReportCommandService : IReportCommandService
         IUserContextService userContextService,
         ILogger<ReportCommandService> logger,
         IEventBus eventBus,
-        IReportDuplicateService reportDuplicateService)
+        IReportDuplicateService reportDuplicateService,
+        IReporterService reporterService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -57,6 +59,7 @@ public class ReportCommandService : IReportCommandService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _reportDuplicate = reportDuplicateService ?? throw new ArgumentNullException(nameof(reportDuplicateService));
+        _reporterService = reporterService ?? throw new ArgumentNullException(nameof(reporterService));
     }
 
     public Expression<Func<MedicalReviewer, object>>[] GetIncludes() => includes;
@@ -122,22 +125,26 @@ public class ReportCommandService : IReportCommandService
             }
 
             // Step 2: Get or create Reporter by normalized full name
-            var reporterRepository = _unitOfWork.GetRepository<Reporter>();
-            var existingReporter = await reporterRepository
-                .FirstOrDefaultAsync(x => x.IdentityNumber.Value == reportDto.Reporter.IdentityNumber);
+            // var reporterRepository = _unitOfWork.GetRepository<Reporter>();
+            // var existingReporter = await reporterRepository
+            //     .FirstOrDefaultAsync(x => x.IdentityNumber.Value == reportDto.Reporter.IdentityNumber);
 
-            Reporter reporter;
-            if (existingReporter != null)
-            {
-                _logger.LogDebug("Existing reporter found with IdentityNumber");
-                reporter = existingReporter;
-            }
-            else
-            {
-                _logger.LogDebug("Creating new reporter");
+            // Reporter reporter;
+            // if (existingReporter != null)
+            // {
+            //     _logger.LogDebug("Existing reporter found with IdentityNumber");
+            //     reporter = existingReporter;
+            // }
+            // else
+            // {
+            //     _logger.LogDebug("Creating new reporter");
 
-                reporter = _mapper.Map<Reporter>(reportDto.Reporter);
-            }
+            //     reporter = _mapper.Map<Reporter>(reportDto.Reporter);
+            // }
+
+
+            var reporter = await _reporterService.GetOrCreateAsync(reportDto.Reporter);
+
 
             var report = _mapper.Map<AefiReport>(reportDto);
             report.VaccinatedSubjectId = vaccinatedSubject.Id;

@@ -258,7 +258,6 @@ public static class SeedReports
         var reports = new List<object>();
 
 
-
         for (int i = 0; i < 1; i++)
         {
             var reportDate = DateTime.Parse("2026-04-11T21:38:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
@@ -267,7 +266,7 @@ public static class SeedReports
             var adverseEventFinishDate = DateTime.Parse("2026-04-11T19:35:54.456Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 
             var vaccineId = vaccineIds![i % vaccineIds.Length];
-            var symptomId = symptomIds![i % symptomIds.Length];
+            var symptomId = symptomIds![(i % symptomIds.Length) + 1];
 
             await LoadLotAsync(vaccineId);
             await LoadVaccinationCenterAsync(1, 2);
