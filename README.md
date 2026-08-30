@@ -196,7 +196,7 @@ Before running the project, make sure you have installed:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-user/Finlay_Pharmacovigilance_Platform.git
+git clone https://github.com/JabelResendiz/Finlay_Pharmacovigilance_Platform.git
 cd Finlay_Pharmacovigilance_Platform
 ```
 
