@@ -1,0 +1,243 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Finlay.PharmaVigilance.Application.IRepository;
+using Finlay.PharmaVigilance.Infrastructure.Repository;
+using Microsoft.AspNetCore.Identity;
+using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Application.Common.Authentication;
+using Finlay.PharmaVigilance.Infrastructure.Authentication;
+using Microsoft.Extensions.Options;
+using Finlay.PharmaVigilance.Application.Authentication;
+using Finlay.PharmaVigilance.Infrastructure.Initializer;
+using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Infrastructure.UnitOfWorkPattern;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
+using Finlay.PharmaVigilance.Application.Repository;
+using Finlay.PharmaVigilance.Application.IServices;
+using Finlay.PharmaVigilance.Infrastructure.Email;
+using MassTransit;
+using Finlay.PharmaVigilance.Infrastructure.Settings;
+using Finlay.PharmaVigilance.Infrastructure.BackgroundServices;
+using Finlay.PharmaVigilance.Application.Common.EventBus;
+using Finlay.PharmaVigilance.Infrastructure.EventBus;
+using Finlay.PharmaVigilance.Infrastructure.Consumers;
+using Finlay.PharmaVigilance.Infrastructure.Encryption;
+using QuestPDF.Infrastructure;
+
+namespace Finlay.PharmaVigilance.Infrastructure;
+
+public static class DependencyInjection
+{
+    /// <summary>
+    /// Adds application-specific services to the dependency injection container 
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add services to.</param>
+    /// <returns>The modified IServiceCollection.</returns>
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, ConfigurationManager configuration)
+
+    {
+
+        QuestPDF.Settings.License = LicenseType.Community;
+
+        // Database Configuration
+        var connectionString = configuration.GetConnectionString("AppDbConnectionString");
+
+        services.AddScoped<AuditInterceptor>();
+
+        services.AddDbContext<FinlayDbContext>((serviceProvider, options) =>
+                {
+                    options.UseMySql(
+                        connectionString,
+                        ServerVersion.AutoDetect(connectionString));
+
+                    options.AddInterceptors(
+                        serviceProvider.GetRequiredService<AuditInterceptor>());
+                });
+
+
+        // Add HttpContextAccessor for accessing the current HTTP context
+        services.AddHttpContextAccessor();
+
+        //Identity configuration
+        services.AddIdentity<User, Role>(options =>
+                {
+                    options.User.RequireUniqueEmail = true;
+
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                })
+               .AddEntityFrameworkStores<FinlayDbContext>() // Configures EF for Identity
+               .AddDefaultTokenProviders(); // Adds default token providers for things like password reset
+
+        services.Configure<PasswordHasherOptions>(options =>
+        {
+            options.IterationCount = 600000;
+        });
+
+
+        // Authentication and Authorization
+        services.AddAuth(configuration);
+
+        services.Configure<EmailJsSettings>(
+            configuration.GetSection("Email:EmailJS")
+        );
+
+        services.Configure<WhatsAppSettings>(
+            configuration.GetSection("WhatsApp")
+        );
+
+        services.Configure<EncryptionOptions>(
+            configuration.GetSection("Encryption")
+        );
+
+
+        //services.AddScoped<ICaptchaService, CaptchaService>();
+        services.AddScoped<ICaptchaService, FriendlyCaptchaService>();
+
+
+        // Add custom repositories and services       
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        // services.AddSingleton<IConverter>(new SynchronizedConverter(new PdfTools()));
+        // services.AddScoped<IPdfService, PdfService>();
+
+        // Message
+        services.AddHttpClient<IEmailService, EmailJsService>();
+        services.AddHttpClient<IMessageService, WhatsAppService>();
+
+
+        var rabbitMqUrl = configuration["RABBITMQ_URL"] ?? "amqp://guest:guest@localhost:5672";
+        services.AddMassTransit(x =>
+        {
+            // x.AddConsumer<MedicalReviewerConsumer>();
+            //x.AddConsumer<AssignmentExpiredConsumer>();
+            //   x.AddConsumer<ReportConfirmationConsumer>();
+            x.AddConsumer<SectionReportAlertConsumer>();
+            x.AddConsumer<RegisterUserConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(rabbitMqUrl);
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+
+
+        services.AddHostedService<AssignmentExpirationBackgroundService>();
+        services.AddScoped<IEventBus, MassTransitEventBus>();
+
+        services.AddScoped<IIdentityManager, IdentityManager>();
+        services.AddScoped<IAdverseEventRepository, AdverseEventRepository>();
+        services.AddScoped<IVaccinatedSubjectRepository, VaccinatedSubjectRepository>();
+        services.AddScoped<IReporterRepository, ReporterRepository>();
+        services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<ISymptomRepository, SymptomRepository>();
+        services.AddScoped<IVaccinationRepository, VaccinationRepository>();
+        services.AddScoped<IVaccineRepository, VaccineRepository>();
+        services.AddScoped<ISectionResponsibleRepository, SectionResponsibleRepository>();
+        services.AddScoped<IMedicalReviewerRepository, MedicalReviewerRepository>();
+        services.AddScoped<IMedicalReviewRepository, MedicalReviewRepository>();
+        services.AddScoped<IVaccinationCenterRepository, VaccinationCenterRepository>();
+        services.AddScoped<ILotRepository, LotRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IMedicalAssignmentRepository, MedicalAssignmentRepository>();
+        services.AddScoped<IReportDuplicateRepository, ReportDuplicateRepository>();
+        services.AddScoped<IEncryptionService, EncryptionService>();
+
+
+        //Register a service of type IHostedService in the dependency container
+        services.AddHostedService<RoleInitializer>();
+
+
+        return services;
+
+    }
+
+
+    /// <summary>
+    /// Configures JWT authentication services for the application.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add services to.</param>
+    /// <param name="configuration">The configuration object for accessing application settings.</param>
+    /// <returns>The updated IServiceCollection.</returns>
+    public static IServiceCollection AddAuth(this IServiceCollection services,
+                                              ConfigurationManager configuration)
+    {
+        var jwtSettings = new JwtSettings();
+        configuration.Bind(JwtSettings.SECTION_NAME, jwtSettings);
+
+        services.AddSingleton(jwtSettings); // Registro directo para dependencias que lo necesiten como instancia
+
+        services.AddSingleton(Options.Create(jwtSettings));
+
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        // Configuración de autenticación JWT
+        services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            System.Text.Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = async context =>
+                        {
+                            context.HandleResponse(); // evita el comportamiento default (302 redirect)
+                            context.Response.StatusCode = 401;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                            {
+                                success = false,
+                                status = 401,
+                                message = "Unauthorized. A valid JWT token is required."
+                            }));
+                        },
+
+                        OnForbidden = async context =>
+                        {
+                            context.Response.StatusCode = 403;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                            {
+                                success = false,
+                                status = 403,
+                                message = "Forbidden. You do not have permission to access this resource."
+                            }));
+                        }
+                    };
+                });
+
+        return services;
+    }
+
+}
+
+
+//scoped : se crea una nueva instacnia por solicitud HTTP.Se
+//utiliza para servicios que necesitan tener estados dentro de una
+// solicitud, como el accede a la BD
+
+//singleton: viven durante toda la vida de la app
+// servicios que no tienen estado o que son costosos de crear, como configuracion o cache
+
+

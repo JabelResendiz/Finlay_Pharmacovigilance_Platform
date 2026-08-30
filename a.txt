@@ -1,0 +1,29 @@
+aqui  :     private static async Task LoginAsync()
+    {
+        Console.WriteLine("🔐 Logging in...");
+
+        var login = new
+        {
+            Email = "admin_email_1@example.com",
+            Password = "Password_123!"
+        };
+
+        var response = await client.PostAsJsonAsync("/api/Authentication/login", login);
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("❌ Login failed:");
+            Console.WriteLine(json);
+            return;
+        }
+
+        using var doc = JsonDocument.Parse(json);
+        token = doc.RootElement.GetProperty("accessToken").GetString();
+
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        Console.WriteLine("✅ Login success");
+    } como hagoa para agregar en el header una vaiarble de idempotcyKey ???

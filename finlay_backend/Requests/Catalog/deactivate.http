@@ -1,0 +1,16 @@
+@host = http://localhost:5137
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZ2l2ZW5fbmFtZSI6ImFkbWluX3VzZXJuYW1lXzEiLCJqdGkiOiJjNTIzODJkNi1mNGM4LTQ5YjItOGZkYi1mNmM1NGMzOWE5YzQiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc3NzczODEyNSwiaXNzIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSIsImF1ZCI6IkZpbmxheV9QaGFybWFWaWdpbGFuY2UifQ.8D-ABylREkGGfIueGfNj-XNH6dY54ujLOJItEJb7p1A
+
+POST {{host}}/api/Catalog/updateStatus/vaccine?vaccineId=08dea54c-1466-426e-843c-be3f2cd6114a&isActive=true
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+####
+
+
+
+POST {{host}}/api/Catalog/activate/symptom/1
+Content-Type:  application/json
+Authorization: Bearer {{token}}

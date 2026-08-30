@@ -1,0 +1,6 @@
+.env
+
+bin/
+obj/
+test/
+finlay_client/

@@ -1,0 +1,265 @@
+using AutoMapper;
+using Finlay.PharmaVigilance.Application.Authentication;
+using Finlay.PharmaVigilance.Application.Common.EventBus;
+using Finlay.PharmaVigilance.Application.DTO;
+using Finlay.PharmaVigilance.Application.DTO.Authentication;
+using Finlay.PharmaVigilance.Application.IRepository;
+using Finlay.PharmaVigilance.Application.IServices.Authentication;
+using Finlay.PharmaVigilance.Application.IServices.Common;
+using Finlay.PharmaVigilance.Application.IUnitOfWorkPattern;
+using Finlay.PharmaVigilance.Application.Validators;
+using Finlay.PharmaVigilance.Domain.Entities;
+using Finlay.PharmaVigilance.Domain.Enum;
+using Finlay.PharmaVigilance.Domain.Events;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace Finlay.PharmaVigilance.Application.Services.Authentication;
+
+/// <summary>
+/// Service implementation for managing Medical Reviewer registration and authentication.
+/// </summary>
+public class MedicalReviewerService : IMedicalReviewerService
+{
+    private readonly IIdentityManager _identityManager;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IUserContextService _userContextService;
+    private readonly IMedicalReviewerRepository _medical;
+    private readonly IEnumerable<IReportValidator<RegisterMedicalReviewerDto>> _validators;
+    private readonly ILogger<MedicalReviewerService> _logger;
+    private readonly IEventBus _eventBus;
+
+    /// <summary>
+    /// Initializes a new instance of the MedicalReviewerService class.
+    /// </summary>
+    public MedicalReviewerService(
+        IIdentityManager identityManager,
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IUserContextService userContextService,
+        IMedicalReviewerRepository medical,
+        IEventBus eventBus,
+        IEnumerable<IReportValidator<RegisterMedicalReviewerDto>> validators,
+        ILogger<MedicalReviewerService> logger)
+    {
+
+        _identityManager = identityManager ?? throw new ArgumentNullException(nameof(identityManager)); ;
+        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); ;
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper)); ;
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService)); ;
+        _medical = medical ?? throw new ArgumentNullException(nameof(medical)); ;
+        _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+    }
+
+    /// <summary>
+    /// Registers a new Medical Reviewer user with their profile information.
+    /// </summary>
+    public async Task<string> RegisterMedicalReviewerAsync(RegisterMedicalReviewerDto registerDto)
+    {
+        _logger.LogInformation("Starting public AEFI report creation process");
+
+        // Validate inputs
+        if (registerDto == null)
+            throw new ArgumentNullException(nameof(registerDto), "Registration DTO cannot be null.");
+
+
+        try
+        {
+            foreach (var validator in _validators)
+            {
+                _logger.LogDebug("Executing {ValidatorCount} validators", _validators.Count());
+                await validator.ValidateAsync(registerDto);
+            }
+
+            var userId = _userContextService.GetUserId();
+
+            var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                            .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+            if (sectionResponsible == null)
+                throw new UnauthorizedAccessException("User is not a section responsible.");
+
+            var provinceId = sectionResponsible.ProvinceId;
+            var municipalityId = sectionResponsible.MunicipalityId;
+
+            var user = _mapper.Map<User>(registerDto);
+            user.UserRole = UserRole.MedicalReviewer.ToString();
+            user.EmailConfirmed = false;
+
+            var createdUser = await _identityManager.CreateUserAsync(user, registerDto.Password);
+
+
+            if (createdUser == null)
+                throw new InvalidOperationException("Failed to create user account.");
+
+            // Assign MedicalReviewer role
+            await _identityManager.AddRoles(createdUser.Id.ToString(), UserRole.MedicalReviewer.ToString());
+
+            var medicalReviewer = _mapper.Map<MedicalReviewer>(registerDto);
+            medicalReviewer.UserId = createdUser.Id;
+            medicalReviewer.User = createdUser;
+            medicalReviewer.ProvinceId = provinceId;
+            medicalReviewer.MunicipalityId = municipalityId;
+            medicalReviewer.SectionResponsibleId = sectionResponsible.Id;
+            medicalReviewer.SectionResponsible = sectionResponsible;
+
+            // Add to repository and save
+            await _unitOfWork.GetRepository<MedicalReviewer>().CreateAsync(medicalReviewer);
+            await _unitOfWork.CompleteAsync();
+
+            await _eventBus.PublishAsync(new RegisterUserEvent
+            {
+                Email = createdUser.Email!,
+                FullName = createdUser.UserName!,
+                Token = await _identityManager.GeneratePasswordResetToken(user)
+                //Token = await _identityManager.GenerateEmailConfirmationTokenAsync(user)
+            });
+
+            return "Medical Reviewer successfully registered";
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Error to register Medical Reviewer: {ex.Message}",
+                ex);
+        }
+
+    }
+
+
+    public async Task<IEnumerable<GetMedicalReviewerDto>> ListByMunicipalityAsync()
+    {
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException("User is not a section responsible.");
+
+        var medicalList = await _medical.GetByMunicipalityAsync(sectionResponsible.MunicipalityId);
+
+        return _mapper.Map<IEnumerable<GetMedicalReviewerDto>>(medicalList);
+    }
+
+
+    public async Task<IEnumerable<GetMedicalReviewerDto>> ListByProvinceAsync(CancellationToken cancellationToken = default)
+    {
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork.GetRepository<SectionResponsible>()
+                                        .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException("User is not a section responsible.");
+
+        var provinceId = sectionResponsible.ProvinceId;
+
+        var medicalList = await _medical.GetByProvinceAsync(provinceId);
+
+        return _mapper.Map<IEnumerable<GetMedicalReviewerDto>>(medicalList);
+    }
+
+
+    public async Task<PagedResultDto<GetMedicalReviewerDetailDto>>
+    GetMedicalReviewerForCurrentUserAsync(
+        PagedRequestDto paged,
+        MedicalReviewerFilterDto? filter)
+    {
+        var userId = _userContextService.GetUserId();
+
+        var sectionResponsible = await _unitOfWork
+            .GetRepository<SectionResponsible>()
+            .FirstOrDefaultAsync(sr => sr.UserId == userId);
+
+        if (sectionResponsible == null)
+            throw new UnauthorizedAccessException(
+                "User is not a section responsible.");
+
+        var reviewers = await _medical
+            .GetByFilter(sectionResponsible.ProvinceId, sectionResponsible.MunicipalityId, filter)
+            .Include(r => r.User)
+            .Include(r => r.MedicalReviews)
+                .ThenInclude(r => r.MedicalReview)
+            .ToListAsync();
+
+        var result = reviewers
+            .Select(r =>
+            {
+                var assignments = r.MedicalReviews;
+
+                var completedAssignments = assignments
+                    .Where(a => a.Status == ReviewAssignmentStatus.Completed)
+                    .ToList();
+
+                double averageTimeReview = 0;
+
+                if (completedAssignments.Any())
+                {
+                    averageTimeReview = Math.Round(
+                                completedAssignments.Average(a =>
+                                    (a.MedicalReview!.ReviewedAt - a.AssignedAt).TotalHours),
+                                2
+                            );
+                }
+
+                return new GetMedicalReviewerDetailDto
+                {
+                    FullName = r.User.UserName ?? "",
+                    Institution = r.Institution,
+                    PhoneNumber = r.User.PhoneNumber ?? "",
+                    CreatedAt = r.CreatedAt,
+
+                    TotalAssignments = assignments.Count,
+
+                    PendingAssignments = assignments.Count(a =>
+                        a.Status == ReviewAssignmentStatus.Pending),
+
+                    CompletedAssignments = assignments.Count(a =>
+                        a.Status == ReviewAssignmentStatus.Completed),
+
+                    ExpiredAssignments = assignments.Count(a =>
+                        a.Status == ReviewAssignmentStatus.Expired),
+
+                    AverageTimeReview = averageTimeReview
+                };
+            });
+
+
+        result = _medical
+            .OrderAndSort(result, filter)
+            .ToList();
+
+        // .ToList();
+
+        var totalItems = result.Count();
+
+        var items = result
+            .Skip((paged.PageNumber - 1) * paged.PageSize)
+            .Take(paged.PageSize)
+            .ToList();
+
+        return new PagedResultDto<GetMedicalReviewerDetailDto>
+        {
+            Items = items,
+            TotalCount = totalItems,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+
+            NextPageUrl =
+                paged.PageNumber * paged.PageSize < totalItems
+                ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber + 1}&pageSize={paged.PageSize}"
+                : null,
+
+            PreviousPageUrl =
+                paged.PageNumber > 1
+                ? $"{paged.BaseUrl}?pageNumber={paged.PageNumber - 1}&pageSize={paged.PageSize}"
+                : null
+        };
+    }
+
+
+}

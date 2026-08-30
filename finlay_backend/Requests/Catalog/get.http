@@ -1,0 +1,45 @@
+@host = http://localhost:5137
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGRlYjg0MS1lOTg0LTQ3MDEtOGU1MC1lODVjZGI0ODgwODIiLCJnaXZlbl9uYW1lIjoiYWRtaW5fdXNlcm5hbWVfMSIsImp0aSI6IjBkYjFhYzc1LWE5NmMtNGY5Mi1iNDc0LTczZGE5MzBmM2I0MCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzc5NDg3MTc3LCJpc3MiOiJGaW5sYXlfUGhhcm1hVmlnaWxhbmNlIiwiYXVkIjoiRmlubGF5X1BoYXJtYVZpZ2lsYW5jZSJ9.h7ZHXk35voUObT5ZMNle6jQxP797YqPHINyYrDCXCgM
+
+###
+Get {{host}}/api/GetCatalog/finlayVaccines
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+###
+GET {{host}}/api/GetCatalog/vaccine?pageNumber=1&pageSize=10
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+####
+
+GET {{host}}/api/GetCatalog/symptom?pageNumber=1&pageSize=10&search=&status=
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+
+####
+
+
+GET http://localhost:5137/api/GetCatalog/symptom?pageNumber=1&pageSize=10
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+### 
+POST {{host}}/api/Catalog/activate/symptom/1
+Content-Type:  application/json
+Authorization: Bearer {{token}}
+
+
+
+####
+
+
+GET http://localhost:5137/api/GetCatalog/vaccines/actives
+Content-Type:  application/json

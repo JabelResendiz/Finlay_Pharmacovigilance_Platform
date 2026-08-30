@@ -1,0 +1,34 @@
+@host = https://backend-production-f150.up.railway.app
+# Admin
+POST {{host}}/api/Authentication/login
+Content-Type:  application/json
+
+{
+  "email": "admin_email_1@example.com",
+  "password": "Password_123!"
+}
+
+
+####
+# SectionResponsible
+POST {{host}}/api/Authentication/login
+Content-Type:  application/json
+
+{
+  "email": "resp2@example.com",
+  "password": "Password_123!",
+  "token" : "kdjfksjdl"
+}
+
+###
+
+POST {{host}}/api/Authentication/login
+Content-Type:  application/json
+
+{
+  "email": "medico_ciegodeavila_19_15@example.com",
+  "password": "Password_123!"
+}
+
+
+
