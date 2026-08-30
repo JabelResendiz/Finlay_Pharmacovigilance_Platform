@@ -1,4 +1,4 @@
-# Finlay Pharma Platform
+# Finlay Pharma Platform - Backend
 
 [![GitHub license](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 [![.NET Version](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/)
@@ -10,7 +10,7 @@
 
 **Finlay Pharma Platform** is a comprehensive pharmacovigilance system designed for the **Finlay Institute**, enabling efficient adverse event reporting, case management, and regulatory compliance. The platform streamlines the entire pharmacovigilance workflow, from initial report submission to medical review and follow-up.
 
-The project is structured as a full-stack solution with a **modular monolith backend** built with ASP.NET Core and a **modern React frontend**, all orchestrated with asynchronous messaging via RabbitMQ.
+The project is structured as a full-stack solution with a **modular monolith backend** built with ASP.NET Core, all orchestrated with asynchronous messaging via RabbitMQ.
 
 ---
 
@@ -43,17 +43,6 @@ The project is structured as a full-stack solution with a **modular monolith bac
 | **xUnit** | Unit testing |
 | **Moq** | Mocking framework |
 
-### Frontend
-| Technology | Purpose |
-|------------|---------|
-| **React 18** | UI library |
-| **TypeScript** | Type-safe JavaScript |
-| **Material-UI** | Component library |
-| **React Router** | Client-side routing |
-| **Axios** | HTTP client |
-| **React Hook Form** | Form management |
-| **JWT Decode** | Token handling |
-
 ### Infrastructure
 | Technology | Purpose |
 |------------|---------|
@@ -72,7 +61,6 @@ The project is structured as a full-stack solution with a **modular monolith bac
 Make sure you have the following installed on your local development machine:
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Node.js & npm](https://nodejs.org/) (v18+ recommended)
 - [MySQL Server 8.0+](https://dev.mysql.com/downloads/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for RabbitMQ)
 - [Git](https://git-scm.com/)

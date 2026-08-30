@@ -200,46 +200,17 @@ git clone https://github.com/JabelResendiz/Finlay_Pharmacovigilance_Platform.git
 cd Finlay_Pharmacovigilance_Platform
 ```
 
-### 2. Start infrastructure services with Docker
+This project contains two main components: a backend API and a frontend web application. Each one has its own detailed installation and configuration guide.
 
-From the backend folder:
+For the backend, please refer to the dedicated README file located at:
 
-```bash
-cd finlay_backend
-docker compose up -d
-```
+[`backend/README.md`](backend/README.md)
 
-This starts:
+For the frontend, please refer to the dedicated README file located at:
 
-- MySQL database
-- RabbitMQ broker
-- API service
+[`frontend/README.md`](frontend/README.md)
 
-### 3. Restore NuGet dependencies
-
-```bash
-dotnet restore
-```
-
-### 4. Run the API locally
-
-From the backend folder:
-
-```bash
-dotnet run --project .\Finlay.PharmaVigilance.API\Finlay.PharmaVigilance.API.csproj
-```
-
-The API listens on the port configured in the project, typically `5137`.
-
-### 5. Verify the application
-
-Open the Swagger UI in the browser:
-
-```text
-http://localhost:5137/swagger
-```
-
-If the application is running correctly, the OpenAPI interface should load and expose the available endpoints.
+Please review the corresponding README for the component you wish to set up. They contain all the necessary steps, including environment variable configuration, database migrations, and service startup instructions.
 
 ---
 
