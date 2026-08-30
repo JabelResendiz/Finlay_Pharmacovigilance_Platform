@@ -1,0 +1,5 @@
+# Excluye toda la carpeta frontend del conteo de lenguajes
+frontend/* linguist-vendored
+frontend/** linguist-vendored
+frontend/**/*.ts linguist-vendored=true
+frontend/**/*.tsx linguist-vendored=true

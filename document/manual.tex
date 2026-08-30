@@ -1,0 +1,1266 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{geometry}
+
+\geometry{margin=2.5cm}
+
+\begin{document}
+	
+	%-------------------------------------------------
+	% PORTADA
+	%-------------------------------------------------
+	
+	\begin{titlepage}
+		\centering
+		
+		
+		\includegraphics[width=15cm]{document/Graphics/logo.jpg}
+
+		\vspace{2cm}
+		
+		{\Huge\bfseries Sistema web para el autorreporte de Eventos Supuestamente Atribuibles a la Vacunación o Inmunización (ESAVI) en el Instituto Finlay de Vacunas (IFV)\par}
+		
+		\vspace{0.5cm}
+		
+		{\Large Manual de Usuario\par}
+		
+		\vfill
+		
+		Versión 1.0
+		
+		\vspace{0.5cm}
+		
+		\today
+		
+		
+	\end{titlepage}
+	
+	\tableofcontents
+	
+	\newpage
+	
+	%-------------------------------------------------
+	% INTRODUCCIÓN
+	%-------------------------------------------------
+	
+	\chapter{Introducción}
+	
+	El Sistema Web para el Reporte de ESAVI fue desarrollado para apoyar el proceso de registro, gestión y seguimiento de los Eventos Supuestamente Atribuibles a la Vacunación o Inmunización (ESAVI) en el Instituto Finlay de Vacunas.
+	
+	La plataforma permite centralizar la información relacionada con los reportes, facilitar la comunicación entre los diferentes actores involucrados y mejorar la trazabilidad de los datos registrados.
+	
+	Este manual tiene como objetivo orientar a los usuarios en el uso de las principales funcionalidades del sistema, proporcionando instrucciones básicas para el acceso, registro y consulta de la información.
+	
+	
+	
+	%-------------------------------------------------
+	% REPORTES
+	%-------------------------------------------------
+	
+	\chapter{Gestión de Reportes}
+
+\section{Creación de un Reporte}
+
+Para registrar un nuevo reporte de ESAVI, seleccione la opción \textbf{Nuevo Reporte} desde la página principal del sistema.
+
+El proceso de reporte está dividido en varias secciones que permiten recopilar toda la información necesaria para la evaluación médica del caso.
+
+\subsection{Página principal de reporte}
+
+La Figura \ref{fig:home-reporte} muestra la página principal desde donde puede iniciarse el proceso de notificación de un ESAVI.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{reporte/home-reporte.drawio.png}
+\caption{Vista principal para el reporte de ESAVI}
+\label{fig:home-reporte}
+\end{figure}
+
+Antes de comenzar, asegúrese de disponer de la información relacionada con el sujeto vacunado, el proceso de vacunación y los eventos adversos observados.
+
+\newpage
+
+\subsection{Información del sujeto vacunado}
+
+La Figura \ref{fig:reporte1} muestra la primera sección del formulario.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/reporte_1.drawio.png}
+\caption{Información del sujeto vacunado}
+\label{fig:reporte1}
+\end{figure}
+
+En esta sección deben registrarse los datos generales de la persona afectada.
+
+\begin{itemize}
+\item Los campos marcados con un asterisco (*) son obligatorios.
+\item Complete la información de identificación y contacto solicitada.
+\item Utilice el botón \textbf{Siguiente} para avanzar hacia la próxima sección del formulario.
+\item Verifique cuidadosamente la información introducida antes de continuar.
+\end{itemize}
+
+\newpage
+
+\subsection{Información de vacunación}
+
+La Figura \ref{fig:reporte2} muestra la sección correspondiente a la vacunación.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/reporte_2.drawio.png}
+\caption{Información de vacunación}
+\label{fig:reporte2}
+\end{figure}
+
+En esta sección se registran los datos relacionados con las vacunas administradas.
+
+\begin{itemize}
+\item Utilice el botón \textbf{Agregar otra vacuna} para registrar una nueva vacuna administrada.
+\item Utilice el botón \textbf{Eliminar} para eliminar una vacunación agregada por error.
+\item Si desconoce el número de lote de una vacuna, seleccione la opción \textbf{Desconocido}.
+\item Registre toda la información disponible para facilitar la evaluación posterior del reporte.
+\end{itemize}
+
+\newpage
+
+\subsection{Eventos adversos}
+
+La Figura \ref{fig:reporte3} muestra la sección destinada al registro de eventos adversos.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/reporte_3.drawio.png}
+\caption{Registro de eventos adversos}
+\label{fig:reporte3}
+\end{figure}
+
+Cada evento adverso debe registrarse de forma independiente.
+
+\begin{itemize}
+\item El botón \textbf{Agregar evento adverso} estará disponible únicamente cuando los campos obligatorios hayan sido completados correctamente.
+\item Puede registrar tantos eventos adversos como sea necesario.
+\item Si el evento adverso continúa presente en la fecha del reporte, deje sin completar la fecha de finalización.
+\item Describa los síntomas observados con la mayor precisión posible.
+\end{itemize}
+
+\newpage
+
+\subsection{Información médica}
+
+La Figura \ref{fig:info-medica} muestra la sección de información médica complementaria.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/reporte_informacion_medica.jpg}
+\caption{Información médica}
+\label{fig:info-medica}
+\end{figure}
+
+Esta sección permite registrar antecedentes y datos clínicos relevantes para la evaluación del caso.
+
+\begin{itemize}
+\item Complete toda la información médica disponible.
+\item Registre antecedentes relevantes cuando corresponda.
+\item La calidad de esta información contribuye a una evaluación más precisa del evento reportado.
+\end{itemize}
+
+\newpage
+
+\subsection{Información del reportante}
+
+La Figura \ref{fig:reporte5} muestra la sección final del formulario.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{reporte/reporte_5.drawio.png}
+\caption{Información del reportante}
+\label{fig:reporte5}
+\end{figure}
+
+En esta sección deben registrarse los datos de la persona que realiza la notificación.
+
+\begin{itemize}
+\item Si selecciona la opción \textbf{Sujeto vacunado (usted mismo)} como relación con el paciente, parte de la información será completada automáticamente utilizando los datos registrados previamente.
+\item Verifique que exista al menos una vía de contacto válida (correo electrónico o teléfono).
+\item Debe aceptar la política de privacidad y declarar que la información proporcionada es verídica.
+\item Espere a que el sistema cargue completamente la verificación CAPTCHA.
+\item Marque la casilla \textbf{Soy humano}.
+\item Una vez completados todos los requisitos, el botón \textbf{Enviar Reporte} se habilitará.
+\end{itemize}
+
+\newpage
+
+\subsection{Confirmación del reporte}
+
+Tras enviar exitosamente el formulario, el sistema mostrará una pantalla de confirmación similar a la mostrada en la Figura \ref{fig:reporte6}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/reporte_6.drawio.png}
+\caption{Confirmación de reporte enviado}
+\label{fig:reporte6}
+\end{figure}
+
+En esta pantalla se muestra el número de notificación asignado al reporte.
+
+\begin{itemize}
+\item Puede utilizar el botón \textbf{Copiar} para copiar el número al portapapeles.
+\item El botón \textbf{Descargar Recibo} genera un documento PDF con los datos registrados.
+\item El botón \textbf{Seguir Reporte} permite consultar posteriormente el estado del reporte utilizando el número de notificación.
+\item El botón \textbf{Salir} finaliza la sesión y regresa a la pantalla principal.
+\item Por razones de seguridad, la sesión se cerrará automáticamente después de un período de inactividad.
+\end{itemize}
+
+
+\textbf{Importante:} El número de notificación es único para cada reporte y constituye el principal mecanismo para realizar su seguimiento. Se recomienda conservar dicho número en un lugar seguro.
+
+
+	\section{Consulta de Reportes}
+
+La funcionalidad de consulta permite a los usuarios realizar el seguimiento de los reportes previamente registrados mediante el número de notificación asignado por el sistema.
+
+\subsection{Búsqueda de un reporte}
+
+La Figura \ref{fig:buscar-reportes} muestra la interfaz utilizada para localizar un reporte existente.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/buscar_reporte.drawio.png}
+\caption{Vista de la búsqueda de reportes}
+\label{fig:buscar-reportes}
+\end{figure}
+
+Para realizar una consulta:
+
+\begin{itemize}
+\item Introduzca el número de notificación proporcionado al momento de registrar el reporte.
+\item Espere a que la verificación CAPTCHA cargue completamente.
+\item Marque la casilla \textbf{Soy humano}.
+\item Presione el botón \textbf{Buscar} para iniciar la consulta.
+\end{itemize}
+
+\newpage
+
+\subsection{Visualización de la información del reporte}
+
+Una vez localizada la información, el sistema mostrará una vista detallada del reporte, similar a la mostrada en la Figura \ref{fig:resultado-busqueda}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{reporte/busqueda_reporte.jpg}
+\caption{Vista general de la información de búsqueda de reportes}
+\label{fig:resultado-busqueda}
+\end{figure}
+
+La información se organiza en diferentes secciones para facilitar su consulta.
+
+Entre los datos que pueden visualizarse se encuentran:
+
+\begin{itemize}
+\item Número de notificación del reporte.
+\item Estado actual del proceso de evaluación.
+\item Información general del sujeto vacunado.
+\item Datos relacionados con la vacunación.
+\item Eventos adversos registrados.
+\item Información médica asociada al caso.
+\item Datos del reportante.
+\end{itemize}
+
+Si la información excede el tamaño de la pantalla, desplácese hacia abajo para visualizar el resto de los datos registrados.
+
+La información mostrada corresponde exactamente a los datos almacenados en el sistema y puede ser utilizada para verificar el estado y contenido del reporte enviado.
+
+	%-------------------------------------------------
+	% RECUPERACIÓN DE CONTRASEÑA
+	%-------------------------------------------------
+	
+
+	%-------------------------------------------------
+	% ACCESO
+	%-------------------------------------------------
+	
+	\chapter{Acceso al Sistema}
+	
+	\section{Inicio de Sesión}
+
+La funcionalidad de inicio de sesión está destinada exclusivamente a los usuarios con permisos administrativos dentro del sistema, incluyendo médicos evaluadores, jefes de vacunación y administradores.
+
+Los usuarios que únicamente deseen reportar un ESAVI no necesitan autenticarse y pueden acceder directamente al formulario de reporte disponible en la página principal.
+
+\subsection{Acceso a la pantalla de autenticación}
+
+Desde la página principal del sistema, seleccione la opción \textbf{Iniciar Sesión}, ubicada en la esquina superior derecha de la interfaz, tal como se muestra en la Figura \ref{fig:home-login}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{reporte/home_login.drawio.png}
+\caption{Acceso a la pantalla de inicio de sesión}
+\label{fig:home-login}
+\end{figure}
+
+Al seleccionar esta opción, el sistema mostrará la pantalla de autenticación presentada en la Figura \ref{fig:login-panel}.
+
+\subsection{Autenticación de usuarios}
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{reporte/login_pane.drawio.png}
+\caption{Pantalla de inicio de sesión}
+\label{fig:login-panel}
+\end{figure}
+
+Para acceder al sistema:
+
+\begin{enumerate}
+\item Introduzca su dirección de correo electrónico institucional.
+\item Introduzca su contraseña.
+\item Espere a que la verificación CAPTCHA cargue completamente.
+\item Marque la casilla \textbf{Soy humano}.
+\item Presione el botón \textbf{Iniciar Sesión}.
+\end{enumerate}
+
+Si las credenciales son válidas, el sistema redirigirá automáticamente al panel principal correspondiente al rol del usuario. 
+En caso contrario, se mostrará un mensaje de error indicando que el correo electrónico o la contraseña son incorrectos, como se muestra en la Figura \ref{fig:login-error}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{reporte/login_incorrecto.drawio.png}
+\caption{Mensaje mostrado cuando las credenciales son incorrectas}
+\label{fig:login-error}
+\end{figure}
+
+Ante esta situación, se recomienda:
+
+\begin{itemize}
+\item Verifique que el correo electrónico y la contraseña hayan sido introducidos correctamente.
+\item Complete nuevamente la verificación CAPTCHA si el sistema lo solicita.
+\end{itemize}
+
+Si el problema persiste después de varios intentos, contacte con el administrador del sistema para verificar el estado de su cuenta o solicitar asistencia técnica.
+
+
+\chapter{Funcionalidades del Jefe de Vacunación}
+
+El Jefe de Vacunación es responsable de supervisar los reportes de ESAVI pertenecientes a su municipio, así como de asignar y reasignar reportes a los médicos evaluadores correspondientes.
+
+\section{Gestión de Reportes}
+
+\subsection{Acceso al módulo de reportes}
+
+Una vez autenticado, el sistema mostrará el panel principal del Jefe de Vacunación, como se observa en la Figura \ref{fig:jefe-home}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{jefe/jefe_home.drawio.png}
+\caption{Panel principal del Jefe de Vacunación}
+\label{fig:jefe-home}
+\end{figure}
+
+Para acceder a la gestión de reportes, seleccione la opción \textbf{Gestionar Reportes} señalada en la interfaz.
+
+\newpage
+
+\subsection{Consulta y filtrado de reportes}
+
+La Figura \ref{fig:filtro-reportes} muestra la ventana principal de gestión de reportes.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{jefe/filtro_reportes.drawio.png}
+\caption{Listado y filtrado de reportes}
+\label{fig:filtro-reportes}
+\end{figure}
+
+El sistema permite filtrar los reportes del municipio utilizando diferentes criterios:
+
+\begin{itemize}
+\item Gravedad del evento reportado.
+\item Vacuna asociada al reporte.
+\item Estado del reporte.
+\item Ordenamiento por fecha de creación.
+\item Ordenamiento alfabético por nombre.
+\item Orden ascendente o descendente.
+\end{itemize}
+
+Debajo de la sección de filtros se muestra el listado de reportes disponibles.
+
+Los reportes clasificados como \textbf{serios} aparecen resaltados en color rojo, mientras que los reportes \textbf{no serios} se muestran en color amarillo.
+
+Cada elemento del listado presenta información relevante, incluyendo:
+
+\begin{itemize}
+\item Nombre del reportante.
+\item Vacuna asociada.
+\item Fecha del reporte.
+\item Último médico evaluador asignado.
+\end{itemize}
+
+La opción \textbf{Asignar} únicamente estará disponible para reportes en estado \textbf{Enviado}.
+
+\newpage
+
+\subsection{Reasignación de reportes}
+
+En determinadas situaciones puede ser necesario reasignar un reporte a otro médico evaluador.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{jefe/reasignar.drawio.png}
+\caption{Opción de reasignación de reportes}
+\label{fig:reasignar-reporte}
+\end{figure}
+
+La opción \textbf{Reasignar} solo estará disponible cuando:
+
+\begin{itemize}
+\item El reporte se encuentre en estado \textbf{En Revisión}.
+\item El tiempo establecido para la evaluación anterior haya expirado.
+\end{itemize}
+
+\newpage
+
+\subsection{Asignación de médicos evaluadores}
+
+Al seleccionar la opción \textbf{Asignar} o \textbf{Reasignar}, se mostrará la ventana presentada en la Figura \ref{fig:seleccionar-medico}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/seleccionar_medico_asignar.drawio.png}
+\caption{Selección de médico evaluador}
+\label{fig:seleccionar-medico}
+\end{figure}
+
+Para realizar una asignación:
+
+\begin{enumerate}
+\item Seleccione un médico evaluador del listado desplegable.
+\item Verifique que el profesional seleccionado sea el adecuado para atender el reporte.
+\item Presione el botón \textbf{Asignar}.
+\item Espere la confirmación de la operación.
+\end{enumerate}
+
+El botón de asignación permanecerá deshabilitado hasta que se seleccione un médico válido.
+
+Una vez completada exitosamente la asignación, el sistema mostrará una notificación similar a la presentada en la Figura \ref{fig:reporte-asignado}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/mensaje_reporte_asignado.drawio.png}
+\caption{Confirmación de asignación exitosa}
+\label{fig:reporte-asignado}
+\end{figure}
+
+La aparición de este mensaje confirma que el reporte ha sido asignado correctamente y que el médico evaluador seleccionado podrá acceder al caso para iniciar el proceso de revisión.
+
+\section{Gestión de Duplicados}
+
+Con el objetivo de evitar el procesamiento repetido de un mismo caso, el sistema identifica automáticamente reportes que podrían corresponder a un ESAVI previamente registrado.
+
+Un reporte es marcado como \textbf{posible duplicado} cuando coincide con otro reporte existente en los siguientes criterios:
+
+\begin{itemize}
+\item Identificador del sujeto vacunado.
+\item Fecha de vacunación.
+\item Vacuna administrada.
+\end{itemize}
+
+La detección automática constituye únicamente una sospecha inicial. Corresponde al Jefe de Vacunación revisar la información disponible y determinar si ambos reportes representan realmente el mismo evento o si se trata de casos distintos.
+
+\subsection{Acceso a la gestión de duplicados}
+
+La funcionalidad de revisión de duplicados se encuentra disponible dentro del módulo \textbf{Gestionar Reportes}, mediante la opción \textbf{Ver Duplicados}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/ver_duplicados.drawio.png}
+\caption{Acceso al módulo de gestión de duplicados}
+\label{fig:ver-duplicados}
+\end{figure}
+
+\newpage
+
+\subsection{Listado de posibles duplicados}
+
+La Figura \ref{fig:listado-duplicados} muestra el listado de reportes identificados por el sistema como posibles duplicados.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/duplicados.drawio.png}
+\caption{Listado de posibles reportes duplicados}
+\label{fig:listado-duplicados}
+\end{figure}
+
+Para cada caso se muestra información básica de ambos reportes, incluyendo:
+
+\begin{itemize}
+\item Nombre del sujeto vacunado.
+\item Fecha del reporte.
+\item Estado actual del reporte original.
+\item Médico evaluador asignado, si existe.
+\end{itemize}
+
+Mientras no se emita un veredicto, el reporte sospechoso permanecerá bloqueado y no podrá ser asignado a ningún médico evaluador.
+
+El Jefe de Vacunación dispone de las siguientes opciones:
+
+\begin{itemize}
+\item \textbf{Ver Comparación}: permite examinar detalladamente ambos reportes.
+\item \textbf{Duplicado}: confirma que ambos reportes corresponden al mismo caso.
+\item \textbf{No Duplicado}: indica que los reportes representan eventos diferentes.
+\end{itemize}
+
+\newpage
+
+\subsection{Comparación de reportes}
+
+Antes de emitir un veredicto, se recomienda revisar cuidadosamente la información contenida en ambos reportes.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/comparación_reportes_duplicados.jpg}
+\caption{Comparación detallada de posibles reportes duplicados}
+\label{fig:comparacion-duplicados}
+\end{figure}
+
+La información se presenta en dos columnas para facilitar la comparación entre ambos registros.
+
+Entre los elementos que pueden analizarse se encuentran:
+
+\begin{itemize}
+\item Fechas de aparición de los eventos adversos.
+\item Síntomas reportados.
+\item Información médica asociada.
+\item Datos de vacunación.
+\end{itemize}
+
+Al final de la página se encuentran disponibles las opciones para clasificar definitivamente el reporte como duplicado o no duplicado.
+
+\newpage
+
+\subsection{Marcación de un reporte como duplicado}
+
+Si tras la revisión se concluye que ambos registros corresponden al mismo caso, debe seleccionarse la opción \textbf{Duplicado}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/mensaje_ver_reporte_duplicado.jpg}
+\caption{Notificación de clasificación de reporte como duplicado}
+\label{fig:mensaje-duplicado}
+\end{figure}
+
+Una vez procesada la operación, el sistema mostrará una notificación de confirmación en la esquina inferior derecha de la pantalla, similar a la mostrada en la Figura \ref{fig:mensaje-duplicado}. Este mensaje indica que la clasificación fue realizada correctamente.
+
+Tras esta acción:
+
+\begin{itemize}
+\item El reporte original se mantiene activo.
+\item El reporte identificado como duplicado es descartado.
+\item El reporte descartado no podrá ser asignado a un médico evaluador.
+\item La decisión quedará registrada en el sistema para futuras consultas.
+\end{itemize}
+
+Si se determina que ambos registros corresponden a eventos distintos, debe seleccionarse la opción \textbf{No Duplicado}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/mensaje_no_duplicado.jpg}
+\caption{Notificación de clasificación de reporte como no duplicado}
+\label{fig:mensaje-no-duplicado}
+\end{figure}
+
+Al completarse la operación, el sistema mostrará una notificación de confirmación en la esquina inferior derecha de la pantalla, similar a la presentada en la Figura \ref{fig:mensaje-no-duplicado}, indicando que la clasificación fue realizada exitosamente.
+
+Tras esta decisión:
+
+\begin{itemize}
+\item El sistema considerará el reporte como un caso independiente.
+\item El reporte podrá continuar su flujo normal de procesamiento.
+\item El caso estará disponible para su asignación a un médico evaluador.
+\item Ambos reportes permanecerán registrados como eventos independientes dentro del sistema.
+\end{itemize}
+
+
+\section{Gestión de Médicos}
+
+La funcionalidad de gestión de médicos permite al Jefe de Vacunación consultar la información de los médicos evaluadores pertenecientes a su municipio, así como registrar nuevos profesionales en el sistema.
+
+\subsection{Acceso al módulo de gestión de médicos}
+
+Desde el panel principal, seleccione la opción \textbf{Gestionar Médicos}, como se muestra en la Figura \ref{fig:jefe-home-medicos}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.9\textwidth]{jefe/jefe_hom_medicos.drawio.png}
+\caption{Acceso al módulo de gestión de médicos}
+\label{fig:jefe-home-medicos}
+\end{figure}
+
+
+
+\subsection{Consulta de médicos}
+
+La Figura \ref{fig:vista-medicos} muestra la vista principal de gestión de médicos.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/vista_medicos.drawio.png}
+\caption{Listado de médicos evaluadores}
+\label{fig:vista-medicos}
+\end{figure}
+
+En esta pantalla se muestra el listado de médicos registrados en el municipio junto con información relevante para el seguimiento de su actividad.
+
+La sección de filtros permite ordenar o localizar médicos utilizando diferentes criterios:
+
+\begin{itemize}
+\item Especialidad médica.
+\item Fecha de registro.
+\item Número total de asignaciones recibidas.
+\item Número de asignaciones completadas.
+\item Nombre del médico.
+\item Tiempo promedio de revisión de reportes.
+\end{itemize}
+
+Cada criterio puede ordenarse de forma ascendente o descendente según las necesidades del usuario.
+
+En la esquina superior derecha se encuentra el botón \textbf{Agregar Médico}, utilizado para registrar nuevos médicos evaluadores.
+
+
+
+\subsection{Registro de un nuevo médico}
+
+Al seleccionar la opción \textbf{Agregar Médico}, el sistema mostrará el formulario presentado en la Figura \ref{fig:registrar-medico}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=0.8\textwidth]{jefe/registrar_medico.drawio.png}
+\caption{Formulario de registro de médicos}
+\label{fig:registrar-medico}
+\end{figure}
+
+Para completar el registro:
+
+\begin{enumerate}
+\item Rellene todos los campos marcados con un asterisco (*).
+\item Verifique que la dirección de correo electrónico sea válida y se encuentre correctamente escrita.
+\item Compruebe que el número de registro profesional corresponda exactamente al médico que se desea registrar.
+\item Revise la información antes de enviar el formulario.
+\end{enumerate}
+
+Una vez completados correctamente todos los datos requeridos, el sistema habilitará la opción para realizar el registro.
+
+
+
+\subsection{Validación de datos}
+
+Durante el proceso de registro, el sistema valida automáticamente la información introducida por el usuario.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=1.0\textwidth]{jefe/formato_error.drawio.png}
+\caption{Ejemplo de validación de datos durante el registro}
+\label{fig:formato-error}
+\end{figure}
+
+Si algún dato no cumple el formato esperado, se mostrará un mensaje de error junto al campo correspondiente, como se observa en la Figura \ref{fig:formato-error}.
+
+Entre las validaciones más comunes se encuentran:
+
+\begin{itemize}
+\item Formato incorrecto del correo electrónico.
+\item Campos obligatorios sin completar.
+\item Valores no válidos en determinados campos del formulario.
+\end{itemize}
+
+Antes de continuar, lea cuidadosamente los mensajes mostrados por el sistema y corrija los errores señalados. Cuando todas las validaciones sean satisfactorias, el botón de registro quedará habilitado y podrá completarse la creación del nuevo médico evaluador.
+
+
+
+\section{Dashboard}
+
+El módulo de \textbf{Dashboard} proporciona información estadística y visual que apoya la toma de decisiones relacionadas con la vigilancia de los ESAVI en el municipio.
+
+\subsection{Acceso al Dashboard}
+
+Desde el panel principal del Jefe de Vacunación, seleccione la opción \textbf{Dashboard} ubicada en la barra de navegación superior, como se muestra en la Figura \ref{fig:home-dashboard}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{jefe/home_dashboard.drawio.png}
+\caption{Acceso al módulo Dashboard}
+\label{fig:home-dashboard}
+\end{figure}
+
+\newpage
+
+\subsection{Visualización de estadísticas}
+
+Al acceder al módulo, el sistema mostrará un conjunto de paneles estadísticos organizados en diferentes vistas, accesibles mediante la barra de navegación horizontal situada en la parte superior de la pantalla.
+
+\begin{figure}[htpb]
+\centering
+
+\begin{subfigure}{0.95\textwidth}
+\centering
+\includegraphics[width=\textwidth]{jefe/dashboard.drawio.png}
+\caption{Resumen general de reportes}
+\end{subfigure}
+
+\vspace{0.5cm}
+
+\begin{subfigure}{0.95\textwidth}
+\centering
+\includegraphics[width=\textwidth]{jefe/dashboard_2.jpg}
+\caption{Indicadores de rendimiento de médicos evaluadores}
+\end{subfigure}
+
+\vspace{0.5cm}
+
+\begin{subfigure}{0.95\textwidth}
+\centering
+\includegraphics[width=\textwidth]{jefe/dsahboard_3.jpg}
+\caption{Análisis epidemiológico de síntomas, vacunas y eventos adversos}
+\end{subfigure}
+
+\caption{Vistas disponibles dentro del módulo Dashboard}
+\label{fig:dashboard-completo}
+\end{figure}
+
+La primera vista presenta un resumen general de la actividad del sistema, incluyendo indicadores como:
+
+\begin{itemize}
+\item Cantidad total de reportes registrados.
+\item Reportes completados.
+\item Reportes en revisión.
+\item Reportes pendientes de asignación.
+\item Distribución de estados de los reportes.
+\end{itemize}
+
+La segunda vista está orientada al seguimiento del desempeño de los médicos evaluadores del municipio. Entre los indicadores disponibles se encuentran:
+
+\begin{itemize}
+\item Número total de reportes asignados.
+\item Reportes completados.
+\item Reportes vencidos.
+\item Reportes actualmente en revisión.
+\item Tiempo promedio de evaluación.
+\end{itemize}
+
+La tercera vista permite analizar tendencias epidemiológicas relacionadas con los ESAVI reportados. En ella pueden consultarse estadísticas sobre:
+
+\begin{itemize}
+\item Síntomas más frecuentes.
+\item Vacunas más reportadas.
+\item Eventos adversos registrados con mayor frecuencia.
+\item Clasificaciones de causalidad.
+\item Distribución general de los eventos observados.
+\end{itemize}
+
+Estas visualizaciones permiten identificar patrones relevantes y facilitan el monitoreo continuo de la actividad de farmacovigilancia en el municipio.
+
+
+
+\chapter{Funcionalidades del Médico Evaluador}
+
+El Médico Evaluador es responsable de analizar los reportes de ESAVI que le han sido asignados, revisar la información disponible y emitir una evaluación clínica especializada del caso.
+
+\section{Revisión de Reportes Asignados}
+
+\subsection{Acceso al módulo de reportes}
+
+Una vez autenticado, el Médico Evaluador accederá a su panel principal, como se muestra en la Figura \ref{fig:medico-home}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{medico/home_medico.drawio.png}
+\caption{Panel principal del Médico Evaluador}
+\label{fig:medico-home}
+\end{figure}
+
+Para consultar los casos pendientes de revisión, seleccione la opción correspondiente a los reportes asignados.
+
+\newpage
+
+\subsection{Consulta de reportes asignados}
+
+La Figura \ref{fig:reportes-asignados} muestra el listado de reportes asignados al médico.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{medico/reportes_asignados.drawio.png}
+\caption{Listado de reportes asignados}
+\label{fig:reportes-asignados}
+\end{figure}
+
+La sección de filtros permite localizar reportes utilizando diferentes criterios:
+
+\begin{itemize}
+\item Nombre de la vacuna.
+\item Gravedad del evento.
+\item Fecha de reporte.
+\item Nombre del sujeto vacunado.
+\end{itemize}
+
+Los resultados pueden ordenarse de forma ascendente o descendente según el criterio seleccionado.
+
+Para cada reporte se encuentran disponibles las siguientes acciones:
+
+\begin{itemize}
+\item \textbf{Ver y Completar}: permite revisar el reporte y registrar la evaluación clínica.
+\item \textbf{Descargar PDF}: genera una copia del reporte en formato PDF para su consulta o archivo.
+\end{itemize}
+
+\newpage
+
+\subsection{Evaluación clínica del reporte}
+
+Al seleccionar la opción \textbf{Ver y Completar}, el sistema mostrará toda la información registrada para el caso.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{medico/revision_2.jpg}
+
+\vspace{0.4cm}
+
+\includegraphics[width=\textwidth]{medico/revision_3.drawio (1).png}
+
+\caption{Información completa del reporte y sección de evaluación clínica}
+\label{fig:evaluacion-clinica}
+\end{figure}
+
+Durante la revisión, el médico puede consultar toda la información asociada al reporte, incluyendo:
+
+\begin{itemize}
+\item Información del reportante.
+\item Datos del sujeto vacunado.
+\item Información de vacunación.
+\item Eventos adversos reportados.
+\item Antecedentes e información médica adicional.
+\end{itemize}
+
+Al final de la página se encuentra el formulario de evaluación clínica, donde el médico debe completar los campos requeridos para emitir su criterio profesional.
+
+Entre los elementos de evaluación disponibles se encuentran:
+
+\begin{itemize}
+\item Clasificación de causalidad.
+\item Significancia clínica.
+\item Resultados de laboratorio.
+\item Código MedDRA asociado.
+\item Clasificación RET.
+\item Observaciones médicas adicionales.
+\end{itemize}
+
+Una vez completada la evaluación, presione el botón \textbf{Guardar Evaluación} para registrar el resultado en el sistema.
+
+\newpage
+
+\subsection{Confirmación de evaluación}
+
+Cuando la evaluación es almacenada correctamente, el sistema mostrará una notificación de confirmación en la esquina inferior derecha de la pantalla, similar a la presentada en la Figura \ref{fig:mensaje-revision}.
+
+\begin{figure}[htpb]
+\centering
+\includegraphics[width=\textwidth]{medico/mensaje_revision.jpg}
+\caption{Notificación de evaluación registrada exitosamente}
+\label{fig:mensaje-revision}
+\end{figure}
+
+La aparición de este mensaje confirma que la evaluación clínica fue almacenada correctamente y que el reporte ha avanzado dentro de su flujo de procesamiento.
+
+\newpage 
+
+\section{Activación de Cuenta}
+
+Los médicos evaluadores son registrados inicialmente por el Jefe de Vacunación. Una vez completado el registro, el sistema envía automáticamente un correo electrónico de invitación para activar la cuenta.
+
+\subsection{Correo de invitación}
+
+La Figura \ref{fig:correo-invitacion} muestra un ejemplo del correo electrónico enviado por la plataforma.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{jefe/email_verificacion.drawio.png}
+\caption{Correo electrónico de activación de cuenta}
+\label{fig:correo-invitacion}
+\end{figure}
+
+El mensaje contiene información sobre la creación de la cuenta y un enlace seguro para completar el proceso de registro.
+
+Para continuar:
+
+\begin{enumerate}
+\item Abra el correo electrónico recibido.
+\item Localice el enlace de activación proporcionado por la plataforma.
+\item Seleccione el enlace para acceder al formulario de activación.
+\end{enumerate}
+
+
+\subsection{Completar registro}
+
+Al acceder mediante el enlace recibido, el sistema mostrará la pantalla presentada en la Figura \ref{fig:completar-registro}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{jefe/correo_login.drawio.png}
+\caption{Formulario de activación de cuenta}
+\label{fig:completar-registro}
+\end{figure}
+
+Para finalizar el proceso de activación:
+
+\begin{enumerate}
+\item Introduzca su número de registro profesional.
+\item Cree una contraseña segura para la cuenta.
+\item Confirme la contraseña introducida.
+\item Presione el botón \textbf{Completar Registro}.
+\end{enumerate}
+
+Una vez completado el proceso satisfactoriamente, la cuenta quedará habilitada y el médico podrá iniciar sesión en la plataforma utilizando su correo electrónico y la contraseña definida.
+
+\textbf{Nota:} Por motivos de seguridad, la contraseña debe mantenerse confidencial y no debe compartirse con otros usuarios.
+
+
+\chapter{Funcionalidades del Administrador}
+
+El Administrador posee acceso a las funcionalidades de configuración y supervisión global del sistema. Entre sus responsabilidades se encuentran la gestión de jefes de vacunación, la administración de catálogos y el monitoreo de indicadores mediante el dashboard administrativo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/home.drawio.png}
+\caption{Panel principal del Administrador}
+\label{fig:admin-home}
+\end{figure}
+
+Desde el panel principal se encuentran disponibles las siguientes funcionalidades:
+
+\begin{itemize}
+\item Consulta de reportes.
+\item Dashboard administrativo.
+\item Gestión de catálogos.
+\item Gestión de jefes de vacunación.
+\end{itemize}
+
+\section{Gestión de Jefes de Vacunación}
+
+La gestión de jefes de vacunación permite administrar los usuarios responsables de coordinar el proceso de evaluación de reportes dentro de cada municipio.
+
+\subsection{Consulta y filtrado de jefes de vacunación}
+
+Al seleccionar la opción \textbf{Gestionar Jefes Municipales}, el sistema mostrará la pantalla presentada en la Figura \ref{fig:gestionar-jefes}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{admin/gestionar_jefes.drawio.png}
+\caption{Gestión de jefes de vacunación}
+\label{fig:gestionar-jefes}
+\end{figure}
+
+La sección de filtros permite localizar usuarios registrados mediante los siguientes criterios:
+
+\begin{itemize}
+\item Provincia.
+\item Municipio.
+\item Nombre del jefe de vacunación.
+\end{itemize}
+
+Para aplicar los filtros configurados, presione el botón \textbf{Filtrar}. Si desea restablecer la vista inicial y eliminar los filtros aplicados, utilice la opción \textbf{Limpiar}.
+
+En la esquina superior derecha se encuentra disponible el botón \textbf{Agregar Jefe Municipal}, utilizado para registrar nuevos usuarios con este rol.
+
+\subsection{Registro de un jefe de vacunación}
+
+Al seleccionar la opción \textbf{Agregar Jefe Municipal}, se mostrará el formulario de registro presentado en la Figura \ref{fig:registrar-jefe}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{admin/registrar_jefe.drawio.png}
+\caption{Formulario de registro de jefe de vacunación}
+\label{fig:registrar-jefe}
+\end{figure}
+
+Para completar el registro:
+
+\begin{enumerate}
+\item Introduzca la información solicitada en el formulario.
+\item Verifique que todos los datos sean correctos antes de continuar.
+\item Compruebe especialmente que la dirección de correo electrónico sea válida.
+\item Presione el botón \textbf{Agregar}.
+\end{enumerate}
+
+El correo electrónico proporcionado será utilizado posteriormente para enviar la invitación de acceso y permitir la activación de la cuenta del nuevo jefe de vacunación.
+
+\subsection{Confirmación de registro}
+
+Una vez completado el proceso de registro, el sistema mostrará una notificación de confirmación similar a la presentada en la Figura \ref{fig:registro-jefe-exitoso}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{admin/mensaje_registro_exitoso.jpg}
+\caption{Notificación de registro exitoso}
+\label{fig:registro-jefe-exitoso}
+\end{figure}
+
+La aparición de esta notificación en la esquina inferior derecha de la pantalla confirma que el jefe de vacunación ha sido registrado correctamente y que el proceso de invitación puede continuar.
+
+
+\section{Gestión de Catálogos}
+
+La gestión de catálogos permite al Administrador mantener actualizada la información utilizada por el sistema durante el registro y evaluación de los reportes de ESAVI. Entre los elementos administrables se encuentran los síntomas, las vacunas y los lotes de vacunas.
+
+\subsection{Gestión de síntomas}
+
+La Figura \ref{fig:registro-sintoma} muestra el formulario utilizado para registrar nuevos síntomas en el sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/registar_sintoma.drawio.png}
+\caption{Formulario de registro de síntomas}
+\label{fig:registro-sintoma}
+\end{figure}
+
+Para registrar un nuevo síntoma, complete la información solicitada y seleccione su estado correspondiente. Los síntomas pueden registrarse como activos o inactivos según su disponibilidad para ser utilizados en futuros reportes.
+
+La Figura \ref{fig:catalogo-sintomas} muestra el listado de síntomas registrados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/sintoma_catalogo2.drawio.png}
+\caption{Catálogo de síntomas registrados}
+\label{fig:catalogo-sintomas}
+\end{figure}
+
+En esta vista se muestra información como:
+
+\begin{itemize}
+\item Nombre del síntoma.
+\item Categoría asociada.
+\item Estado actual del registro.
+\end{itemize}
+
+Mediante el interruptor disponible en cada fila es posible activar o desactivar síntomas sin necesidad de eliminarlos del sistema.
+
+\subsection{Gestión de vacunas}
+
+La Figura \ref{fig:registro-vacuna} muestra el formulario para registrar nuevas vacunas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/gestionar_vacuna.drawio.png}
+\caption{Formulario de registro de vacunas}
+\label{fig:registro-vacuna}
+\end{figure}
+
+Para registrar una vacuna:
+
+\begin{enumerate}
+\item Complete la información general de la vacuna.
+\item Seleccione un fabricante existente o registre uno nuevo.
+\item En caso de registrar un nuevo fabricante, introduzca su nombre y país de origen.
+\item Presione el botón \textbf{Registrar}.
+\end{enumerate}
+
+Las vacunas también pueden configurarse como activas o inactivas según las necesidades del sistema.
+
+La Figura \ref{fig:catalogo-vacunas} muestra el catálogo de vacunas registradas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/vacuna_catalogo.drawio.png}
+\caption{Catálogo de vacunas registradas}
+\label{fig:catalogo-vacunas}
+\end{figure}
+
+Desde esta pantalla es posible consultar las vacunas registradas y modificar su estado mediante los controles de activación y desactivación.
+
+\subsection{Gestión de lotes de vacunas}
+
+La Figura \ref{fig:registro-lote} muestra la interfaz utilizada para registrar lotes de vacunas del Instituto Finlay de Vacunas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{admin/catalog_lote.drawio.png}
+\caption{Registro de lotes de vacunas}
+\label{fig:registro-lote}
+\end{figure}
+
+Para registrar un nuevo lote:
+
+\begin{enumerate}
+\item Seleccione una vacuna del Instituto Finlay previamente registrada en el sistema.
+\item Introduzca el número de lote correspondiente.
+\item Presione el botón \textbf{Registrar}.
+\end{enumerate}
+
+Los lotes registrados estarán disponibles posteriormente durante el proceso de notificación de reportes, permitiendo una identificación más precisa de las vacunas administradas.
+
+\section{Dashboard Administrativo}
+
+El Dashboard Administrativo proporciona una visión global del funcionamiento del sistema de farmacovigilancia. Esta herramienta permite monitorear indicadores operacionales, evaluar el desempeño de los usuarios y analizar tendencias relacionadas con los reportes de ESAVI registrados en la plataforma.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{admin/dashboard.drawio.png}
+\caption{Dashboard administrativo}
+\label{fig:dashboard-administrativo}
+\end{figure}
+
+El dashboard se encuentra organizado en tres secciones principales, accesibles mediante la barra de navegación superior.
+
+\subsection{Indicadores de Rendimiento}
+
+Esta sección permite evaluar el desempeño general del proceso de gestión de reportes y de los usuarios responsables de su revisión.
+
+Entre los indicadores disponibles se encuentran:
+
+\begin{itemize}
+\item Tiempo promedio de asignación de reportes.
+\item Tiempo promedio de revisión.
+\item Cantidad de médicos evaluadores activos.
+\item Distribución de reportes por médico.
+\item Estado actual de las evaluaciones en curso.
+\end{itemize}
+
+Estos indicadores permiten identificar posibles retrasos y optimizar la distribución de la carga de trabajo entre los médicos evaluadores.
+
+\subsection{Indicadores de Reportes}
+
+Esta vista presenta información consolidada sobre los reportes registrados en el sistema.
+
+Entre las estadísticas disponibles se incluyen:
+
+\begin{itemize}
+\item Total de reportes registrados.
+\item Reportes completados.
+\item Reportes en revisión.
+\item Reportes pendientes de asignación.
+\item Distribución de reportes por provincia.
+\item Tendencias temporales de notificación.
+\end{itemize}
+
+La información facilita el seguimiento de la actividad de farmacovigilancia a nivel nacional y provincial.
+
+\subsection{Indicadores de Vacunas y Eventos Adversos}
+
+Esta sección permite analizar los datos epidemiológicos recopilados por la plataforma.
+
+Entre los indicadores disponibles se encuentran:
+
+\begin{itemize}
+\item Vacunas más reportadas.
+\item Lotes de vacunas con mayor cantidad de notificaciones.
+\item Síntomas más frecuentes.
+\item Eventos adversos más reportados.
+\item Distribución de clasificaciones de causalidad.
+\item Tendencias asociadas a vacunas específicas.
+\end{itemize}
+
+Estas visualizaciones contribuyen a la detección temprana de patrones y apoyan la toma de decisiones relacionadas con la vigilancia de la seguridad vacunal.
+
+
+
+
+
+\section{Consulta de Reportes}
+
+La funcionalidad de consulta de reportes permite al Administrador visualizar, filtrar y exportar la información de los reportes de ESAVI registrados en el sistema.
+
+\subsection{Listado de reportes}
+
+Al acceder a la opción \textbf{Consultar Reportes}, el sistema mostrará una vista similar a la presentada en la Figura \ref{fig:consulta-reportes}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{admin/consultar_reporte.drawio.png}
+\caption{Vista general de consulta de reportes}
+\label{fig:consulta-reportes}
+\end{figure}
+
+En la parte superior de la pantalla se encuentra la sección de filtros, que permite restringir los resultados mostrados utilizando diferentes criterios de búsqueda.
+
+Entre los filtros disponibles se encuentran:
+
+\begin{itemize}
+\item Vacuna administrada.
+\item Gravedad del evento adverso.
+\item Estado actual del reporte.
+\item Provincia de procedencia.
+\end{itemize}
+
+Los resultados se actualizan automáticamente a medida que se modifican los filtros de búsqueda.
+Asimismo, el sistema permite exportar la información visible a un archivo de Excel mediante la opción \textbf{Exportar a Excel}.
+
+La tabla de resultados muestra información resumida de cada reporte, incluyendo:
+
+\begin{itemize}
+\item Número de notificación.
+\item Nombre del sujeto vacunado.
+\item Vacuna reportada.
+\item Evento adverso principal.
+\item Nivel de severidad.
+\item Estado del reporte.
+\item Médico evaluador asignado, si corresponde.
+\end{itemize}
+
+\subsection{Consulta detallada de un reporte}
+
+Para visualizar toda la información asociada a un reporte específico, seleccione el número de notificación correspondiente dentro de la tabla de resultados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{admin/consulta_detallada.drawio.png}
+\caption{Vista detallada de un reporte}
+\label{fig:consulta-detallada}
+\end{figure}
+
+La vista detallada presenta toda la información registrada para el caso, incluyendo:
+
+\begin{itemize}
+\item Datos del sujeto vacunado.
+\item Información de vacunación.
+\item Eventos adversos reportados.
+\item Estado actual del reporte.
+\item Información del reportante.
+\item Historial de asignaciones realizadas.
+\item Evaluaciones médicas registradas.
+\end{itemize}
+
+Además, desde esta pantalla se encuentran disponibles las siguientes acciones:
+
+\begin{itemize}
+\item \textbf{Exportar a PDF}: genera una versión del reporte en formato PDF.
+\item \textbf{Exportar a TXT}: genera una copia del reporte en formato de texto.
+\end{itemize}
+
+Estas opciones permiten conservar, compartir o archivar la información del reporte según las necesidades de la institución.
+
+
+
+
+\chapter{Soporte y Contacto}
+
+Este manual describe las principales funcionalidades disponibles para los diferentes roles del Sistema Web para el Reporte de ESAVI del Instituto Finlay de Vacunas.
+
+Ante cualquier incidencia durante el uso de la plataforma, se recomienda realizar las siguientes comprobaciones antes de solicitar asistencia técnica:
+
+\begin{itemize}
+\item Verificar la disponibilidad de conexión a Internet.
+\item Confirmar que las credenciales de acceso sean correctas.
+\item Revisar que toda la información requerida haya sido completada adecuadamente.
+\item Actualizar la página del navegador e intentar nuevamente la operación.
+\item Comprobar que el navegador utilizado se encuentre actualizado.
+\end{itemize}
+
+Si el problema persiste, contacte con el personal responsable de la administración de la plataforma para recibir asistencia técnica especializada.
+
+
+\end{document}
