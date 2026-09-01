@@ -1,9 +1,6 @@
 
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.DTO.Authentication;
 using Finlay.PharmaVigilance.Application.IServices;
-using Finlay.PharmaVigilance.Application.IServices.Authentication;
-using Finlay.PharmaVigilance.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

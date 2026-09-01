@@ -4,3 +4,4 @@ bin/
 obj/
 test/
 finlay_client/
+issues.md

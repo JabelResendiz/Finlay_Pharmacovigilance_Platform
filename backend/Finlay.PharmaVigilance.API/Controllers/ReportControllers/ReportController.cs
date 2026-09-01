@@ -1,7 +1,5 @@
 using Finlay.PharmaVigilance.Application.DTO;
-using Finlay.PharmaVigilance.Application.Enum;
 using Finlay.PharmaVigilance.Application.IServices;
-using Finlay.PharmaVigilance.Application.IServices.Pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

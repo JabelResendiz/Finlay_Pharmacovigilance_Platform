@@ -88,6 +88,19 @@ The IFV context is important because the solution is not only a data-entry appli
 
 ---
 
+## 🏗️ Architecture at a glance
+
+- **Pattern:** Clean Architecture with CQRS and Repository/Unit of Work.
+- **Security:** JWT + refresh tokens, PBKDF2 hashing, row-level optimistic locking.
+- **Async:** RabbitMQ + MassTransit for notifications (email/WhatsApp).
+- **Database:** MySQL 8 with EF Core, Guid primary keys for security.
+- **Concurrency:** Optimistic locking via RowVersion; idempotency keys for report creation.
+- **Observability:** Audit logs + Serilog structured logging.
+
+For a complete breakdown, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+---
+
 ## Typical user flows
 
 ### 1. Citizen or reporter flow
@@ -117,6 +130,21 @@ Medical specialist review
         ↓
 Case classification and follow-up
 ```
+
+---
+
+
+
+## 📊 Testing & Quality
+
+The platform has been tested across multiple dimensions:
+
+- **Performance:** Load testing with k6 (supports 70 concurrent users).
+- **Usability:** SUS score of 90/100 (Excelente).
+- **Accessibility:** WCAG 2.1 AA compliance (89-98 points).
+- **Code Coverage:** 92% backend, 68% frontend.
+
+For detailed results, see [`docs/test-results.md`](docs/test-results.md).
 
 ---
 
@@ -214,7 +242,7 @@ Please review the corresponding README for the component you wish to set up. The
 
 ---
 
-## Docker-based startup
+<!-- ## Docker-based startup
 
 The project includes a Docker Compose configuration for local development and testing.
 
@@ -235,43 +263,7 @@ To remove volumes when resetting the environment:
 
 ```bash
 docker compose down -v
-```
-
----
-
-## Environment and configuration
-
-The application configuration is defined in the ASP.NET project settings. Typical values include:
-
-- database connection string
-- JWT secret and issuer configuration
-- SMTP or email configuration
-- RabbitMQ connection settings
-
-The project uses configuration files and environment variables to support different environments such as development and production.
-
----
-
-## Suggested development workflow
-
-1. Start infrastructure with Docker.
-2. Restore and build the .NET solution.
-3. Run the API locally.
-4. Validate endpoints through Swagger.
-5. Apply database migrations if required.
-6. Test report creation, duplicate detection, and internal review flows.
-
----
-
-## Security considerations
-
-This project deals with medical and potentially sensitive information, therefore the following should be treated as essential:
-
-- secure authentication and authorization for internal users
-- controlled access to medical review workflows
-- careful handling of personal or clinical data
-- audit logs and traceability for all important actions
-- secure management of environment variables and secrets
+``` -->
 
 ---
 
@@ -294,14 +286,17 @@ This project is distributed under the terms defined in the repository license. P
 
 ---
 
-## Contact and project ownership
+## 📬 Contact and project ownership
 
-This solution is intended for institutional public health and pharmacovigilance use, especially in the context of the Instituto Finlay de Vacunas (IFV). Its design is oriented toward practical safety monitoring, clinical documentation, and operational response.
+This project was developed in the context of the **Instituto Finlay de Vacunas (IFV)** to support public health surveillance and pharmacovigilance workflows.
 
-If you want, I can also create a second version of the README focused on:
+For inquiries, please contact the project maintainer:
 
-- a more executive and institutional presentation for stakeholders
-- a technical README for developers
-- a lighter GitHub landing-page style README
-- a version with badges, screenshots, and a structured architecture section
+- **Maintainer:** Jabel Resendiz Aguirre
+- **Email:** jabelresendiz03@gmail.com 
+- **Institution:** Instituto Finlay de Vacunas (IFV)
+
+---
+
+**© 2026 Finlay Pharmacovigilance Platform – All rights reserved.**
 

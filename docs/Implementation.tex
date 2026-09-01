@@ -1,0 +1,1268 @@
+\chapter{Detalles de Implementación}
+\label{chapter:implementation}
+
+\section{Introducción}
+
+Este capítulo describe los principales aspectos relacionados con la implementación del sistema web desarrollado para el autorreporte y la gestión operativa de \gls{esavi}. 
+El contenido aborda las tecnologías y herramientas incorporadas durante el desarrollo, la organización estructural de la solución y los mecanismos implementados tanto en la capa de servicios como en la interfaz de usuario.
+
+La implementación materializa las decisiones arquitectónicas definidas en el capítulo anterior mediante una arquitectura modular. 
+La solución integra mecanismos de autenticación, comunicación asíncrona, persistencia de datos y validación de información, con el propósito de garantizar escalabilidad, mantenibilidad y seguridad.
+
+Además, el capítulo expone los principales componentes funcionales de la plataforma, incluyendo el registro de reportes de ESAVI, la gestión de revisiones médicas, la asignación de responsables y el sistema de notificaciones. 
+Finalmente, el contenido aborda elementos asociados al despliegue y la organización técnica de la aplicación.
+
+\section{Tecnologías y herramientas utilizadas}
+\label{section:technologies}
+
+El sistema utiliza el conjunto de tecnologías seleccionadas en el Capítulo \ref{chapter:marco-teorico-referencial}. 
+Este apartado presenta las versiones específicas y las herramientas complementarias que materializaron el desarrollo.
+
+\subsection{Pila tecnológica principal}
+
+\textbf{C\# y .NET 8.} La capa de servicios utiliza C\# sobre .NET 8, cuya versión de soporte a largo plazo garantiza estabilidad y actualizaciones de seguridad durante todo el ciclo de vida del proyecto. 
+Para la persistencia, Entity Framework Core 8 permite trabajar con la base de datos mediante objetos del dominio sin escribir consultas SQL manualmente.
+
+\textbf{React 18 con TypeScript.} La interfaz de usuario emplea React 18, cuya versión introdujo el modo de renderizado concurrente que mejora la fluidez de la interfaz. 
+TypeScript añadió tipado estático al desarrollo, lo que redujo errores en tiempo de ejecución y mejoró la mantenibilidad del código.
+
+\textbf{MySQL 8.0.} El sistema utilizó MySQL 8.0 como motor de base de datos relacional, accedido mediante el proveedor Pomelo.EntityFrameworkCore.MySql. 
+MySQL Workbench facilitó la administración visual de la base de datos, el diseño de esquemas y la ejecución de consultas.
+
+\subsection{Herramientas de infraestructura y despliegue}
+
+\textbf{Docker.} La contenedorización de la aplicación empleó \textbf{Docker} para garantizar la consistencia entre los entornos de desarrollo, pruebas y producción. La documentación oficial de Docker establece que los contenedores empaquetan el código junto con todas sus dependencias, lo que asegura que el software funcione de manera uniforme en cualquier infraestructura \cite{docker-overview}. Esta característica elimina el clásico problema de ``en mi máquina funciona'' y facilita la distribución del proyecto.
+
+\textbf{Railway.} El despliegue de la API, la base de datos MySQL y los servicios externos como RabbitMQ recayó en \textbf{Railway}, una plataforma como servicio que permite aprovisionar infraestructura en la nube y conectar el despliegue directamente con un repositorio de GitHub \cite{railway-docs}. Railway gestiona de forma automática las variables de entorno, los volúmenes de datos y la exposición de puertos, y activa una nueva construcción y publicación con cada cambio en la rama principal, lo que reduce significativamente el esfuerzo operativo durante el desarrollo \cite{railway-deployments}.
+
+\textbf{Vercel.} Para la interfaz de usuario, el despliegue recayó en \textbf{Vercel}, una plataforma optimizada para aplicaciones web modernas que ofrece integración continua con repositorios de GitHub y distribución global mediante una red de entrega de contenido \cite{vercel-docs}.
+
+Es importante señalar que tanto Railway como Vercel constituyen soluciones de desarrollo y demostración, adoptadas exclusivamente para facilitar que el equipo de investigadores del Instituto Finlay de Vacunas (IFV) y los tutores del proyecto pudieran observar los avances de forma remota y en tiempo real. La arquitectura del sistema está diseñada para migrar y contenerizar en servidores físicos dedicados del IFV cuando el proyecto transite a la etapa de producción, garantizando así el control institucional sobre los datos y la infraestructura.
+
+\subsection{Herramientas de apoyo al desarrollo}
+
+\textbf{Visual Studio Code.} El desarrollo del proyecto transcurrió en \textbf{Visual Studio Code}, con las extensiones oficiales para C\# y Docker. 
+Microsoft recomienda este entorno para el desarrollo en .NET, ya que ofrece una integración completa con el SDK y la CLI de .NET \cite{vscode-dotnet}. 
+Dicha integración permite crear, compilar y ejecutar aplicaciones directamente desde el editor, lo que agiliza el flujo de trabajo \cite{vscode-csharp}.
+
+\textbf{Git y GitHub.} El control de versiones recayó con \textbf{Git} y el alojamiento del código en \textbf{GitHub}. 
+GitHub proporciona un historial completo de cambios donde es posible consultar qué modificaciones ocurrieron, quién las hizo y por qué \cite{github-commits}. 
+Al tratarse de un sistema distribuido, cada copia local del repositorio contiene el historial completo del proyecto, lo que permite recuperar cualquier estado anterior del código sin depender del servidor central \cite{pro-git-distributed}.
+
+\textbf{Swagger (Swashbuckle).} Para documentar y probar la API, el proyecto incorporó \textbf{Swagger} a través de la librería Swashbuckle, que genera automáticamente una interfaz web con todos las rutas, sus parámetros y permite ejecutar peticiones de prueba directamente desde el navegador \cite{swagger-ui}.
+
+
+
+\section{Implementación de la arquitectura}
+\label{section:backend}
+
+El Capítulo \ref{chapter:proposal} definió la arquitectura del sistema a partir de los criterios de diseño establecidos. 
+Este apartado describe cómo el código materializa esas decisiones.
+La implementación sigue la estructura en capas propuesta por la arquitectura limpia: dominio, aplicación, infraestructura y presentación. 
+Cada capa presenta los patrones utilizados, las tecnologías que los materializan y los fragmentos de código que ilustran las decisiones más relevantes.
+
+\subsection{Capa de Dominio}
+
+La capa de dominio constituye el núcleo del sistema y no depende de ningún otro proyecto de la solución ni de paquetes externos. 
+Contiene las entidades de negocio, los objetos de valor, los enumerados, los eventos de dominio y las reglas intrínsecas del dominio de farmacovigilancia. 
+Su independencia garantiza que los cambios en la infraestructura o en la presentación no afecten la lógica central del negocio.
+
+\subsubsection{Entidades y agregados}
+
+El diseño de las entidades parte del modelo de base de datos definido en el Capítulo \ref{chapter:proposal}. 
+Cada tabla corresponde a una clase de C\# que hereda de una jerarquía de clases base diseñada para unificar propiedades comunes y permitir la creación de interfaces genéricas en la capa de aplicación.
+
+La jerarquía de herencia parte de \texttt{BasicEntity}, una clase abstracta que define las marcas de tiempo comunes a todas las entidades del sistema:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Clase base BasicEntity con marcas de tiempo}, label={lst:basicentity}]
+public abstract class BasicEntity
+{
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+\end{lstlisting}
+
+Para contemplar entidades con distintos tipos de identificador, el dominio define la interfaz genérica \texttt{IEntity<TId>}:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Interfaz genérica para identificadores de entidad}, label={lst:ientity}]
+public interface IEntity<TId>
+{
+    TId Id { get; init; }
+}
+\end{lstlisting}
+
+A partir de esta interfaz, el dominio proporciona dos clases abstractas especializadas. La clase \texttt{GuidEntity} constituye la norma para la mayoría de las entidades del sistema y utiliza un \texttt{Guid} como identificador. La documentación oficial de Microsoft establece que un \texttt{Guid} (Globally Unique Identifier) es un número de 128 bits generado mediante una combinación de la marca de tiempo, una secuencia y el identificador único de la máquina \cite{microsoft_guid}. 
+Este mecanismo garantiza que dos \texttt{Guid} generados en cualquier momento o lugar tengan una probabilidad de colisión tan baja que resulta estadísticamente insignificante, incluso generando millones de identificadores por segundo. 
+A diferencia de los identificadores enteros autoincrementales, un \texttt{Guid} no depende de un contador centralizado ni del estado de la base de datos, lo que lo hace inmune a fallos del servidor o cortes de electricidad. Además, no revela la cantidad de registros en una tabla y no es predecible, lo que impide que un usuario malintencionado itere sobre valores consecutivos expuestos en una URL.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Clase GuidEntity para entidades con identificador Guid}, label={lst:guidentity}]
+public abstract class GuidEntity : BasicEntity, IEntity<Guid>
+{
+    public Guid Id { get; init; } = new Guid();
+}
+\end{lstlisting}
+
+Para entidades de catálogo que requieren un identificador entero —como las listas de provincias y municipios, cuyos registros son pocos, estables y no requieren las propiedades de seguridad de un \texttt{Guid}—, existe la clase \texttt{CatalogEntity}.
+La relación entre provincia y municipio utiliza \texttt{int} en ambos extremos de la llave foránea, lo que mantiene la integridad referencial sin conflictos de tipo.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Clase CatalogEntity para entidades con identificador entero}, label={lst:catalogentity}]
+public abstract class CatalogEntity : BasicEntity, IEntity<int>
+{
+    public int Id { get; init; }
+}
+\end{lstlisting}
+
+Gracias a que \texttt{BasicEntity} unifica las propiedades comunes \texttt{CreatedAt} y \texttt{UpdatedAt}, la capa de aplicación puede definir interfaces genéricas que operan sobre cualquier entidad del sistema sin necesidad de implementaciones específicas por cada tipo. 
+El siguiente fragmento, extraído de la capa de aplicación, ilustra esta ventaja:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Interfaz genérica que opera sobre cualquier entidad que herede de BasicEntity}, label={lst:genericinterface}]
+public interface IGenericRepository<T> where T : BasicEntity
+{
+    Task<T> GetByIdAsync<TId>(TId elementId);
+    Task DeleteByIdAsync<TId>(TId elementId);
+}
+\end{lstlisting}
+
+La restricción \texttt{where T : BasicEntity} garantiza en tiempo de compilación que la interfaz solo reciba entidades que posean las marcas de tiempo \texttt{CreatedAt} y \texttt{UpdatedAt}, independientemente del tipo de su identificador. Así, el sistema puede incorporar nuevas entidades —ya sea con \texttt{Guid} o con \texttt{int} como identificador— sin modificar las interfaces genéricas existentes, en cumplimiento del Principio de Abierto/Cerrado de \texttt{SOLID}.
+
+El parámetro \texttt{TId} no lleva restricción explícita porque el repositorio asume que coincide con el tipo de la clave primaria definido por la entidad \texttt{T} a través de \texttt{IEntity<TId>}. Dado que el sistema solo emplea \texttt{Guid} e \texttt{int} como identificadores —mediante \texttt{GuidEntity} y \texttt{CatalogEntity}—, no existe riesgo de pasar tipos incompatibles en las llamadas reales del sistema.
+
+\paragraph{Entidades User y Role}
+
+Para la gestión de usuarios y roles, el proyecto emplea las clases \texttt{IdentityUser} y \texttt{IdentityRole} del paquete \texttt{Microsoft.AspNetCore.Identity}. Esta decisión evita implementar desde cero funcionalidades críticas como el almacenamiento seguro de contraseñas, la generación de tokens de verificación y el bloqueo de cuentas tras intentos fallidos.
+
+La entidad \texttt{User} hereda de \texttt{IdentityUser<Guid>} y extiende el modelo con los campos requeridos por el dominio:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Entidad User que hereda de IdentityUser<Guid>}, label={lst:user}]
+public class User : IdentityUser<Guid>
+{
+    public Guid RoleId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+\end{lstlisting}
+
+Aunque la clase derivada solo declara tres propiedades adicionales, la herencia de \texttt{IdentityUser<Guid>} aporta un conjunto completo de campos que cubren todas las necesidades de gestión de identidad \cite{microsoft_identity_model}. 
+\texttt{UserName} almacena el nombre de usuario único para el inicio de sesión. 
+\texttt{Email} contiene el correo electrónico empleado para notificaciones y verificación de cuenta. 
+\texttt{PasswordHash} guarda el resultado del algoritmo de hashing y nunca contiene la contraseña en texto plano. 
+\texttt{PhoneNumber} registra el teléfono para autenticación de dos factores o recuperación de cuenta. 
+\texttt{EmailConfirmed} indica si el usuario verificó su correo electrónico. 
+\texttt{SecurityStamp} almacena un valor aleatorio que cambia al modificar credenciales, lo que invalida automáticamente sesiones y tokens anteriores.
+
+La entidad \texttt{Role} hereda de \texttt{IdentityRole<Guid>} y mantiene la misma coherencia en el tipo de identificador:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Entidad Role que hereda de IdentityRole<Guid>}, label={lst:role}]
+public class Role : IdentityRole<Guid>{ }
+\end{lstlisting}
+
+La herencia de \texttt{IdentityRole<Guid>} proporciona las propiedades \texttt{Name} (nombre único del rol) y \texttt{NormalizedName} (versión normalizada para búsquedas). 
+La relación entre usuarios y roles sigue una restricción de uno a muchos: cada usuario posee un único rol mediante la clave foránea \texttt{RoleId} en la entidad \texttt{User}, mientras que un mismo rol puede agrupar a múltiples usuarios.
+
+
+El uso de \texttt{Guid} como tipo de identificador en \texttt{IdentityUser} y \texttt{IdentityRole} mantiene la coherencia con la clase \texttt{GuidEntity} definida para el resto de las entidades del sistema, lo que permite que las tablas de identidad compartan el mismo tipo de clave primaria que las tablas de negocio.
+
+
+\paragraph{Mecanismo de hashing de contraseñas}
+
+La documentación oficial de Microsoft describe que el \texttt{PasswordHasher} de Identity implementa el algoritmo PBKDF2 (Password-Based Key Derivation Function 2), estándar del RFC 2898 que deriva una clave segura a partir de una contraseña \cite{rfc2898}. 
+El algoritmo toma la contraseña del usuario, la combina con un \textit{salt} criptográficamente aleatorio de 128 bits y aplica repetidamente la función HMAC-SHA256\footnote{HMAC-SHA256: código de autenticación de mensajes basado en hash \cite{rfc2104}. Aplica de forma anidada el algoritmo SHA-256 a la combinación de una clave secreta con el mensaje. Internamente, procesa la clave mediante una operación XOR con una secuencia de relleno interno (\textit{ipad}) y otra con relleno externo (\textit{opad}), lo que produce una firma resistente a ataques de extensión de longitud.}
+durante 100,000 iteraciones como valor predeterminado \cite{microsoft_password_hasher}. Cada iteración adicional duplica el costo computacional de un ataque por fuerza bruta sin afectar perceptiblemente el tiempo de verificación para un usuario legítimo. El formato del hash generado produce una cadena con la siguiente estructura \cite{microsoft_hash_format}:
+
+\begin{center}
+\texttt{Base64(salt).Base64(subkey)}
+\end{center}
+
+Donde el \textit{salt} es un valor aleatorio único por cada contraseña y el \textit{subkey} es el resultado de aplicar PBKDF2 durante el número configurado de iteraciones.
+
+Este mecanismo garantiza tres propiedades de seguridad esenciales:
+
+\begin{itemize}
+    \item \textbf{Unicidad del hash:} dos usuarios con la misma contraseña producen hashes completamente diferentes porque el \textit{salt} generado para cada uno es distinto. Esto impide que un atacante compare hashes para identificar contraseñas idénticas dentro de una base de datos comprometida \cite{owasp_password_storage}.
+    
+    \item \textbf{Irreversibilidad computacional:} PBKDF2 es una función unidireccional. El elevado número de iteraciones convierte el cálculo del hash en un proceso deliberadamente costoso en tiempo de CPU, lo que ralentiza significativamente cualquier intento de ataque por fuerza bruta incluso si el atacante posee hardware especializado \cite{microsoft_password_hasher}.
+    
+    \item \textbf{Invalidación de sesiones previas:} la propiedad \texttt{SecurityStamp}, generada aleatoriamente y modificada cada vez que el usuario cambia su contraseña, forma parte de la generación de tokens de autenticación. 
+    Si un atacante obtiene credenciales antiguas, el cambio de \texttt{SecurityStamp} invalida inmediatamente cualquier sesión o token previo \cite{microsoft_security_stamp}.
+\end{itemize}
+
+La verificación de la contraseña durante el inicio de sesión ocurre internamente mediante el método \texttt{VerifyHashedPassword}, que recalcula el hash con el \textit{salt} almacenado y compara los resultados en tiempo constante, sin que la aplicación necesite conocer el texto plano de la contraseña en ningún momento \cite{microsoft_password_hasher}.
+
+
+\paragraph{Generación de tokens para verificación de identidad}
+
+El paquete Identity incluye proveedores de tokens integrados que generan cadenas criptográficamente seguras para distintos propósitos. 
+El sistema emplea estos tokens en el flujo de registro de médicos evaluadores: cuando un jefe de vacunación da de alta a un médico, el sistema genera un token y lo envía por correo electrónico para que el médico active su cuenta y establezca su contraseña.
+
+La documentación oficial explica que el proveedor predeterminado \texttt{DataProtector\-TokenProvider} utiliza internamente la API de Protección de Datos de ASP.NET Core, la cual aplica cifrado autenticado (AES-256-CBC\footnote{AES-256-CBC (Advanced Encryption Standard con modo Cipher Block Chaining y clave de 256 bits): algoritmo de cifrado simétrico estandarizado por el Instituto Nacional de Estándares y Tecnología (NIST, por sus siglas en inglés), agencia del gobierno de Estados Unidos. Transforma datos legibles en texto cifrado usando una clave secreta, y el modo CBC garantiza que mensajes idénticos produzcan resultados cifrados diferentes \cite{nist_aes}.} con HMAC-SHA256) sobre los datos del token \cite{microsoft_token_providers}. 
+Esto garantiza tres propiedades de seguridad esenciales: el token no revela información del usuario si es interceptado, cualquier modificación invalida la firma y provoca el rechazo del servidor, y un atacante no puede generar un token válido sin acceder a las claves de protección del servidor \cite{microsoft_data_protection}.
+
+El token posee una vigencia predeterminada de 24 horas, controlada por la propiedad \texttt{TokenLifespan} de \texttt{DataProtectionTokenProviderOptions}, transcurrida la cual expira automáticamente \cite{microsoft_identity_config}. 
+La validación ocurre en el servidor sin necesidad de consultar una tabla de tokens pendientes, lo que simplifica la arquitectura y elimina la necesidad de limpiar tokens expirados. 
+
+\paragraph{Configuración de seguridad adicional}
+
+Además de los valores predeterminados, el proyecto configura el número de iteraciones del algoritmo PBKDF2 a 600,000 mediante la clase \texttt{PasswordHasherOptions}:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de iteraciones de hashing en Program.cs}, label={lst:passwordoptions}]
+builder.Services.Configure<PasswordHasherOptions>(options =>
+{
+    options.IterationCount = 600_000;
+});
+\end{lstlisting}
+
+Este ajuste sigue las recomendaciones actuales de OWASP para el algoritmo PBKDF2-SHA256, que establecen un mínimo de 600,000 iteraciones para aplicaciones desplegadas en entornos de producción \cite{owasp_password_storage}. El incremento respecto al valor predeterminado de 100,000 iteraciones aumenta el costo computacional de cada intento de verificación de contraseña en un factor de seis, lo que dificulta aún más los ataques de diccionario sin afectar perceptiblemente el tiempo de inicio de sesión de un usuario legítimo.
+
+\paragraph{Limitaciones}
+
+La seguridad del mecanismo depende de las claves maestras del servidor: un acceso no autorizado a ellas comprometería todos los tokens emitidos. La expiración fija de 24 horas no contempla escenarios de conectividad limitada, y la ausencia de registro de intentos fallidos impide detectar ataques de fuerza bruta sobre este vector. 
+Estas limitaciones resultan aceptables para la etapa actual y encuentran mitigación parcial en la protección del servidor y la rotación automática de claves de ASP.NET Core.
+
+\subsubsection{Enumerados}
+
+Los enumerados representan clasificaciones propias del negocio cuyos valores no cambian durante la ejecución de la aplicación. El dominio los define mediante el tipo \texttt{enum} de C\#, lo que garantiza que toda la aplicación comparta las mismas categorías sin riesgo de discrepancias entre capas. Estos tipos no constituyen entidades ni tablas en la base de datos porque sus valores son fijos y no requieren persistencia independiente.
+
+En contraste, provincia y municipio sí constituyen entidades propias.
+Existe una relación entre ambos —cada municipio pertenece a una provincia— que resulta más clara de expresar mediante llaves foráneas que mediante un enumerado extenso. 
+Además, el sistema realiza operaciones frecuentes de búsqueda y filtrado sobre estos datos, para las cuales una tabla indexada ofrece mejor rendimiento. 
+Por último, la lista de provincias y municipios puede actualizarse ocasionalmente por cambios administrativos, y una tabla permite modificarla sin recompilar la aplicación.
+
+\subsubsection{Entidades de infraestructura adicionales}
+Durante la implementación surgieron además dos entidades de infraestructura no previstas en el diseño inicial: \texttt{RefreshToken}, que permite la renovación de sesiones sin reautenticación.
+\texttt{AuditLog} registra las operaciones realizadas sobre el sistema con fines de trazabilidad.
+Ambas heredan de \texttt{GuidEntity} y su definición detallada aparece en el Anexo \ref{anexo:entidades_infraestructura}.
+
+
+\subsection{Capa de Aplicación}
+\label{subsection:aplicacion}
+
+La capa de aplicación orquesta los casos de uso del sistema. Recibe comandos y consultas desde la capa de presentación, coordina las entidades del dominio y los servicios de infraestructura, y retorna resultados transformados en DTOs. Esta capa depende exclusivamente del dominio, por lo que desconoce los detalles de la base de datos, el envío de correos o la generación de tokens.
+
+
+
+\subsubsection{Mapeo y transformación de datos}
+
+La capa de aplicación define DTOs para mover información entre la API y el dominio, sin exponer las entidades fuera de esta capa. 
+El sistema emplea AutoMapper, una biblioteca del ecosistema .NET que automatiza la conversión entre objetos, materializando el patrón Mapper definido en el Capítulo \ref{chapter:proposal}. 
+AutoMapper empareja las propiedades del tipo origen y del tipo destino por similitud de nombre, lo que evita que el desarrollador escriba manualmente cada asignación y reduce el código repetitivo.
+
+Las reglas de transformación residen en perfiles: clases que heredan de \texttt{Profile} y agrupan todas las conversiones de un mismo recurso del dominio. 
+Cada perfil declara cómo asigna cada propiedad del tipo origen al tipo destino, incluso cuando el valor proviene de una relación entre entidades:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Perfil de mapeo con AutoMapper}, label={lst:mapper_profile}]
+public class AutomapperProfile : Profile
+{
+    public AutomapperProfile()
+    {
+        CreateMap<AefiReport, ReportDto>()
+            .ForMember(dest => dest.SubjectName,
+                opt => opt.MapFrom(src => src.VaccinatedSubject.FullName))
+            .ForMember(dest => dest.VaccineNames,
+                opt => opt.MapFrom(src => src.Vaccinations
+                    .Select(v => v.Lot.Vaccine.Name)));
+    }
+}
+\end{lstlisting}
+
+En este ejemplo, \texttt{SubjectName} (nombre del sujeto vacunado) no existe directamente en \texttt{AefiReport} (entidad de reporte), sino que proviene de navegar la relación hacia \texttt{VaccinatedSubject} (sujeto vacunado).
+AutoMapper resuelve esta navegación automáticamente y genera la consulta SQL correspondiente.
+
+Para las consultas, el sistema aprovecha el método \texttt{ProjectTo<T>} de AutoMapper. 
+A diferencia de un mapeo en memoria —que cargaría la entidad completa para luego transformarla—, \texttt{ProjectTo} traduce la proyección directamente a SQL.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Proyección directa a DTO con ProjectTo}, label={lst:projectto}]
+// mapear de la entidad AefiReport a un ReportDto
+    var items = await _unitOfWork.GetRepository<AefiReport>()
+    .GetPaged(query, skip, take)
+    .ProjectTo<ReportDto>(_mapper.ConfigurationProvider) 
+    .ToListAsync();
+\end{lstlisting}
+
+Al invocar \texttt{ProjectTo<ReportDto>}, Entity Framework Core consulta el perfil de AutoMapper para conocer qué propiedades del DTO provienen de qué columnas de la entidad y construye una consulta SQL con solo esos campos, incluyendo las uniones y selecciones necesarias para resolver las navegaciones definidas en el mapeo. Esto evita cargar la entidad completa y delega el filtrado al motor de base de datos.
+
+
+\subsubsection{Casos de uso y servicios de aplicación}
+
+\paragraph{Separación de comandos y consultas}
+
+Siguiendo el principio CQS adoptado en el diseño (Sección \ref{subsection:clean_architecture}), cada recurso del dominio define dos interfaces: una para comandos y otra para consultas. Los comandos pueden retornar un identificador o una confirmación mínima sin violar el principio, ya que el valor retornado no es el resultado de una consulta sino un dato necesario para que el cliente pueda referenciar el recurso creado.
+
+El siguiente fragmento muestra esta separación para el recurso de reportes:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Separación CQS en interfaces de reportes}, label={lst:cqs}]
+// Comandos: modifican el estado
+public interface IReportCommandService
+{
+    Task<string> CreatePublicReportAsync(PublicAefiReportDto dto);
+}
+
+// Consultas: retornan datos sin modificar
+public interface IReportQueryService
+{
+    Task<PagedResultDto<ReportDto>> GetReportsAsync(PagedRequestDto paged);
+    Task<ReportDto> GetReportByNotificationNumber(string notificationNumber);
+}
+\end{lstlisting}
+
+Esta separación permite que ambas interfaces evolucionen de forma independiente y que las pruebas unitarias verifiquen comandos y consultas de forma aislada.
+
+\paragraph{Creación de reporte público.}
+
+El método \texttt{CreatePublicReportAsync} ilustra el orden lógico de un caso de uso complejo. 
+Primero ejecuta los validadores de negocio que verifican la consistencia de los datos. 
+Luego persiste el sujeto vacunado y el reportante —o los recupera si ya existen—, genera el número de notificación y almacena el reporte. 
+A continuación invoca al servicio de detección de duplicados, que compara el número de identidad del sujeto y las vacunas administradas con los reportes existentes; si encuentra coincidencias, registra la relación en \texttt{ReportDuplicate} sin rechazar el reporte. 
+Finalmente publica un evento para que el sistema envíe la notificación de confirmación sin bloquear la respuesta al usuario:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Flujo principal de creación de reporte}, label={lst:create_report_flow}]
+// 1. Validar
+foreach (var validator in _validators)
+    await validator.ValidateAsync(reportDto);
+
+// 2. Persistir sujeto, reportante y reporte
+await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);
+await _unitOfWork.CompleteAsync();
+
+// 3. Detectar duplicados
+var duplicate = await _reportDuplicate.ValidateAndRegisterAsync(report);
+
+// 4. Notificar sin bloquear
+await _eventBus.PublishAsync(new ReportConfirmationEvent { ... });
+
+return new CreateReportResponseDto { NotificationNumber = report.NotificationNumber };
+\end{lstlisting}
+
+La detección de duplicados compara el número de identidad del sujeto vacunado y, para cada vacuna del nuevo reporte, busca coincidencias de vacuna y fecha de administración en reportes anteriores:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Consulta de detección de duplicados}, label={lst:duplicate_query}]
+var reportOrigin = _unitOfWork.GetRepository<AefiReport>()
+    .GetAllByItems(ar =>
+        ar.VaccinatedSubject.IdentityNumber.Value == report.VaccinatedSubject.IdentityNumber.Value
+        && ar.Id != report.Id)
+    .FirstOrDefault(ar =>
+        ar.Vaccinations.Any(v =>
+            report.Vaccinations.Any(rv =>
+                v.Lot.VaccineId == rv.Lot.VaccineId &&
+                v.AdministrationDate == rv.AdministrationDate)));
+\end{lstlisting}
+
+El número de notificación sigue la estructura \texttt{AEFI-YYYYMMDD-XXXXXXXX}, donde \texttt{YYYYMMDD} es la fecha de creación y \texttt{XXXXXXXX} es un código alfanumérico de 8 caracteres. Para generar este código, el sistema selecciona 8 valores aleatorios de un alfabeto de 36 caracteres —letras mayúsculas de la A a la Z y dígitos del 0 al 9— utilizando \texttt{RandomNumberGenerator}, el generador criptográfico de .NET:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Generación del código aleatorio del número de notificación}, label={lst:notification_number}]
+private string GenerateSecureCode(int length)
+{
+    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var bytes = new byte[length];
+    using var rng = RandomNumberGenerator.Create();
+    rng.GetBytes(bytes);
+    var result = new StringBuilder(length);
+    foreach (var b in bytes)
+        result.Append(chars[b % chars.Length]);
+    return result.ToString();
+}
+\end{lstlisting}
+
+Esta estrategia evita la dependencia de un contador secuencial, lo que hace el número de notificación inmune a cortes de electricidad o reinicios del servidor. La combinación de fecha y código aleatorio reduce la probabilidad de colisión a 1 entre 2.8 billones por día. Un índice único sobre este campo en la base de datos garantiza que, en el improbable caso de una colisión, el sistema reintente la generación hasta obtener un valor único.
+
+\paragraph{Asignación y reasignación de reportes.}
+
+Si bien los casos de uso definieron el flujo de asignación y reasignación (sección \ref{section:casos_uso}), su implementación involucra un problema de concurrencia que no emerge del flujo funcional: dos operaciones simultáneas —un médico completando una revisión y un jefe reasignando el mismo reporte— pueden generar una actualización perdida en la base de datos.
+El siguiente fragmento muestra cómo la capa de aplicación resuelve este conflicto: el método \texttt{ReassignedAsync} cancela la asignación anterior y crea una nueva, y el bloque \texttt{try-catch} captura \texttt{DbUpdateConcurrencyException} para notificar al jefe que el estado cambió mientras procesaba la operación:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Manejo de concurrencia en la reasignación}, label={lst:reassign_concurrency}]
+try
+{
+    await _unitOfWork.GetRepository<MedicalReviewAssignment>().CreateAsync(newMedicalReviewAssignment);
+    await _unitOfWork.CompleteAsync();
+}
+catch (DbUpdateConcurrencyException)
+{
+    throw new InvalidOperationException(
+        "The assignment was modified while processing the reassignment. Please refresh and verify.");
+}
+\end{lstlisting}
+
+El mecanismo de detección de concurrencia que dispara esta excepción —basado en tokens de fila— aparece detallado en la sección de infraestructura.
+
+
+
+\paragraph{Inyección de dependencias.}
+
+El contenedor nativo de ASP.NET Core materializa el patrón de Inyección de Dependencias definido en el Capítulo \ref{chapter:proposal}.
+El siguiente fragmento muestra el registro centralizado y cómo el controlador recibe la interfaz sin conocer la implementación concreta:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Registro y consumo de dependencias}, label={lst:di_registration}]
+// Registro: el contenedor asocia cada interfaz con su implementacion
+services.AddScoped<IReportCommandService, ReportCommandService>();
+services.AddScoped<IIdentityService, IdentityService>();
+
+// Consumo: el controlador solo declara la interfaz en su constructor
+public class ReportController : ControllerBase
+{
+    private readonly IReportCommandService _reportCommandService;
+
+    public ReportController(IReportCommandService reportCommandService)
+    {
+        _reportCommandService = reportCommandService;
+    }
+}
+\end{lstlisting}
+
+.Net resuelve en tiempo de ejecución que \texttt{IReportCommandService} corresponde a \texttt{ReportCommandService} y lo inyecta automáticamente.
+El método \texttt{AddScoped} registra un servicio para que el contenedor cree una única instancia por cada solicitud HTTP, lo que garantiza que todos los componentes que participan en una misma petición compartan el mismo contexto de base de datos. 
+Cada capa del sistema define su propio método de extensión para registrar sus dependencias, invocados al inicio de la aplicación:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Invocación de los métodos de registro en Program.cs}, label={lst:program}]
+var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+
+// Cada capa registra sus propias dependencias
+services.AddPresentation();
+services.AddApplication(builder.Configuration);
+services.AddInfrastructure(builder.Configuration);
+
+var app = builder.Build();
+
+app.Run();
+
+\end{lstlisting}
+
+
+
+\subsubsection{Validaciones y manejo de solicitudes}
+El sistema aplica dos niveles de validación. El primero opera sobre los DTOs mediante el paquete \texttt{System.ComponentModel.DataAnnotations} de .NET, que permite decorar propiedades con atributos que verifican condiciones simples —obligatoriedad, longitud máxima, formato de correo electrónico— sin escribir lógica de validación manual. 
+Si alguna regla falla, el sistema rechaza la solicitud automáticamente antes de que alcance el servicio de aplicación.
+.NET proporciona atributos integrados como \texttt{[Required]} y \texttt{[StringLength]}; el sistema extiende este mecanismo con atributos personalizados que heredan de \texttt{ValidationAttribute} y encapsulan reglas reutilizables:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Atributos de validación integrados y personalizados}, label={lst:validation}]
+public class VaccinatedSubjectDto
+{
+    [Required(ErrorMessage = "Full name is required.")]       
+    // Integrado de .NET
+    [StringLength(150, MinimumLength = 1)]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Identity number is required.")]
+    // Personalizado para que cumpla el formato de CI en Cuba
+    [IdentityNumberValidation]                                
+    public string IdentityNumber { get; set; } = string.Empty;
+}
+\end{lstlisting}
+
+El segundo nivel opera dentro del servicio de aplicación y aplica reglas de negocio que requieren consultar la base de datos o comparar datos de múltiples fuentes. El sistema define la interfaz \texttt{IReportValidator<T>} e inyecta todas sus implementaciones como una colección. Cada implementación valida un aspecto específico: \texttt{AdverseEventValidator} verifica que los síntomas existan en la base de datos, que las fechas respeten la consistencia cronológica (RN-04) y que los eventos de fallecimiento incluyan la fecha correspondiente:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Validador de eventos adversos}, label={lst:adverse_event_validator}]
+public class AdverseEventValidator : IReportValidator<ReportDto>
+{
+    public async Task ValidateAsync(ReportDto reportDto)
+    {
+        // RN-05: Al menos un evento adverso y una vacuna
+        if (!reportDto.AdverseEvents.Any())
+            throw new ArgumentException("At least one adverse event is required.");
+
+        // RN-04: Consistencia cronológica
+        if (adverseEvent.StartDate < minVaccinationDate)
+            throw new ArgumentException("Event start date cannot be before vaccination date.");
+
+        // Verificar que el síntoma exista en la base de datos
+        var symptom = await symptomsRepository.GetByIdAsync(adverseEvent.SymptomId)
+            ?? throw new KeyNotFoundException($"Symptom not found.");
+    }
+}
+\end{lstlisting}
+
+El contenedor de dependencias de .NET resuelve automáticamente todas las implementaciones de \texttt{IReportValidator<T>} registradas y las inyecta como una colección. Basta con registrar cada validador en el método \texttt{AddAplication} para que el servicio los reciba sin conocer sus tipos concretos:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Registro de validadores en el contenedor}, label={lst:validator_registration}]
+services.AddScoped<IReportValidator<ReportDto>, AdverseEventValidator>();
+services.AddScoped<IReportValidator<ReportDto>, VaccinationValidator>();
+\end{lstlisting}
+
+Agregar una nueva regla de validación solo requiere implementar la interfaz y añadir una línea de registro, sin modificar el servicio de aplicación.
+
+
+\subsection{Capa de Infraestructura}
+
+La capa de infraestructura implementa los contratos definidos en las capas de dominio y aplicación. Contiene el acceso a la base de datos, la generación de tokens, el envío de correos electrónicos, la mensajería asíncrona y la integración con servicios externos. Todas las dependencias hacia el mundo exterior residen aquí, lo que permite que el núcleo del sistema permanezca independiente de tecnologías concretas.
+
+
+\subsubsection{Persistencia de datos y configuración de Entity Framework Core}
+La conexión a MySQL utiliza una cadena que contiene la dirección del servidor de base de datos, el nombre de la base de datos y las credenciales de acceso, almacenada en las variables de entorno bajo el nombre \texttt{AppDbConnectionString}.
+La configuración ocurre durante el arranque de la aplicación, en un método de extensión llamado \texttt{AddInfrastructure} que centraliza el registro de todos los servicios de esta capa en el contenedor de inyección de dependencias:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de la conexión a MySQL}, label={lst:mysqlconfig}]
+var connectionString = configuration.GetConnectionString("AppDbConnectionString");
+
+services.AddDbContext<FinlayDbContext>(options =>
+    options.UseMySql(
+        connectionString, ServerVersion.AutoDetect(connectionString)));
+\end{lstlisting}
+
+Sobre esta conexión, el contexto \texttt{FinlayDbContext} —la clase que representa la sesión con la base de datos— centraliza el acceso a todas las tablas del sistema. 
+El método \texttt{OnModelCreating} define las características de infraestructura de cada tabla mediante la API fluida de Entity Framework Core, sin decorar las clases del dominio con atributos propios de la persistencia \cite{microsoft_efcore}.
+Este método aplica las mismas restricciones definidas en el diseño de la base de datos: nulabilidad, longitudes máximas, llaves foráneas e índices.
+Además, cada relación declara un comportamiento de borrado y actualización: \texttt{Cascade} propaga la operación cuando la entidad dependiente carece de sentido sin su principal, mientras que \texttt{Restrict} la bloquea si existen registros referenciados desde otra tabla. 
+El siguiente fragmento, correspondiente a la entidad \texttt{AefiReport}, ilustra estas decisiones:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de infraestructura para AefiReport}, label={lst:fluentapi}]
+builder.Entity<AefiReport>(entity =>
+{
+    entity.HasKey(e => e.Id);
+    entity.Property(e => e.NotificationNumber)
+          .IsRequired()
+          .HasMaxLength(100);
+    entity.HasIndex(e => e.NotificationNumber).IsUnique();
+    entity.HasOne(r => r.VaccinatedSubject)
+          .WithMany(p => p.AefiReports)
+          .HasForeignKey(r => r.VaccinatedSubjectId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+    // otros atributos y llaves foráneas
+});
+\end{lstlisting}
+
+
+\subsubsection{Migraciones y acceso a datos}
+
+El acceso a los datos emplea dos patrones complementarios.
+El patrón Repositorio abstrae las operaciones de persistencia detrás de interfaces definidas en la capa de aplicación. 
+La clase \texttt{GenericRepository<T>} proporciona una implementación genérica para operaciones comunes —crear, obtener por identificador, listar, actualizar y eliminar— y aprovecha la restricción \texttt{where T : BasicEntity} para operar sobre cualquier entidad del sistema sin duplicar código:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Repositorio genérico}, label={lst:genericrepository}]
+public class GenericRepository<T> : IGenericRepository<T> where T : BasicEntity
+{
+    protected readonly DbSet<T> _entity;
+
+    public virtual async Task<T> CreateAsync(T element) { ... }
+    public virtual async Task<T> GetByIdAsync<TId>(TId elementId) { ... }
+    public virtual IQueryable<T> GetAll() { ... }
+
+}
+\end{lstlisting}
+
+Cada entidad del dominio cuenta con su propio repositorio, que hereda de \texttt{Generic\-Repository<T>} incluso si en esta etapa no añade métodos adicionales. Para aquellas entidades que requieren consultas específicas, el repositorio correspondiente extiende la clase base con los métodos particulares que necesita. Todas las consultas utilizan LINQ, el lenguaje de consulta integrado de C\#, que Entity Framework Core traduce automáticamente a SQL.
+
+La interfaz \texttt{IGenericRepository<T>} declara un conjunto completo de operaciones de lectura y escritura. 
+Esto supone una relajación deliberada del Principio de Segregación de Interfaces (ISP) de SOLID, ya que algunas entidades —como \texttt{RefreshToken}— no necesitan todos estos métodos en sus casos de uso. 
+Mantener un repositorio unificado prioriza la simplicidad del diseño para el volumen actual de entidades, y la clase genérica evita que los repositorios específicos tengan que implementar manualmente métodos que no utilizan. 
+Si en el futuro aumentara la diversidad de casos de uso o el número de entidades con restricciones similares, la interfaz podría segregarse en contratos independientes de lectura y escritura.
+
+El patrón Unit of Work, implementado en la clase \texttt{UnitOfWork}, coordina las operaciones de múltiples repositorios dentro de una única transacción. Su método \texttt{CompleteAsync} invoca \texttt{SaveChangesAsync} del contexto, lo que garantiza la persistencia atómica de todos los cambios realizados durante un caso de uso \cite{martin_fowler_uow}.
+El método \texttt{GetRepository<T>} resuelve el repositorio correspondiente a cada entidad bajo demanda mediante reflexión, lo que evita inyectar manualmente decenas de repositorios en cada servicio de aplicación.
+
+Ni \texttt{CreateAsync} ni \texttt{Update} materializan los cambios en la base de datos por sí mismos: solo marcan las entidades en el \texttt{ChangeTracker} de Entity Framework Core como pendientes de inserción o modificación. Solo cuando el caso de uso invoca \texttt{CompleteAsync}, el Unit of Work traduce todas esas marcas acumuladas a sentencias SQL y las ejecuta dentro de una única transacción. 
+El siguiente fragmento, correspondiente a la creación de un reporte, ilustra cómo el sistema marca el reporte y el registro de un posible duplicado antes de confirmarlos juntos:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Marcado de entidades y confirmación atómica}, label={lst:unitofwork_atomic}]
+await _unitOfWork.GetRepository<AefiReport>().CreateAsync(report);   // Marca el reporte
+await _reportDuplicate.ValidateAndRegisterAsync(report);             // Marca el duplicado, si existe
+await _unitOfWork.CompleteAsync();                                   // Confirma ambos o ninguno
+\end{lstlisting}
+
+El nivel de aislamiento transaccional es el predeterminado de MySQL (REPEATABLE READ)\footnote{REPEATABLE READ (lectura repetible): nivel de aislamiento que garantiza que una misma consulta ejecutada varias veces dentro de una transacción devuelva los mismos resultados, evitando lecturas sucias y no repetibles \cite{mysql_isolation}.}. 
+Esto significa que cualquier otra solicitud que consulte las tablas involucradas en una transacción en curso verá el estado anterior a dicha transacción hasta que \texttt{CompleteAsync} la confirme. 
+De este modo, ninguna solicitud externa observará un estado intermedio donde el reporte exista pero el duplicado no. 
+
+Sin embargo, REPEATABLE READ no previene las actualizaciones perdidas: si dos transacciones leen simultáneamente la misma fila y ambas intentan modificarla, la segunda sobrescribirá los cambios de la primera sin detectar el conflicto. 
+Para abordar este problema, el sistema incorpora un control de concurrencia optimista, descrito a continuación.
+
+\subsubsection{Control de concurrencia optimista}
+
+El sistema adopta una estrategia de concurrencia optimista: en lugar de bloquear la fila durante toda la operación, permite que ambas transacciones avancen y detecta el conflicto al momento de persistir los cambios. 
+La entidad \texttt{MedicalReviewAssignment} incluye una propiedad \texttt{RowVersion} que Entity Framework Core gestiona como token de concurrencia:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Token de concurrencia en MedicalReviewAssignment}, label={lst:rowversion}]
+public class MedicalReviewAssignment : GuidEntity
+{
+    public byte[] RowVersion { get; set; } = null!;
+}
+
+// En OnModelCreating
+entity.Property(a => a.RowVersion).IsRowVersion();
+\end{lstlisting}
+
+Cada vez que una transacción modifica la fila, MySQL incrementa automáticamente el valor de \texttt{RowVersion}. Cuando otra transacción intenta modificar la misma fila, EF Core compara el valor original del token con el valor actual en la base de datos. Si difieren —porque otra operación la modificó antes—, lanza una excepción \texttt{DbUpdateConcurrencyException}. 
+La capa de aplicación captura esta excepción y notifica al usuario que el estado cambió mientras procesaba la operación, tal como mostró la sección de asignación y reasignación (Apartado \ref{subsection:aplicacion}).
+
+\subsubsection{Idempotencia en la creación de reportes}
+
+Aunque el sistema incorpora mecanismos para que un jefe municipal pueda detectar y validar posibles reportes duplicados, existen situaciones ajenas a la lógica de negocio que pueden provocar la creación innecesaria de múltiples registros. 
+Entre ellas figuran los dobles clics sobre el botón de envío, los reintentos automáticos ocasionados por fallos de red o la repetición accidental de una misma solicitud por parte del cliente.
+
+Para evitar este problema, el sistema implementa una estrategia de idempotencia.
+Esta consiste en asociar a cada solicitud de creación de reportes un identificador único, denominado \texttt{Idempotency-Key}, generado por el frontend antes de realizar el envío. 
+Cuando el backend recibe una petición, verifica si esa clave ya ha sido utilizada. 
+Si existe un registro asociado, el sistema no procesa la operación nuevamente, garantizando que una misma solicitud produzca un único resultado.
+
+Con el propósito de realizar esta comprobación de manera eficiente, la clave de idempotencia reside en una columna indexada de la base de datos. 
+Sin embargo, el uso de un índice por sí solo no elimina completamente el riesgo de concurrencia. Si dos solicitudes con la misma clave llegan prácticamente al mismo instante, ambas podrían consultar la base de datos antes de que alguna de ellas complete la inserción y concluir incorrectamente que la clave aún no existe.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Definición de la clave de idempotencia}, label={lst}]
+builder.Entity<AefiReport>(entity =>
+{
+    entity.Property(e => e.IdempotencyKey)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(e => e.IdempotencyKey)
+        .IsUnique();
+});
+\end{lstlisting}
+
+Para evitar esta condición de carrera, la columna correspondiente incluye además una restricción de unicidad. 
+De esta forma, cuando dos solicitudes con la misma \texttt{Idempotency-Key} intentan insertarse simultáneamente, el motor de almacenamiento de MySQL permite que solo una de ellas complete la operación, mientras que la segunda es rechazada por violación de la restricción única \cite{mysql_isolation}. 
+Este mecanismo garantiza la creación de un único reporte, incluso bajo escenarios de concurrencia extrema.
+
+\subsubsection{Registro de auditoría}
+
+El requerimiento RNF-08 exige que el sistema registre las acciones relevantes realizadas por los usuarios con fines de trazabilidad. 
+Para implementarlo, el sistema define un interceptor\footnote{Interceptor: clase enganchada al proceso de guardado de Entity Framework Core y ejecuta lógica adicional antes de que los cambios lleguen a la base de datos.} que hereda de \texttt{SaveChangesInterceptor}. 
+Entity Framework Core invoca este interceptor automáticamente antes de cada \texttt{SaveChangesAsync}.
+Recorre el \texttt{ChangeTracker} —el registro interno que EF Core mantiene con todas las entidades modificadas desde la última consulta— y serializa los valores anteriores y posteriores de cada operación en formato JSON. 
+A continuación, añade los registros correspondientes a la tabla \texttt{AuditLog}.
+Como el interceptor opera dentro de la misma transacción, la auditoría y los cambios de negocio persisten de forma atómica. 
+Los casos de uso no necesitan invocar ningún servicio de auditoría.
+
+La serialización de los valores anteriores y posteriores añade una sobrecarga mínima a cada transacción, proporcional al número de entidades modificadas. 
+Para el volumen de operaciones de escritura esperado en el Instituto Finlay —decenas de reportes diarios, no miles—, este costo resulta insignificante y no afecta perceptiblemente el tiempo de respuesta.
+
+
+\subsubsection{Registro de logs}
+
+El sistema utiliza Serilog, una biblioteca de registro estructurado para .NET, configurada al iniciar la aplicación. 
+Serilog escribe los registros simultáneamente en consola y en archivos rotativos diarios almacenados en el directorio \texttt{logs/}, lo que permite diagnosticar errores en producción sin necesidad de acceder a la base de datos:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de Serilog en Program.cs}, label={lst:serilog}]
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+\end{lstlisting}
+
+La biblioteca \texttt{Microsoft.Extensions.Logging} de .NET proporciona una abstracción común para el registro, con niveles predefinidos —Information, Warning, Error, Debug— que el sistema utiliza sin necesidad de configuración adicional. Cada servicio de aplicación recibe una instancia de \texttt{ILogger<T>} mediante inyección de dependencias y la utiliza para registrar eventos relevantes durante la ejecución de los casos de uso:
+
+
+\subsubsection{Exportación de datos}
+
+El sistema permite la exportación de reportes en formatos PDF y Excel para su uso en análisis institucionales. Para la generación de PDF, el servicio \texttt{PdfService} utiliza la librería QuestPDF, que describe la estructura del documento —páginas, tablas, texto— mediante una API fluida en código C\#, sin depender de plantillas HTML ni de librerías externas \cite{questpdf}. Para la exportación a Excel, el sistema emplea la biblioteca ClosedXML, que genera hojas de cálculo directamente desde los datos consultados, sin necesidad de automatizar Microsoft Excel.
+
+\subsubsection{Notificaciones del sistema}
+
+El sistema notifica a los usuarios sobre eventos relevantes del flujo de farmacovigilancia —asignación a revisor, expiración de asignación— a través de canales accesibles para la población cubana. 
+La vía de SMS resultó inviable para esta etapa por razones de infraestructura y costo, por lo que el sistema adopta el correo electrónico y WhatsApp, los dos canales con mayor presencia en la ciudadanía cubana.
+
+\paragraph{EmailJS.}
+
+EmailJS es un servicio de correo electrónico transaccional que permite enviar mensajes desde aplicaciones web sin necesidad de configurar un servidor SMTP propio. 
+Funciona mediante una API REST: el desarrollador define plantillas en la plataforma de EmailJS y la aplicación envía solicitudes HTTP con los parámetros que completan cada plantilla. 
+EmailJS ofrece un plan gratuito con un límite mensual de envíos, lo que lo hace adecuado para la etapa de prototipado sin incurrir en costos iniciales. 
+
+La capa de aplicación declara la interfaz \texttt{IEmailService}, que recibe el correo del destinatario, el tipo de notificación definido y los datos del evento de dominio que contienen la información de la plantilla:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Interfaz genérica de envío de correos}, label={lst:iemailservice}]
+public interface IEmailService
+{
+    Task SendEmailAsync<T>(
+        string toEmail,
+        EmailTemplateType template,
+        T templateData);
+}
+\end{lstlisting}
+
+El servicio \texttt{EmailJsService} implementa esta interfaz. 
+A partir del tipo de notificación recibido, selecciona el \texttt{template\_id} correspondiente sin necesidad de exponer este identificador ni las variables de entorno fuera de la capa de infraestructura.
+A continuación, construye una solicitud HTTP con los parámetros de la plantilla, el identificador del servicio y el token de acceso, todos obtenidos de las variables de entorno generadas por la plataforma:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Construcción y envío de la solicitud a la API de EmailJS}, label={lst:emailjs}]
+var payload = new
+{
+    service_id = _settings.ServiceId,       
+    template_id = templateId,                
+    user_id = _settings.UserId,             
+    accessToken = _settings.AccessToken,   
+    template_params = templateParams
+};
+
+var json = JsonSerializer.Serialize(payload);
+var content = new StringContent(json, Encoding.UTF8, "application/json");
+var response = await _httpClient.PostAsync(url, content);
+\end{lstlisting}
+
+
+\paragraph{OpenWA (WhatsApp).}
+
+OpenWA es una API de código abierto que permite enviar mensajes de WhatsApp mediante un servidor intermediario conectado a una sesión de WhatsApp Web activa. 
+El despliegue del servidor OpenWA ocurre localmente a partir del repositorio oficial del proyecto, lo que otorga control total sobre la infraestructura: configurar puertos, gestionar sesiones, decidir la persistencia de datos y establecer las claves de API que autorizan el acceso.
+Esta gestión propia introduce una complejidad operativa adicional, pero garantiza mayor soberanía sobre los datos y elimina los costos por mensaje y la verificación empresarial que exige la API oficial de WhatsApp Business, cuyas credenciales y mensajes transitan por servidores ajenos.
+
+La capa de aplicación declara la interfaz \texttt{IWhatsAppService} con el mismo patrón que \texttt{IEmailService}: recibe el número de teléfono del destinatario, el tipo de notificación y los datos del evento de dominio. 
+La capa de infraestructura tiene predefinido el texto de cada mensaje y lo completa con los datos recibidos antes de enviarlo:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Interfaz de envío de mensajes WhatsApp}, label={lst:iwhatsappservice}]
+public interface IWhatsAppService
+{
+    Task SendMessageAsync<T>(
+        string phoneNumber,
+        WhatsAppTemplateType template,
+        T templateData);
+}
+\end{lstlisting}
+
+El servicio \texttt{WhatsAppService} implementa esta interfaz. A partir del tipo de notificación recibido, selecciona el texto predefinido correspondiente, inserta los datos del evento de dominio y construye la solicitud HTTP al servidor OpenWA con el número de teléfono normalizado y el mensaje resultante:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Construcción y envío de la solicitud HTTP a OpenWA}, label={lst:whatsapp}]
+var requestBody = new
+{
+    chatId = $"{cleanPhoneNumber}@c.us",
+    text = message
+};
+
+var json = JsonSerializer.Serialize(requestBody);
+var content = new StringContent(json, Encoding.UTF8, "application/json");
+var response = await _httpClient.PostAsync(endpoint, content);
+\end{lstlisting}
+
+Tanto EmailJS como OpenWA constituyen soluciones para la etapa de desarrollo y demostración. 
+La arquitectura en capas permite migrar a servicios de producción sin modificar la lógica de negocio: EmailJS puede reemplazarse por un servidor SMTP institucional del IFV.
+OpenWA puede migrar a la API oficial de WhatsApp Business de Meta cuando el proyecto transite a producción. 
+
+Los canales de salida de mensajería carecen de políticas específicas anti-spam.
+El control de abuso actual opera únicamente de forma global en el punto de entrada de la aplicación para mitigar accesos automatizados generales.
+Por consiguiente, el sistema no restringe cuotas de envío individuales por usuario o número de teléfono por hora. 
+Esta limitación es asumible para el alcance de este MVP. 
+Al ser componentes auxiliares fuera del núcleo de farmacovigilancia, su robustecimiento corresponde a futuras etapas de infraestructura perimetral.
+
+\subsubsection{Comunicación asíncrona mediante mensajería}
+
+Cuando un jefe de vacunación asigna un reporte a un médico evaluador, el sistema persiste la asignación y envía una notificación. 
+Aunque la operación principal finaliza correctamente, el envío depende de un servicio externo sujeto a latencia de red o indisponibilidad temporal. 
+Si esta comunicación ocurre dentro del mismo hilo que atiende la solicitud HTTP, el usuario percibe esa demora o nunca recibe la notificación.
+
+Las colas de mensajes resuelven este problema desacoplando la operación principal de sus efectos secundarios. El caso de uso deposita un evento en la cola y retorna de inmediato al usuario; el procesamiento ocurre en segundo plano. Si falla, el evento permanece en la cola y puede reintentarse sin afectar al usuario.
+
+El sistema utiliza RabbitMQ como intermediario de mensajería y MassTransit como librería de integración con .NET \cite{masstransit}. Para mantener la capa de aplicación independiente de MassTransit, el sistema define la interfaz \texttt{IEventBus} en la capa de aplicación y su implementación concreta, \texttt{MassTransitEventBus}, en la capa de infraestructura:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de MassTransit con RabbitMQ}, label={lst:masstransit}]
+services.AddMassTransit(x =>
+{
+    x.AddConsumer<MedicalReviewerConsumer>();
+    x.AddConsumer<AssignmentExpiredConsumer>();
+    x.AddConsumer<ReportConfirmationConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(rabbitMqUrl);
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+services.AddScoped<IEventBus, MassTransitEventBus>();
+\end{lstlisting}
+
+Cada tipo de evento tiene asociado un consumidor que procesa el mensaje cuando llega a la cola. El siguiente fragmento muestra el patrón completo: el caso de uso publica el evento y retorna sin esperar; el consumidor recibe el mensaje en segundo plano y resuelve los datos necesarios para el envío:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Publicación y consumo de un evento}, label={lst:publish_consume}]
+// Capa de aplicación: publicar en la cola y retornar
+await _assignmentRepository.CreateAsync(medicalReviewAssignment);
+await _unitOfWork.CompleteAsync();
+await _eventBus.PublishAsync(new NewAssignmentEvent {...});
+
+// Capa de infraestructura: recibir y procesar
+public class NewAssignmentConsumer : IConsumer<NewAssignmentEvent>
+{
+    public async Task Consume(ConsumeContext<NewAssignmentEvent> context)
+    {
+        // lógica de consumidor
+        await _emailService.SendEmailAsync(...);
+    }
+}
+\end{lstlisting}
+
+Si el envío falla, MassTransit aplica reintentos automáticos con intervalos crecientes. El mismo mecanismo aplica al resto de notificaciones del sistema: expiración de una asignación no completada y correo de activación de cuenta para un revisor recién registrado.
+
+
+
+\subsection{Capa de Presentación}
+
+La capa de presentación constituye el punto de entrada al sistema desde el exterior. Materializa los principios de la arquitectura limpia al depender exclusivamente de la capa de aplicación: los controladores reciben solicitudes HTTP, las transforman en comandos o consultas, y retornan respuestas estructuradas sin contener lógica de negocio.
+
+\subsubsection{Diseño de la API REST y controladores}
+
+El sistema expone una API REST que sigue las convenciones del protocolo HTTP. 
+Esta decisión responde a dos razones. REST utiliza los verbos y códigos de estado estándar de HTTP, lo que permite integrar cualquier interfaz de usuario sin necesidad de librerías propietarias. Además, su modelo sin estado —cada solicitud contiene toda la información necesaria para procesarla— simplifica el escalamiento horizontal y la depuración \cite{fielding2000}.
+
+Cada recurso del dominio —reportes, evaluaciones, asignaciones, vacunas— responden a una ruta única bajo el prefijo \texttt{/api/}. 
+Los controladores organizan estos recursos y actúan como fachada entre el protocolo HTTP y los casos de uso de la capa de aplicación.
+Utilizan los verbos HTTP estándar conforme a su propósito: \texttt{POST} para crear recursos, \texttt{GET} para consultarlos, \texttt{PUT} para modificarlos y \texttt{DELETE} para eliminarlos. 
+
+Las respuestas siguen una estructura uniforme. Las operaciones exitosas retornan el código HTTP correspondiente junto con un objeto JSON que contiene un mensaje descriptivo y los datos solicitados. El siguiente fragmento, extraído del controlador de reportes, ilustra esta convención:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Respuesta estructurada en el controlador de reportes}, label={lst:apiresponse}]
+return StatusCode(StatusCodes.Status201Created, new
+{
+    message = "Report successfully created",
+    data = notificationNumber
+});
+\end{lstlisting}
+
+Los códigos de estado HTTP comunican el resultado de cada operación de forma inequívoca: 201 para creación exitosa, 200 para consultas, 400 para errores de validación, 404 para recursos no encontrados y 500 para errores internos. 
+
+El atributo \texttt{[ApiController]} activa automáticamente la validación de los DTO descrita en la sección de validaciones, rechazando las solicitudes que no cumplen las reglas declaradas antes de que alcancen el servicio de aplicación.
+
+\subsubsection{Documentación de la API}
+
+Swagger, integrado mediante la librería Swashbuckle, genera automáticamente la documentación interactiva de la API.
+Swagger analiza los controladores, los modelos de solicitud y respuesta para producir una especificación OpenAPI completa y una interfaz web donde los desarrolladores pueden explorar las rutas y realizar peticiones de prueba directamente desde el navegador.
+
+La configuración ocurre en el método \texttt{AddPresentation} de la capa de API y la aplicación la expone solo en entorno de desarrollo:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de Swagger en la aplicación}, label={lst:swagger}]
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+\end{lstlisting}
+
+Esta restricción garantiza que la documentación interactiva no quede expuesta en producción, donde podría revelar detalles de la API a usuarios no autorizados.
+
+
+
+\subsubsection{Manejo de excepciones y respuestas}
+
+El sistema centraliza el manejo de errores en el middleware \texttt{ErrorHandlingMiddleware}, que intercepta cualquier excepción no controlada durante el procesamiento de una solicitud y la traduce a un código HTTP y un mensaje apropiado \cite{microsoft_error_handling}. El mapeo distingue varias categorías: \texttt{KeyNotFoundException} retorna 404, \texttt{ArgumentException} y \texttt{ArgumentNullException} retornan 400, \texttt{UnauthorizedAccessException} retorna 401, e \texttt{InvalidOperationException} retorna 400. Cualquier otra excepción retorna 500 con un mensaje genérico. Esta clasificación permite a la interfaz de usuario interpretar el error sin inspeccionar el mensaje:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Mapeo de excepciones a códigos HTTP}, label={lst:error_mapping}]
+switch (exception)
+{
+    case KeyNotFoundException:
+        code = HttpStatusCode.NotFound; break;
+    case ArgumentNullException:
+    case ArgumentException:
+    case InvalidOperationException:
+        code = HttpStatusCode.BadRequest; break;
+    case UnauthorizedAccessException:
+        code = HttpStatusCode.Unauthorized; break;
+    default:
+        code = HttpStatusCode.InternalServerError; break;
+}
+\end{lstlisting}
+
+Para los errores de validación del modelo, el sistema configura una respuesta personalizada que retorna un objeto JSON con los campos que fallaron y los mensajes correspondientes. Esto garantiza que incluso los errores detectados antes de que la solicitud llegue al controlador —como un campo requerido ausente— sigan el mismo formato de respuesta que el resto de la API.
+
+Las secciones anteriores recorrieron las cuatro capas del sistema —dominio, aplicación, infraestructura y presentación— y mostraron cómo cada una materializa los patrones y tecnologías seleccionados. Queda por abordar un aspecto que atraviesa todas ellas: la seguridad.
+
+\subsection{Seguridad de la aplicación}
+\label{section:seguridad}
+
+El requerimiento RNF-07 exige que el sistema garantice la confidencialidad, integridad y disponibilidad de los datos. 
+Las siguientes subsecciones detallan la implementación de los mecanismos de autenticación, control de acceso y protección ante ataques, desde la generación de tokens hasta la limitación de velocidad.
+
+\subsubsection{Autenticación basada en JWT y Refresh Token}
+
+El sistema emplea \gls{JWT} como mecanismo de autenticación sin estado, combinado con tokens de actualización (refresh tokens) almacenados en cookies HttpOnly. Esta combinación responde a dos objetivos contrapuestos: el token de acceso tiene una vida útil corta para limitar el daño en caso de robo, pero el usuario no necesita iniciar sesión repetidamente.
+
+\paragraph{JSON Web Token (JWT)}
+
+Un JWT es un estándar abierto definido en el RFC 7519 que permite transmitir información verificable entre dos partes mediante un token firmado digitalmente \cite{rfc7519}. El token consta de tres secciones codificadas en Base64 y separadas por puntos: encabezado, carga útil y firma. 
+La carga útil contiene los \textit{claims} —afirmaciones sobre el usuario, como su identificador, nombre y rol—, mientras que la firma garantiza que el token no fue alterado desde su emisión.
+
+El sistema genera el JWT mediante la clase \texttt{JwtTokenGenerator}, que utiliza HMAC-SHA256 como algoritmo de firma con una clave secreta simétrica almacenada en variables de entorno. 
+Esta clave nunca aparece en el código fuente ni llega al cliente.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Generación del JWT en JwtTokenGenerator}, label={lst:jwttokengenerator}]
+public async Task<string> GenerateToken(User user)
+{
+    var key = new SigningCredentials(
+        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+        SecurityAlgorithms.HmacSha256);
+
+    var role = await _userManager
+            .GetRolesAsync(user)
+            .FirstOrDefault();
+
+    var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.GivenName, user.UserName!),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, role!)
+    };
+
+    var securityToken = new JwtSecurityToken(
+        signingCredentials: key,
+        issuer: _jwtSettings.Issuer,
+        audience: _jwtSettings.Audience,
+        expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+        claims: claims);
+
+    return new JwtSecurityTokenHandler().WriteToken(securityToken);
+}
+\end{lstlisting}
+
+El método define cuatro claims en el token: identificador del usuario (\texttt{Sub}), nombre de usuario (\texttt{GivenName}), identificador único del token (\texttt{Jti}) y rol del usuario (\texttt{Role}). 
+La expiración queda configurada en 15 minutos mediante \texttt{JwtSettings.ExpiryMinutes}.
+
+El middleware de ASP.NET Core valida cada solicitud entrante verificando cuatro propiedades del token: que el emisor y la audiencia coincidan con los valores configurados, que la firma HMAC-SHA256 sea correcta y que el token no haya expirado. Si un atacante intercepta el JWT, puede usarlo durante un máximo de 15 minutos, transcurridos los cuales el token expira y el middleware lo rechaza automáticamente.
+
+\paragraph{Refresh Token en cookie HttpOnly}
+
+Para compensar la corta vida del JWT sin sacrificar seguridad, el sistema implementa refresh tokens. Un refresh token es un valor aleatorio generado criptográficamente que permite obtener nuevos tokens de acceso sin que el usuario vuelva a ingresar sus credenciales. El método \texttt{GenerateRefreshToken} utiliza la clase \texttt{RandomNumberGenerator} de .NET, una alternativa criptográficamente segura frente a generadores predecibles como \texttt{System.Random} \cite{microsoft_random}.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Generación criptográfica del refresh token}, label={lst:generaterefreshtoken}]
+private string GenerateRefreshToken()
+{
+    using var rng = RandomNumberGenerator.Create();
+    var randomBytes = new byte[64];
+    rng.GetBytes(randomBytes);
+    return Convert.ToBase64String(randomBytes);
+}
+\end{lstlisting}
+
+El método produce 64 bytes de entropía criptográfica y los codifica en Base64. 
+Este valor reside en la base de datos junto con su fecha de vencimiento y el identificador del usuario.
+
+La seguridad de este mecanismo descansa en tres decisiones reflejadas en la configuración de la cookie que transporta el refresh token:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de la cookie del refresh token}, label={lst:cookieconfig}]
+Response.Cookies.Append("refreshToken", authResult.RefreshToken,
+    new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Expires = DateTime.UtcNow.AddHours(_jwtSettings.RefreshTokenExpiryHours)
+    });
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{HttpOnly = true}: impide que JavaScript acceda al valor de la cookie, lo que neutraliza los ataques de cross-site scripting (XSS), ataque que inyecta código JavaScript malicioso en una página web legítima para robar datos del usuario\cite{owasp_httponly}.
+    \item \texttt{Secure = true}: restringe la transmisión de la cookie a conexiones HTTPS, evitando su exposición en redes no cifradas.
+    \item \texttt{SameSite = None}: permite el envío de la cookie desde dominios distintos al del backend —necesario cuando frontend y backend residen en servidores separados—, pero el estándar obliga a combinarlo con \texttt{Secure = true} \cite{owasp_cookies}. 
+Una política CORS (Cross-Origin Resource Sharing) complementa esta configuración al restringir los dominios autorizados a realizar solicitudes a la API.
+    \item \texttt{Expires}: establece la caducidad de la cookie en 8 horas mediante el valor definido en las variables de entorno.
+\end{itemize}
+
+En el entorno de producción previsto para el Instituto Finlay, donde ambos componentes compartirán el mismo dominio, la política CORS dejará de ser necesaria y \texttt{SameSite} podrá restringirse a \texttt{Lax}, lo que reforzará la seguridad al impedir el envío de la cookie en solicitudes cross-site.
+
+Además, cada vez que el cliente utiliza un refresh token para obtener un nuevo JWT, el sistema aplica rotación: revoca el token anterior y emite uno nuevo. Si un atacante logra robar un refresh token, la rotación limita su utilidad a una única renovación, tras la cual el token legítimo queda invalidado y el usuario inicia sesión nuevamente.
+
+\paragraph{Envío del token en cada solicitud}
+
+El cliente recibe el JWT en el cuerpo de la respuesta de inicio de sesión y lo almacena en memoria. En cada solicitud subsiguiente, lo incluye en el encabezado \texttt{Authorization: Bearer <token>}, conforme al estándar definido en el RFC 6750 \cite{rfc6750}. El refresh token, por su parte, viaja automáticamente en la cookie sin intervención del código frontend, lo que reduce la superficie de ataque al no exponerlo a lógica JavaScript.
+
+\subsubsection{Autorización basada en roles}
+
+Una vez que el middleware de autenticación valida el JWT y establece la identidad del usuario, el sistema delega el control de acceso en dos mecanismos complementarios: el atributo \texttt{[Authorize]} para restringir rutas por rol, y un servicio de contexto de usuario para recuperar la identidad del usuario autenticado dentro de la capa de aplicación.
+
+El atributo \texttt{[Authorize(Roles = "SectionResponsible")]} indica al middleware de autorización que solo los usuarios cuyo claim \texttt{Role} coincida con ese valor pueden ejecutar el método. Si el token no contiene el rol requerido, el middleware retorna automáticamente un código 403 (Forbidden) con un mensaje JSON, según la configuración establecida en el evento \texttt{OnForbidden} del JWT Bearer.
+
+Para que la capa de aplicación pueda acceder a la identidad del usuario autenticado sin que el frontend la envíe manualmente en cada solicitud, el sistema implementa \texttt{UserContextService}. Este servicio extrae el claim \texttt{NameIdentifier} del token JWT validado —disponible en el \texttt{HttpContext} de la solicitud— y lo expone mediante el método \texttt{GetUserId()}:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Servicio de contexto de usuario autenticado}, label={lst:usercontext}]
+public class UserContextService : IUserContextService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserContextService(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public Guid GetUserId()
+    {
+        var user = _httpContextAccessor.HttpContext?.User
+            ?? throw new UnauthorizedAccessException("No authenticated user.");
+
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? throw new UnauthorizedAccessException("User ID not found in token.");
+
+        return Guid.Parse(userId);
+    }
+}
+\end{lstlisting}
+
+El método \texttt{GetUserId()} obtiene el \texttt{HttpContext} de la solicitud actual mediante \texttt{IHttpContextAccessor} y recupera el claim \texttt{ClaimTypes.NameIdentifier} —cuyo valor quedó establecido durante la generación del JWT con \texttt{JwtRegisteredClaimNames.Sub}—.
+Este enfoque elimina la necesidad de que cada ruta reciba explícitamente el identificador del usuario como parámetro, lo que reduce el riesgo de suplantación: el identificador no puede ser manipulado por el cliente porque proviene del token validado por el servidor.
+
+La capa de aplicación consume este servicio para personalizar las consultas según el usuario autenticado. 
+El siguiente fragmento muestra cómo un revisor médico obtiene únicamente los reportes que le fueron asignados, sin recibir como parámetro su propio identificador:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Uso de UserContextService en la capa de aplicación}, label={lst:usercontextusage}]
+public async Task<PagedResultDto<ReportMedicalReviewerDto>> GetReportAssigment(
+    PagedRequestDto paged,
+    ReportMedicalReviewerFilter filter)
+{
+    var userId = _userContextService.GetUserId();
+
+    var medicalReviewer = await _unitOfWork
+        .GetRepository<MedicalReviewer>()
+        .FirstOrDefaultAsync(sr => sr.UserId == userId)
+        ?? throw new UnauthorizedAccessException("User is not a medical reviewer");
+
+    var reportIds = _unitOfWork
+        .GetRepository<MedicalReviewAssignment>()
+        .GetAllByItems(mra =>
+            mra.MedicalReviewerId == medicalReviewer.Id &&
+            mra.Status == ReviewAssignmentStatus.Pending)
+        .Select(a => a.AefiReportId)
+        .Distinct();
+
+    var query = _unitOfWork
+        .GetRepository<AefiReport>()
+        .GetAllByItems(r => reportIds.Contains(r.Id));
+
+    // Filtrado, paginación y proyección a DTO...
+}
+\end{lstlisting}
+
+El método obtiene el identificador del usuario desde el token, lo utiliza para localizar al revisor médico asociado y filtra los reportes cuyas asignaciones coincidan con ese revisor. 
+En ningún momento el frontend envía el identificador del usuario; este deriva exclusivamente del token validado, lo que garantiza que un usuario autenticado solo pueda acceder a sus propios recursos.
+
+\subsubsection{Protección de datos sensibles mediante índice ciego}
+
+Para armonizar la protección de datos sensibles (\textbf{RNF-07}) con la necesidad de detectar reportes duplicados (\textbf{RF-11}), la infraestructura implementa un índice ciego sobre el número de identidad del ciudadano.
+
+La entidad persona almacena dos campos derivados del número de identidad:
+
+\begin{itemize}
+    \item \texttt{IdentityNumberEncrypted}: preserva el valor original mediante cifrado AES-256 para su recuperación clínica.
+    \item \texttt{IdentityNumberBlindIndex}: contiene un hash HMACSHA256 generado con una clave criptográfica distinta de la usada para el cifrado. 
+Esta columna porta un índice que permite al motor de base de datos localizar el registro en tiempo logarítmico sin recorrer toda la tabla.
+\end{itemize}
+
+El servicio \texttt{EncryptionService} proporciona tres operaciones: \texttt{Encrypt} aplica AES-256 con un vector de inicialización aleatorio; \texttt{Decrypt} revierte el proceso para uso clínico autorizado; y \texttt{CreateBlindIndex} genera un hash HMACSHA256 determinista a partir del número de identidad. Cuando un ciudadano reporta un ESAVI, el sistema calcula el índice ciego y verifica si ya existe en la base de datos, sin exponer ni descifrar el identificador durante la consulta.
+
+La separación de las claves de cifrado y del índice ciego garantiza que un atacante que comprometa una de ellas no pueda derivar la otra. 
+La clave de índice ciego reside fuera del código fuente, independiente de la clave de cifrado.
+
+El sistema deriva el hash que alimenta el índice ciego del número de identidad en texto plano, antes de cifrarlo. Una corrupción del cifrado no afecta la integridad del índice. Ambas operaciones —cifrado y generación del hash— ocurren dentro de la misma transacción del Unit of Work, lo que garantiza su atomicidad: si cualquiera de las dos falla, ninguna persiste.
+
+\subsubsection{Validación de datos y protección ante ataques automatizados}
+
+Las rutas públicas del sistema —inicio de sesión, registro de reportes, consulta por número de notificación— están expuestos a ataques automatizados que pueden saturar la base de datos con reportes falsos o probar credenciales por fuerza bruta. Como primera barrera, el sistema exige que cada solicitud incluya un token que demuestre que proviene de un humano.
+
+Entre los distintos tipos de CAPTCHA, el sistema opta por Friendly CAPTCHA, un servicio basado en prueba de trabajo (proof-of-work) que resuelve el desafío criptográfico en segundo plano sin interrumpir al usuario. La documentación oficial describe que este mecanismo exige al cliente resolver un cálculo criptográfico antes de enviar la solicitud, y que el servicio ajusta la dificultad del desafío en función del comportamiento del cliente para dificultar ataques automatizados \cite{friendlycaptcha}. 
+
+La figura \ref{fig:captcha_flow} ilustra el flujo de verificación: un widget —un pequeño fragmento de código JavaScript que Friendly CAPTCHA proporciona para incrustar en los formularios del frontend— resuelve el desafío mientras el usuario completa los campos, adjunta un token a la solicitud y el controlador lo verifica antes de ejecutar el caso de uso.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Graphics/Cap4/captcha_completo.png}
+    \caption{Flujo de verificación de Friendly CAPTCHA en rutas públicas. Fuente: elaboración propia.}
+    \label{fig:captcha_flow}
+\end{figure}
+
+
+\subsubsection{Limitación de velocidad}
+
+La limitación de velocidad (en inglés, \textit{\gls{rate limiting}}) restringe el número de solicitudes que un cliente puede realizar a la API en un período de tiempo determinado. Su propósito es proteger el sistema contra ataques de fuerza bruta, enumeración de recursos y denegación de servicio \cite{microsoft_rate_limiting}. Además, evita que picos de tráfico legítimo o bucles accidentales en el frontend consuman todos los recursos del servidor y degraden la experiencia del resto de usuarios.
+
+Las rutas públicas del sistema ya cuentan con CAPTCHA como primera barrera, tal como detalló la sección anterior.
+El rate limiting actúa como segunda barrera: si un atacante resuelve el CAPTCHA para cada intento, el límite de solicitudes por minuto hace inviable cualquier ataque masivo. Para las rutas protegidas con JWT, el rate limiting constituye la defensa principal contra el abuso por parte de usuarios autenticados o tokens comprometidos.
+
+\paragraph{Limitación por IP y por sesión}
+
+El sistema aplica un limitador global que contabiliza todas las solicitudes de un mismo cliente, independientemente de la ruta de destino. 
+Para clientes anónimos —como un reportante que envía un formulario público—, el límite opera por dirección IP: 100 solicitudes por minuto. 
+Para usuarios autenticados, el límite opera por identificador de sesión extraído del JWT: 200 solicitudes por minuto. 
+Esta diferenciación evita que usuarios legítimos que comparten red —como el personal de un mismo centro de salud— resulten bloqueados por el comportamiento de un tercero, y otorga mayor margen a quienes ya superaron la barrera de autenticación. 
+Una solicitud solo recibe procesamiento si el limitador global lo permite.
+
+\paragraph{Políticas complementarias por tipo de operación}
+
+Sobre esta base, el sistema añade políticas específicas que restringen aún más ciertas rutas según la criticidad de la operación. 
+Cada política define un límite de solicitudes, una ventana de tiempo y un comportamiento de encolamiento. 
+La ventana fija restablece el contador al cumplirse el intervalo; la ventana deslizante distribuye el límite en segmentos para suavizar los picos de tráfico legítimo. 
+El encolamiento permite retener las solicitudes excedentes durante un breve período antes de rechazarlas, lo que evita que un pico puntual de actividad legítima genere errores inmediatos al cliente \cite{microsoft_rate_limiting}.
+
+\begin{itemize}
+    \item \texttt{Auth}: 3 solicitudes por minuto para rutas de autenticación, sin encolamiento. Un usuario legítimo inicia sesión pocas veces al día; tres intentos por minuto bastan para la operación normal y hacen inviable un ataque de fuerza bruta incluso si el atacante resuelve el CAPTCHA en cada intento.
+    \item \texttt{Command}: 5 solicitudes por minuto para operaciones de escritura estándar, como la creación de reportes ESAVI, con cola de hasta 5 solicitudes. Equivale a un reporte cada 12 segundos, ritmo suficiente para un centro de salud con múltiples reportantes simultáneos.
+    \item \texttt{ReportDaily}: 30 solicitudes por día para la creación de reportes desde una misma IP, mediante ventana deslizante de 24 horas dividida en 24 segmentos. Cubre la actividad diaria de un centro de salud activo y acota el daño máximo de un ataque automatizado a 30 reportes falsos, los cuales pueden identificarse y eliminarse manualmente.
+    \item \texttt{CommandDaily}: 20 solicitudes por día para operaciones administrativas como la asignación de reportes o la finalización de revisiones médicas. Refleja el ritmo real de trabajo de un jefe de vacunación municipal o médico evaluador.
+    \item \texttt{Query}: 60 solicitudes por minuto para operaciones de lectura, con ventana deslizante dividida en 3 segmentos y cola de hasta 10 solicitudes. Las consultas no modifican el estado del sistema; una consulta por segundo permite una navegación fluida mientras dificulta la extracción masiva de datos.
+\end{itemize}
+
+El siguiente fragmento muestra la configuración de dos de estas políticas dentro de la clase \texttt{RateLimitingMiddleware}:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Configuración de políticas de rate limiting}, label={lst:ratelimiting}]
+// Autenticación: muy restrictivo
+options.AddFixedWindowLimiter("Auth", config =>
+{
+    config.PermitLimit = 3;
+    config.Window = TimeSpan.FromMinutes(1);
+    config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    config.QueueLimit = 0;
+});
+
+// Comandos estándar: restrictivo
+options.AddFixedWindowLimiter("Command", config =>
+{
+    config.PermitLimit = 5;
+    config.Window = TimeSpan.FromMinutes(1);
+    config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    config.QueueLimit = 5;
+});
+\end{lstlisting}
+
+
+
+
+\paragraph{Aplicación a rutas}
+El atributo \texttt{[EnableRate\-Limiting]} aplica las políticas sobre controladores completos o rutas específicas. Una misma ruta puede combinar múltiples políticas cuando requiere protección en distintas ventanas de tiempo. Por ejemplo, el controlador de autenticación declara únicamente \texttt{Auth} a nivel de clase:
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Aplicación del rate limiting a controladores y rutas}, label={lst:ratelimitingapplication}]
+[ApiController]
+[Route("api/[controller]")]
+[EnableRateLimiting("Auth")]
+public class AuthenticationController : ControllerBase { }
+\end{lstlisting}
+
+La ruta de creación de reportes, en cambio, combina dos políticas: \texttt{Command} limita la tasa por minuto y \texttt{ReportDaily} impone un límite diario por IP. 
+Ambas actúan en conjunto con el limitador global: la solicitud solo recibe procesamiento si las tres capas lo permiten.
+
+\begin{lstlisting}[language={[Sharp]C}, caption={Combinación de políticas en una misma ruta}, label={lst:ratelimitingcombination}]
+[HttpPost]
+[EnableRateLimiting("Command")]
+[EnableRateLimiting("ReportDaily")]
+public async Task<IActionResult> Create(CreateReportDto dto) { }
+\end{lstlisting}
+
+
+\paragraph{Alcance de las defensas implementadas}
+
+Aun con estas barreras, un atacante requiere resolver múltiples desafíos de proof-of-work y mantenerse por debajo de los umbrales de rate limiting simultáneamente. 
+El costo computacional de esta estrategia la vuelve inviable para ataques masivos con los recursos actuales.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Implementación de la interfaz de usuario}
+\label{section:frontend}
+
+El frontend del sistema adopta el modelo de Aplicación de Página Única (\gls{SPA}, por Single Page Application), desarrollada en React con TypeScript. 
+Esta arquitectura carga una sola página HTML y actualiza dinámicamente su contenido sin recargar el navegador, lo que ofrece una experiencia de usuario más fluida. 
+La aplicación consume la API REST del backend y ofrece una interfaz accesible tanto para todos los actores.
+
+\subsection{Arquitectura y enrutamiento}
+
+La interfaz de usuario emplea \textbf{React Router v6}, biblioteca estándar para la gestión de rutas en aplicaciones React.
+Esta solución sustituyó a un enrutamiento manual implementado inicialmente, con el objetivo de mejorar la mantenibilidad del código y aprovechar el soporte nativo para rutas anidadas e historial del navegador.
+
+La aplicación define rutas públicas —página de inicio, información y activación de cuenta— y rutas protegidas que requieren autenticación. 
+Un componente \texttt{ProtectedRoute} implementa la protección: verifica la sesión activa desde el contexto de autenticación y redirige al inicio de sesión si el usuario no está autenticado.
+Para las rutas con restricción de roles, el mismo componente valida el rol y redirige a la página principal si los permisos son insuficientes.
+
+Las páginas de mayor tamaño —paneles de administración, editor de reportes y tableros de revisión— cargan de forma diferida mediante \texttt{lazy} y \texttt{Suspense}. 
+Estas funciones de React posponen la descarga del código de una página hasta que el usuario navega hacia ella, lo que reduce el código descargado en la carga inicial.
+
+Los contextos globales de autenticación y reportes envuelven toda la aplicación y comparten el estado sin necesidad de pasarlo manualmente entre componentes.
+
+\subsection{Gestión del estado y comunicación con la API}
+
+El estado global de autenticación reside en un contexto de React que expone los datos del usuario, el estado de la sesión y las funciones de inicio y cierre de sesión. Al cargar la aplicación, este contexto intenta restaurar la sesión mediante la ruta de refresco de token, lo que evita que el usuario deba iniciar sesión nuevamente si su token de acceso expiró.
+
+La comunicación con el backend recae en una instancia de Axios —biblioteca de JavaScript para realizar solicitudes HTTP— configurada con interceptores que gestionan automáticamente los tokens. 
+El interceptor de solicitud inyecta el encabezado de autorización con el token de acceso; el interceptor de respuesta detecta los códigos 401, intenta renovar el token y reenvía la solicitud original. El refresco excluye las rutas de autenticación para evitar bucles y preserva los encabezados originales en el reintento. 
+Si la renovación falla, la sesión finaliza automáticamente y el usuario regresa a la página de inicio de sesión.
+
+\subsection{Almacenamiento del JWT en memoria}
+
+El token de acceso reside exclusivamente en memoria, sin persistencia en almacenamiento local o de sesión. 
+Esta decisión reduce el riesgo de robo por lecturas desde almacenamiento persistente, aunque no protege contra scripts inyectados en ejecución sobre la página.
+Por ello, el patrón de seguridad completo combina el token de acceso en memoria con un refresh token almacenado en una cookie HttpOnly, Secure y con SameSite estricta, que el frontend no manipula y por tanto no es vulnerable a ataques de cross-site scripting.
+
+Esta estrategia conlleva un riesgo: el token de acceso desaparece al recargar la página.
+Para mitigarlo, el contexto de autenticación invoca la ruta de refresco al cargar la aplicación. 
+Si el refresco tiene éxito, el nuevo token queda en memoria y la sesión restaura sin interrupción para el usuario.
+
+\subsection{Validación en tiempo real}
+
+Los formularios del sistema aplican validación en tiempo real mediante las librerías \texttt{react-hook-form} y \texttt{zod}. La primera reduce el número de renderizaciones al no almacenar el estado de cada campo individualmente, lo que mejora el rendimiento en formularios extensos como el de registro de reportes. La segunda define esquemas declarativos que especifican el formato esperado de cada campo —correo electrónico válido, longitud mínima de contraseña, coincidencia entre campos— y los mensajes de error correspondientes. La integración de ambas permite que el usuario reciba retroalimentación inmediata mientras escribe, sin esperar a enviar el formulario, lo que reduce la cantidad de solicitudes fallidas al backend y mejora la experiencia de uso.
+
+\subsection{Construcción de interfaces de usuario y diseño responsivo}
+
+La interfaz integra componentes reutilizables construidos con Tailwind CSS y Radix UI. 
+Tailwind CSS proporciona utilidades de diseño que permiten crear interfaces responsivas sin escribir hojas de estilo personalizadas: las cuadrículas reorganizan sus columnas según el ancho de la pantalla, la navegación alterna entre un menú de escritorio y un menú lateral en dispositivos móviles, y los formularios mantienen un aspecto adecuado en cualquier tamaño de pantalla. 
+Radix UI aporta componentes accesibles —diálogos, selectores, pestañas— que garantizan la compatibilidad con lectores de pantalla y navegación por teclado, en cumplimiento de los requisitos de accesibilidad.
+
+Los gráficos del panel de control utilizan \texttt{recharts}, una librería de visualización de datos para React. 
+Cada gráfico reside en un contenedor responsivo que adapta su tamaño al ancho disponible, y el backend preprocesa los datos para reducir el volumen de información transferida al cliente.
+Los componentes visuales emplean memoización para evitar renderizaciones innecesarias y mantener un rendimiento fluido durante la navegación.
+
+\subsection{Manejo de autenticación en el cliente}
+
+Al iniciar sesión, el cliente decodifica el JWT para extraer el rol del usuario y mostrar únicamente las rutas y opciones correspondientes a ese perfil. 
+Esta diferenciación garantiza que cada perfil acceda exclusivamente a las funcionalidades que le corresponden.
+
+
+\subsection{Prevención de envíos duplicados}
+
+La creación de un reporte puede duplicarse debido a dobles clics del usuario, reintentos automáticos provocados por fallos de red o pérdidas temporales de conectividad. 
+Para evitar este problema, la aplicación cliente implementa un mecanismo de idempotencia técnica basado en una clave única asociada a cada operación de envío.
+
+La clave surge de \texttt{crypto.randomUUID()}, función estandarizada que produce identificadores UUID v4 mediante un generador criptográficamente seguro del sistema operativo.
+Este mecanismo emplea 122 bits de entropía aleatoria, lo que hace que la probabilidad de que dos solicitudes distintas generen la misma clave sea estadísticamente despreciable \cite{w3c_uuid}.
+
+Una vez creada, la clave permanece almacenada en memoria del navegador hasta que el servidor responde satisfactoriamente. 
+Su ciclo de vida es completamente independiente del estado del servicio; por tanto, un reinicio del servicio, un corte de electricidad o una caída temporal del servidor no provocan su pérdida. Si la solicitud falla, el siguiente intento reutilizará exactamente la misma clave de idempotencia.
+
+La clave viaja al servidor mediante el encabezado HTTP \texttt{Idempotency-Key}, ya que representa un identificador de la operación y no un dato propio del reporte. 
+De esta forma, el backend puede reconocer reintentos de una misma solicitud y evitar la creación de registros duplicados.
+
+\begin{lstlisting}[language={TypeScript}, caption={Generación y envío de la clave de idempotencia}, label={lst:idempotency_key}]
+const idempotencyKeyRef = useRef<string | null>(null);
+
+const handleSubmit = async (payload: ReportPayload) => {
+if (!idempotencyKeyRef.current) {
+idempotencyKeyRef.current = crypto.randomUUID();
+}
+
+```
+const response = await api.post('/Report/createPublic', payload, {
+    headers: {
+        'Idempotency-Key': idempotencyKeyRef.current
+    }
+});
+
+idempotencyKeyRef.current = null; // liberar solo tras éxito
+```
+
+};
+\end{lstlisting}
+
+
+
+\section{Despliegue de la solución}
+\label{section:deployment}
+
+El sistema utiliza dos entornos diferenciados. Para demostración y pruebas, Railway aloja la API y los servicios auxiliares, y Vercel la interfaz de usuario, plataformas descritas en la sección \ref{section:technologies}. La contenerización de la solución completa —MySQL, RabbitMQ y la API— reside en un archivo \texttt{docker-compose.yml} preparado para el despliegue en producción.
+
+Un \texttt{Dockerfile} construye la API en dos etapas: una primera con la imagen de SDK\footnote{SDK: imagen con compilador y herramientas de desarrollo.} compila y publica la aplicación, y una segunda con la imagen de runtime\footnote{Runtime: imagen solo con las bibliotecas para ejecutar la aplicación.} ejecuta solo los binarios publicados. Las variables de entorno inyectan las credenciales de base de datos, las claves de JWT y las API keys de los servicios externos sin exponerlas en el código fuente.
+
+La migración a servidores físicos del Instituto Finlay, prevista para la etapa de producción, mantendrá esta misma configuración de contenedores y variables de entorno.
+
+
+\section{Conclusiones del capítulo}
+\label{section:chapter_conclusions}
+
+Este capítulo presentó los principales detalles relacionados con la implementación de la plataforma desarrollada, describiendo las tecnologías empleadas, la organización arquitectónica de la solución y los mecanismos utilizados en el backend y el frontend. 
+Asimismo, abordó los aspectos asociados a la seguridad, la integración entre componentes y el despliegue del sistema, evidenciando la materialización práctica de la propuesta presentada en el capítulo anterior.
